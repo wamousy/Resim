@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Resim · 芯片资源实验室</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='9' fill='%23111e2b'/%3E%3Ctext x='11' y='29' font-size='29' font-family='sans-serif' fill='%2359c8bf'%3ER%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/static/style.css?v=studio-1">
+  <link rel="stylesheet" href="/static/studio.css?v=3">
+  <script type="importmap">{"imports":{"three":"/static/vendor/three.module.js"}}</script>
+</head>
+<body data-workspace="layout">
+<dialog id="discard-dialog"><h2>当前修改尚未保存</h2><p>切换后会放弃当前草稿。你也可以保留修改，先评估并保存。</p><div><button id="keep-draft" autofocus>保留修改</button><button id="discard-draft">放弃修改并切换</button></div></dialog>
+<aside class="app-sidebar"><a class="brand" href="#" data-workspace="layout" aria-label="Resim 布局规划"><span class="brandmark">R</span><div><strong>Resim</strong><small>芯片资源规划</small></div></a><div class="nav-caption">工作空间</div><nav class="workspace-tabs" role="tablist" aria-label="工作区" aria-orientation="vertical"><button role="tab" id="tab-inputs" aria-label="架构输入" title="架构输入" aria-controls="page-inputs" aria-selected="false" tabindex="-1" data-workspace="inputs"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16M4 12h16M4 19h16M8 3v4M16 10v4M9 17v4"/></svg><span>架构输入</span></button><button role="tab" id="tab-layout" aria-label="布局规划" title="布局规划" aria-controls="page-layout" aria-selected="true" tabindex="0" data-workspace="layout"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 9 5-9 5-9-5 9-5Zm-9 9 9 5 9-5M3 16l9 5 9-5"/></svg><span>布局规划</span></button><button role="tab" id="tab-difficulties" aria-label="实现难点" title="实现难点" aria-controls="page-difficulties" aria-selected="false" tabindex="-1" data-workspace="difficulties"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 10 18H2L12 3Z M12 9v5M12 17v1"/></svg><span>实现难点</span></button><button role="tab" id="tab-connections" aria-label="连接与布线" title="连接与布线" aria-controls="page-connections" aria-selected="false" tabindex="-1" data-workspace="connections"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="3" width="6" height="6" rx="1"/><rect x="16" y="15" width="6" height="6" rx="1"/><path d="M5 9v9h11M8 6h11v9"/></svg><span>连接与布线</span><em id="nav-links">—</em></button><button role="tab" id="tab-resources" aria-label="资源与计算" title="资源与计算" aria-controls="page-resources" aria-selected="false" tabindex="-1" data-workspace="resources"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21h18M6 17V9M12 17V3M18 17v-5"/></svg><span>资源与计算</span></button><button role="tab" id="tab-reports" aria-label="结果管理" title="结果管理" aria-controls="page-reports" aria-selected="false" tabindex="-1" data-workspace="reports"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l4 4v14H6V3ZM14 3v5h5M9 12h7M9 16h7"/></svg><span>结果管理</span><i id="unsaved-dot" hidden title="当前方案未保存"></i></button></nav><div class="sidebar-note"><span class="dot"></span> 本地运行<small>架构级资源估算<br>辅助 partition 与 floorplan</small></div></aside>
+<div class="app-content"><header class="app-topbar"><div class="project-switch"><span>工程</span><select id="project" aria-label="选择项目"></select><button id="load" title="载入所选工程">载入</button></div><button id="technology-pill" data-workspace="resources" class="technology-pill">工艺 · 等待输入</button><button id="project-options" aria-expanded="false" aria-controls="project-options-panel">工程设置</button></header>
+
+<div class="workspace-heading"><div><div class="eyebrow" id="workspace-kicker">FLOORPLAN / PARTITION</div><h1 id="workspace-title">布局规划</h1><p id="active-context">正在载入工程…</p></div><div class="primary-actions"><label class="candidate-control">当前方案 <select id="candidate" aria-label="当前方案"><option value="current">给定布局</option></select></label><button class="accent" id="optimize">自动分区与布局</button><button class="primary" id="evaluate">评估并保存</button></div></div>
+
+
+<div id="notice" role="status">正在载入项目…</div>
+
+
+
+
+
+
+<div id="workspace-anchor"></div><section class="stats"><div><span>堆叠结构</span><strong id="s-dies">—</strong><small id="s-modules">—</small></div><div><span>总功耗</span><strong id="s-power">—</strong><small>输入功耗之和</small></div><div><span>信号 TSV 需求</span><strong id="s-tsv">—</strong><small>逐接口累加 · 不含电源和地</small></div><div><span>峰值拥塞比</span><strong id="s-congestion">—</strong><small>网格需求 / 金属可用容量</small></div><div class="difficulty-shortcut" role="button" tabindex="0" data-workspace="difficulties" aria-label="查看实现难点"><span>约束违例 ↗</span><strong id="s-errors">—</strong><small id="s-status">等待评估</small></div></section>
+<section class="workspace-page" id="page-inputs" role="tabpanel" aria-labelledby="tab-inputs" hidden>
+<div class="page-guide"><span class="guide-number">01</span><div><b>定义架构，再规划布局</b><p>调整 Die 参数，或导入完整 YAML；应用预览后再评估保存。</p></div><button id="validate">校验输入</button><button id="editor-toggle" aria-expanded="false" aria-controls="editor-panel">编辑 YAML</button></div><section id="project-options-panel" class="project-options panel">
+  <label>项目名称 <input id="project-name" aria-label="项目名称" maxlength="200"></label>
+  <button id="web-new-project">网页新建工程</button><button id="new-project">复制为新项目</button><label class="button" for="file" tabindex="0" role="button">导入新项目 YAML</label><input id="file" type="file" accept=".yml,.yaml" hidden>
+  <label>结果根目录 <input id="output-dir" aria-label="结果根目录" placeholder="留空使用工程默认目录"></label><span>填写本机绝对路径；输出至 所选目录/工程ID/运行ID，历史记录仍可追溯。</span><span id="storage-path" hidden></span>
+</section><details class="panel" id="structure-panel" open><summary class="panel-head"><b>架构输入 · Die 层数与尺寸</b><span id="structure-count">载入工程后可编辑</span></summary>
+<p class="hint">表格与 YAML 使用同一份输入；修改后先应用预览，再评估保存。自下而上排列，删除有模块或接口引用的层会被阻止。面积和宽度决定高度，不自动缩放模块。DRAM 抽象平台的绘图尺寸不计入 die 面积。</p>
+<div style="overflow:auto"><table><thead><tr><th>Die ID</th><th>类型</th><th>面积 / mm²</th><th>宽 / mm</th><th>高 / mm</th><th>厚度 / µm</th><th>功耗预算 / W</th><th></th></tr></thead><tbody id="structure-rows"></tbody></table></div>
+<div class="edit-fields"><button id="add-die">新增一层 Die</button><button id="apply-structure">应用结构并预览</button><button id="reset-structure">撤销表格未应用修改</button><span id="structure-state"></span></div></details><section id="editor-panel" hidden><div class="panel-head"><b>项目 YAML</b><span>修改后点击评估或自动规划 · 字段名包含单位</span><button id="preview-input">应用输入并预览</button><button id="input-export">下载输入 YAML</button></div><textarea id="yaml" spellcheck="false" aria-label="项目 YAML 输入"></textarea></section></section>
+<section class="workspace-page" id="page-difficulties" role="tabpanel" aria-labelledby="tab-difficulties" hidden><div class="page-guide"><span class="guide-number">02</span><div><b>先处理违例，再补齐判断依据</b><p>按问题类型汇总影响范围与修改建议；数据缺失不代表可实现。</p></div><button data-workspace="layout">返回布局定位</button></div><div id="assessment" class="assessment" role="status"><b id="assessment-title">等待评估</b><span id="assessment-note"></span></div><div class="difficulty-totals"><article><span>实现性违例</span><b id="difficulty-errors">—</b><small>需要优先修改</small></article><article><span>风险与提示</span><b id="difficulty-warnings">—</b><small>需要进一步验证</small></article><article><span>待补数据</span><b id="difficulty-unknowns">—</b><small>影响评估完整性</small></article></div><section class="panel difficulty-panel"><div id="difficulty-summary"></div></section></section>
+
+<section class="workspace-page" id="page-layout" role="tabpanel" aria-labelledby="tab-layout">
+
+<div class="scene-navigation panel"><div><span class="section-label">查看范围</span><select id="scene-scope" aria-label="展示范围"><option value="array">整体 · 全部 core 多层</option><option value="core">单 core · 多层展开</option></select><select id="scene-core" aria-label="展示 core" hidden></select></div><label id="external-control" hidden><input type="checkbox" id="show-external">完整显示跨 core 连接</label><div class="quick-view-controls">    <label>显示层<select id="layer" aria-label="查看层"><option value="all">全部层 · 三维堆叠</option></select></label>    <label>连接展示<select id="connection-view" aria-label="连接展示"><option value="logical">逻辑连接 · 位宽与速率</option><option value="metal">金属实现 · 分层线束</option></select></label></div><span id="scene-context">整体模型</span></div>
+
+<div class="workspace-options"><details class="panel layout-tools" id="layout-tools">
+  <summary class="panel-head"><b>模块移动与坐标编辑</b><span id="draft-status">展开后可拖动、跨层移动或修改坐标</span></summary>
+  <div class="edit-fields"><label><input id="edit-mode" type="checkbox"> 拖动模块</label><label>模块 <select id="edit-module" aria-label="编辑模块"><option value="">选择模块</option></select></label><label>目标 die <select id="edit-die" aria-label="目标 die"></select></label><label>X / µm <input id="edit-x" aria-label="模块 X 坐标" type="number" min="0" step="any"></label><label>Y / µm <input id="edit-y" aria-label="模块 Y 坐标" type="number" min="0" step="any"></label><label>吸附 / µm <input id="edit-grid" aria-label="拖动吸附间距" type="number" min="0" step="any" value="1"></label><button id="apply-move">应用位置 / 跨层移动</button><button id="undo-move" disabled>撤销移动</button><button id="redo-move" disabled>重做移动</button><button id="retry-preview" hidden>重试预览</button></div>
+  <div class="edit-fields"><label>全局模块间距 / µm <input id="edit-spacing" aria-label="全局模块间距" type="number" min="0" step="any"></label><label>选中模块外围预留 / µm <input id="edit-halo" aria-label="选中模块外围预留" type="number" min="0" step="any"></label><button id="apply-spacing">应用间距与外围预留</button><span>显式通道在“编辑输入”的 routing_channels 中配置。</span></div>
+  <p id="edit-help">开启拖动后可在当前 die 平面移动；选择目标 die 再应用可跨层移动。约束违例会在右侧报告。</p>
+  <div id="live-metrics"></div>
+</details><details id="display-settings" class="panel display-settings"><summary>显示选项 <span>堆叠展开、金属层与诊断着色</span></summary>  <div class="controls">
+
+
+
+    <label>堆叠展开 <span id="explode-value">65%</span><input type="range" id="explode" min="0" max="100" value="65"></label>
+    <div id="metal-controls" hidden><label>金属层<select id="metal-layer" aria-label="金属层"><option value="all">所有金属层</option></select></label><label>金属层展开 <span id="metal-explode-value">50%</span><input type="range" id="metal-explode" min="0" max="100" value="50"></label><label>连线着色<select id="connection-color" aria-label="连线着色"><option value="scope">core 内 / core 间 / 跨 die</option><option value="metal">按金属层</option></select></label></div>
+    <div class="metal-legend-title" id="connection-legend-title">连接归属颜色</div><div id="metal-color-legend" class="metal-legend"></div>
+    <details id="advanced-view"><summary>高级显示与诊断</summary>
+      <label>诊断着色<select id="overlay" aria-label="资源着色"><option value="kind">关闭 · 按模块类型显示</option><option value="util">标准单元利用率</option><option value="power">功耗密度 W/mm²</option><option value="congestion">金属布线拥塞</option></select></label>
+      <p class="hint">仅用于排查资源风险：利用率表示单元填充程度；功耗密度不是温度；拥塞比超过 1 表示容量不足。缺失值显示灰色。</p>
+      <label>连接筛选<select id="connection-scope" aria-label="连接范围"><option value="all">不筛选</option><option value="intra">同层 core 内</option><option value="inter">同层 core 间</option><option value="cross">跨 die</option></select></label>
+      <label id="related-core-control">仅看相关 core 的连接<select id="connection-core" aria-label="关联 core"><option value="">不筛选</option></select></label>
+      <div class="display-options"><label class="check"><input id="tsv" type="checkbox" checked> TSV / HB 接口</label><label class="check"><input id="ports" type="checkbox" checked> 供电端口图标</label><label class="check"><input id="wires" type="checkbox" checked> 模块连接</label><label class="check"><input id="wire-envelope" type="checkbox" checked> 选中连接的线束占宽</label><label class="check"><input id="clearances" type="checkbox"> 外围预留与通道</label><label class="check"><input id="labels" type="checkbox"> 全部模块名称</label></div>
+      <p id="diagnostic-status" class="hint"></p><p id="connection-mode-note" class="hint"></p>
+    </details>
+    <div class="hint"><span id="interaction-hint">拖动旋转 · 滚轮缩放</span><br>箭头：发送端 → 接收端；双向传输用两条反向连接。点击连线聚焦，点击 TSV / 供电端口查看详情。</div><button id="reset">重置视角</button>
+  </div></details></div><main id="layout-workbench">
+
+  <section class="viewport panel"><div class="viewport-title"><div><b id="scene-title">3D STACK</b><span id="plan-id">—</span></div><span id="viewport-state">等待输入</span></div><div id="canvas"></div><div id="selection-banner" hidden><div><span>已选中模块</span><strong id="selection-name"></strong><small id="selection-meta"></small><small id="selection-info"></small></div><button id="locate-module">定位所在层</button><button id="clear-selection" aria-label="取消模块选择">×</button></div><aside id="port-popover" hidden aria-label="供电端口详情"><button id="close-port" aria-label="关闭供电端口详情">×</button><div id="port-popover-content"></div></aside><div class="canvas-toolbar"><div class="view-buttons"><button id="view3d" class="selected">三维堆叠</button><button id="view2d">单层正面布局</button><button id="nav-rotate" class="selected">旋转</button><button id="nav-pan">平移</button></div><button id="focus-view" aria-pressed="false">专注视图</button></div><div class="canvas-foot"><span id="color-scale">模块类型</span><span>平面按尺寸缩放 · 模块及金属层高度为示意 · 功耗密度不代表温度</span></div><div id="render-error" hidden></div></section>
+  <aside class="inspector panel"><div class="section-label">模块与约束</div><div id="detail"><h3>选择模块查看资源</h3><p>点击三维模型中的模块，查看面积、容量、功耗和数据来源。</p></div><div class="divider"></div><div class="issue-title"><h3>约束检查</h3><span id="issue-count">0</span></div><select id="issue-filter" aria-label="问题分类"><option value="all">全部问题</option><option value="error">实现性违例</option><option value="unknown">缺失数据</option><option value="warning">提示与线索</option></select><p id="focused-issue" hidden></p><div id="issues"></div></aside>
+</main><details class="dimensions-disclosure panel"><summary>芯片与各层尺寸</summary><div id="scene-dimensions"></div></details><section id="external-peers" class="panel" hidden><div class="panel-head"><div><div class="section-label">CORE 外部接口</div><h3>与其他 core 的连接</h3></div><span>点击连接展开完整路径及对端 core；关闭跨 core 显示可返回局部</span></div><div id="peer-list"></div></section>
+
+</section>
+<section class="workspace-page" id="page-connections" role="tabpanel" aria-labelledby="tab-connections" hidden>
+<section class="panel connections" id="connection-panel">
+  <div class="panel-head"><div><div class="section-label">模块互联</div><h2>连接与布线资源</h2></div><label class="check"><input id="wire-labels" type="checkbox"> 在图中标注所有连线数据</label></div>
+  <div class="connection-controls"><label class="connection-search-label">搜索连接 <input id="connection-search" type="search" aria-label="搜索连接" placeholder="模块名称或连接 ID"></label><label>关联模块 <select id="connection-module" aria-label="关联模块"><option value="">全部模块</option></select></label><label>查看连接 <select id="connection-select" aria-label="查看连接"><option value="">选择连接</option></select></label><span>点击图中连线或下表可高亮查看。线束粗细按总线数示意，不代表实际金属线宽。</span></div>
+  <div class="connection-overview"><span id="connection-count"></span><button data-workspace="layout" class="text-button">返回三维布局 ↗</button></div><div id="connection-detail"><p>评估后显示各模块的互联数据。</p></div>
+  <div class="table-scroll"><table><thead><tr><th>源模块 → 目标模块</th><th>位宽 bit</th><th>并行数据线</th><th>控制 / 冗余</th><th>合计线数</th><th>带宽 GB/s</th><th>平面线长 µm</th><th>跨层数</th><th>金属面积 µm²</th><th>轨道面积 µm²</th></tr></thead><tbody id="connection-rows"></tbody></table></div>
+</section>
+
+</section>
+<section class="workspace-page" id="page-resources" role="tabpanel" aria-labelledby="tab-resources" hidden>
+<section class="panel model-methods" id="model-methods"></section>
+<section class="panel ledger"><div class="panel-head"><div><div class="section-label">资源总览</div><h2>逐层资源账本</h2></div><div><button id="export-json">导出评估 JSON</button><button id="export-yaml">导出布局 YAML</button></div></div><div class="table-scroll"><table><thead><tr><th>Die / 类型</th><th>面积 mm²</th><th>有效区占用 / 模块面积</th><th>预留 mm²</th><th>功耗 / 余量 W</th><th>峰值拥塞</th><th>向上一层 TSV 用量 / 容量</th><th>互联金属 / 轨道面积 µm²</th></tr></thead><tbody id="ledger"></tbody></table></div></section>
+<section class="panel routing-resources" id="routing-resources"></section>
+<section class="panel calculations" id="calculation-panel"><div class="panel-head"><div><div class="section-label">计算依据</div><h2>计算依据与参数</h2></div><label>查看 die <select id="calculation-die" aria-label="计算明细 die"></select></label></div><p>公式中的输入来自当前方案；面积预算与详细布线结果分开理解。</p><div class="calculation-tabs" role="group" aria-label="计算类别"><button data-calculation-group="area" aria-pressed="true">面积与利用率</button><button data-calculation-group="wiring" aria-pressed="false">互联与拥塞</button><button data-calculation-group="power" aria-pressed="false">功耗与 TSV</button></div><div id="calculation-detail"></div></section>
+<section class="panel" id="timing-summary"></section><section class="panel supply"><div class="panel-head"><h2>供电资源</h2><span>电流单位 A · 底层入口包含向上供电的负载</span></div><div class="table-scroll"><table><thead><tr><th>Die / 电压域</th><th>本层电流</th><th>入口需求</th><th>端口能力</th><th>余量</th></tr></thead><tbody id="supply-rows"></tbody></table></div><p>端口图标表示供电接入预算点，不是实际焊盘尺寸；不等于已完成电源网布线或 IR-drop 验证。</p><details><summary>供电端口与核归属明细</summary><div class="edit-fields"><label>供电端口<select id="edit-supply-port" aria-label="供电端口选择"></select></label><label>X µm<input id="supply-x" type="number" min="0"></label><label>Y µm<input id="supply-y" type="number" min="0"></label><label>电流能力 A（空白=未知）<input id="supply-capacity" type="number" min="0" step="any"></label><label>接入方式<select id="supply-feed"><option value="external">外部入口</option><option value="stack_base">底层供电</option></select></label><button id="apply-supply">应用供电端口修改</button></div><div id="supply-port-details" class="table-scroll"></div></details></section>
+
+</section>
+<section class="workspace-page" id="page-reports" role="tabpanel" aria-labelledby="tab-reports" hidden>
+  <div class="page-intro"><div class="section-label">运行记录</div><h2>结果文件与方案对比</h2><p>查看当前方案的报告，或载入历史运行。每次保存都会生成独立结果目录。</p></div>
+  <section class="history-panel panel"><label>历史运行 <select id="history" aria-label="历史运行"><option value="">暂无运行</option></select></label><button id="load-run">查看历史结果</button><span>载入历史不会覆盖当前工程文件。</span></section>
+  <section class="panel search-method" id="search-method"></section>
+  <section class="report-empty panel" id="reports-empty"><span class="empty-icon">↗</span><h3>尚无当前方案的结果</h3><p>载入或导入工程后，点击顶部“评估并保存”，即可在这里查看报告与文件。</p></section>
+<section id="result-files" class="panel result-files" hidden>
+  <div><b id="result-state">结果已保存</b><p id="result-location"></p><small id="result-note"></small></div>
+  <div class="result-actions"><button id="open-results">打开结果文件夹</button><button id="copy-results">复制路径</button><a id="html-report" target="_blank" rel="noreferrer">查看报告 ↗</a><button id="result-json">下载 JSON</button><button id="result-yaml">下载布局 YAML</button></div>
+</section>
+<section id="comparison" class="panel" hidden></section>
+
+</section>
+<section class="panel provenance"><details><summary>模型边界与开源来源 <span>透明的假设，可替换的数据</span></summary><div id="assumptions"></div><p><a href="https://github.com/ucb-bar/gemmini" target="_blank" rel="noreferrer">Gemmini 架构参考 ↗</a> <a href="https://github.com/The-OpenROAD-Project/OpenROAD-flow-scripts/tree/master/flow/platforms/nangate45" target="_blank" rel="noreferrer">Nangate45 工艺几何参考 ↗</a> <a href="/api/sources" target="_blank">下载版本与 SHA-256 ↗</a></p></details></section>
+
+<footer><span>RESIM · 芯片资源实验室</span><span>架构级估算 · 本地运行 · 工程独立保存</span></footer></div>
+<script type="module" src="/static/app.js?v=studio-3"></script>
+</body></html>
