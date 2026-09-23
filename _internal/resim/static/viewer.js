@@ -1,3 +1,4 @@
+import {dieDisplayRoles} from './structure-editor.js?v=2';
 import {spreadTSV,directedDies} from './tsv-display.js?v=19';
 import {coreFrames,coreBounds,cropRect,clipPath,insideBounds} from './core-view.js?v=19';
 import {separateLogicalRoutes} from './logical-routes.js?v=19';
@@ -24,7 +25,7 @@ export class Viewer {
     this.controls.enablePan=!editing;this.controls.enableRotate=!editing&&this.view!=='2d';
     $('nav-pan').classList.toggle('selected',mode==='pan');$('nav-rotate').classList.toggle('selected',mode==='rotate');
     this.renderer.domElement.style.cursor=editing?'crosshair':mode==='pan'?'grab':'';
-    $('interaction-hint').textContent=editing?'拖动模块模式：左键移动模块，空白处不平移；点击“平移”退出模块编辑。':mode==='pan'?'平移模式：左键拖动视图，不改变模块坐标；滚轮缩放。':'旋转模式：左键旋转视图；滚轮缩放。';
+    $('interaction-hint').textContent=editing?'拖动模块 · 点击“平移”退出编辑':mode==='pan'?'拖动平移 · 滚轮缩放':'拖动旋转 · 滚轮缩放';
   }
   clear(){this.root.traverse(o=>{o.geometry?.dispose();o.material?.map?.dispose();o.material?.dispose();});this.root.clear();this.meshes=[];this.wireMeshes=[];this.portMeshes=[];this.tsvMeshes=[];this.coreMeshes=[];}
   setView(mode,report,pending){this.view=mode;$('view3d').classList.toggle('selected',mode==='3d');$('view2d').classList.toggle('selected',mode==='2d');this.draw(report,pending);this.reset();}
@@ -68,6 +69,7 @@ export class Viewer {
   }
   draw(report,pending=false){
     if(!report)return;this.report=report;this.clear();const focusedCore=$('scene-scope').value==='core'?$('scene-core').value:null,external=Boolean(focusedCore&&$('show-external').checked),core=external?null:focusedCore,logicReport={...report,modules:report.modules.filter(m=>report.dies.find(d=>d.id===m.die)?.kind!=='dram')},bounds=coreBounds(logicReport,core);this.core=core;this.dimensions=sceneDimensions([{width_um:bounds.width,height_um:bounds.height}]);
+    const roles=dieDisplayRoles(report.project),role=id=>roles.get(id)||id;
     const overview=!focusedCore&&report.project.architecture.chip==='blx_scheme1';
     const scale=this.dimensions.scale,ox=(bounds.x+bounds.width/2)*scale,oz=(bounds.y+bounds.height/2)*scale,layer=$('layer').value,explode=Number($('explode').value)/100;
     const faceDown=new Set();for(const v of report.interfaces){if(v.orientation==='F2F')faceDown.add(v.upper_die);if(v.orientation==='B2B')faceDown.add(v.lower_die);}const faceOffset=(die,offset)=>this.view!=='2d'&&faceDown.has(die)?-offset-(report.dies.find(d=>d.id===die)?.thickness_um||0)*scale:offset;
@@ -79,7 +81,7 @@ export class Viewer {
     for(const option of $('overlay').options)option.disabled=option.value!=='kind'&&!diagnostics[option.value];
     if($('overlay').selectedOptions[0]?.disabled)$('overlay').value='kind';
     const overlay=$('overlay').value;
-    $('diagnostic-status').textContent=hasLinks?'灰色选项表示缺少数据；线束占宽需要在金属视图中选中一条连接。':'当前只有接口预算，尚无逐模块连线；连线筛选、金属分配和拥塞诊断暂不可用。';
+    $('diagnostic-status').textContent=hasLinks?'灰色选项：数据缺失。线束占宽：金属视图选中连接后查看。':'尚未定义模块连接，相关诊断不可用。';
     const metalFilter=physical?$('metal-layer').value:'all',metals=report.project.resources.metals;
     const modules=Object.fromEntries(report.project.architecture.modules.map(m=>[m.id,m])),placements=Object.fromEntries(report.project.floorplan.placements.map(p=>[p.module,p]));
     const scope=l=>connectionScope(l,modules,placements),shown=l=>visibleConnection(l,scope(l),$('connection-scope').value,focusedCore||$('connection-core').value,modules)&&(!focusedCore||external||modules[l.source]?.core===modules[l.target]?.core);
@@ -88,7 +90,7 @@ export class Viewer {
     $('connection-color').disabled=!physical||!hasLinks;$('metal-controls').hidden=!physical;
     this.linkDefinitions=Object.fromEntries(report.project.architecture.links.map(l=>[l.id,l]));
     $('connection-legend-title').textContent=byMetal?'金属层颜色':'连接归属颜色';
-    $('connection-mode-note').textContent=physical?'分段金属层与线束预算；不是逐根详细布线。':'箭头表示 source → target，反向传输为另一条连接。逻辑线错开仅为示意，不改变实际线长；点击连线聚焦，金属视图查看实际分配。';
+    $('connection-mode-note').textContent=physical?'分段金属层与线束预算；不是逐根详细布线。':'逻辑连线为方向示意；金属视图查看实际分配。';
     const metalSpread=Number($('metal-explode').value)/100,metalStep=this.view==='2d'||!physical?0:.024+metalSpread*.22;
     $('metal-explode-value').textContent=Math.round(metalSpread*100)+'%';
     const metalHeight=name=>name?.length?Math.max(0,metals.findIndex(m=>m.name===name))*metalStep:0;
@@ -102,23 +104,23 @@ export class Viewer {
       const localFrame=coreFrames(report,d.id).find(f=>f.core===core);
       const surface=core&&d.kind!=='dram'&&localFrame?localFrame:core?cropRect({x_um:0,y_um:0,width_um:d.width_um,height_um:d.height_um},bounds):{x_um:0,y_um:0,width_um:d.width_um,height_um:d.height_um};if(!surface)continue;
       const sy=layer==='all'?d.z_um*scale+d.order*(explode*.85+Math.max(0,metals.length-1)*metalStep):0;this.origins[d.id]=sy;const thick=d.kind==='dram'?.025:d.thickness_um*scale;
-      this.cube(surface.width_um*scale,thick,surface.height_um*scale,(surface.x_um+surface.width_um/2)*scale-ox,sy-thick/2,(surface.y_um+surface.height_um/2)*scale-oz,d.kind==='dram'?0x566274:overview?(d.id==='xdie'?0xe3ebe5:0xffdf83):0x427580,overview?.85:.30);
+      this.cube(surface.width_um*scale,thick,surface.height_um*scale,(surface.x_um+surface.width_um/2)*scale-ox,sy-thick/2,(surface.y_um+surface.height_um/2)*scale-oz,d.kind==='dram'?0x566274:overview?(role(d.id)==='xdie'?0xe3ebe5:0xffdf83):0x427580,overview?.85:.30);
       this.line([[surface.x_um,surface.y_um],[surface.x_um+surface.width_um,surface.y_um],[surface.x_um+surface.width_um,surface.y_um+surface.height_um],[surface.x_um,surface.y_um+surface.height_um],[surface.x_um,surface.y_um]].map(([x,y])=>new THREE.Vector3(x*scale-ox,sy,y*scale-oz)),0x6ea9b0);
-      if(!core&&d.kind!=='dram')this.label(`${d.id==='dram_8layers'?'DRAM (8 layers)':d.id} · ${fmt(d.width_um/1000)} × ${fmt(d.height_um/1000)} mm · ${fmt(d.area_mm2)} mm² · 正面${faceDown.has(d.id)?'↓':'↑'}${core?' · 局部查看':''}`,(surface.x_um+surface.width_um/2)*scale-ox,sy+.14,surface.y_um*scale-oz-.22,.20);
-      if(core)this.label(d.kind==='dram'?'DRAM (8 layers)':`${d.id} · 核布局区 ${fmt(surface.width_um/1000)} × ${fmt(surface.height_um/1000)} mm · ${fmt(surface.width_um*surface.height_um/1e6)} mm²`,(surface.x_um+surface.width_um/2)*scale-ox,sy+.15,surface.y_um*scale-oz-.25,.24,true);
-      if(d.id==='dram_8layers'){const rows=report.interfaces.filter(v=>v.upper_die===d.id&&(!core||v.region?.core===core)),signals=rows.reduce((n,v)=>n+v.signal_vias,0);this.label(`DRAM (8 layers)\n${rows.length?fmt(signals,0)+' bit TSV 接口预算':'存储平台'}`,(surface.x_um+surface.width_um/2)*scale-ox,sy+.24,(surface.y_um+surface.height_um/2)*scale-oz,.26,true);}
+      if(!core&&d.kind!=='dram')this.label(`${role(d.id)==='dram_8layers'?'DRAM (8 layers)':d.id} · ${fmt(d.width_um/1000)} × ${fmt(d.height_um/1000)} mm · ${fmt(d.area_mm2)} mm² · 正面${faceDown.has(d.id)?'↓':'↑'}${core?' · 局部查看':''}`,(surface.x_um+surface.width_um/2)*scale-ox,sy+.14,surface.y_um*scale-oz-.22,.20);
+      if(core)this.label(d.kind==='dram'?`${d.id} · DRAM (8 layers)`:`${d.id} · 核布局区 ${fmt(surface.width_um/1000)} × ${fmt(surface.height_um/1000)} mm · ${fmt(surface.width_um*surface.height_um/1e6)} mm²`,(surface.x_um+surface.width_um/2)*scale-ox,sy+.15,surface.y_um*scale-oz-.25,.24,true);
+      if(role(d.id)==='dram_8layers'){const rows=report.interfaces.filter(v=>v.upper_die===d.id&&(!core||v.region?.core===core)),signals=rows.reduce((n,v)=>n+v.signal_vias,0);this.label(`${d.id} · DRAM (8 layers)\n${rows.length?fmt(signals,0)+' bit TSV 接口预算':'存储平台'}`,(surface.x_um+surface.width_um/2)*scale-ox,sy+.24,(surface.y_um+surface.height_um/2)*scale-oz,.26,true);}
       for(const frame of (d.kind==='dram'?[]:coreFrames(report,d.id)).filter(f=>!core||f.core===core)){
         const x=frame.x_um,z=frame.y_um,w=frame.width_um,h=frame.height_um;
         if(overview){
           const tile=this.cube(w*scale,.055,h*scale,(x+w/2)*scale-ox,sy+.04,(z+h/2)*scale-oz,0x94aecb,.98);tile.userData.core=frame.core;this.coreMeshes.push(tile);
-          if(d.id==='xdie'){const ioLeft=Number(frame.core.replace('core',''))<8,iw=w*.43,ix=ioLeft?x:x+w-iw;const io=this.cube(iw*scale,.025,h*scale,(ix+iw/2)*scale-ox,sy+.085,(z+h/2)*scale-oz,0x91cb48);io.userData.core=frame.core;this.coreMeshes.push(io);this.label('3 × UCIE',(ix+iw/2)*scale-ox,sy+.15,(z+h/2)*scale-oz,.11);}
-          if(d.id==='bdie')for(const f of [.13,.37,.62,.87])this.line([new THREE.Vector3((x+80)*scale-ox,sy+.08,(z+h*f)*scale-oz),new THREE.Vector3((x+w-80)*scale-ox,sy+.08,(z+h*f)*scale-oz)],0xd7c8fa);
-          this.label(frame.core,(x+w*(d.id==='xdie'?(Number(frame.core.replace('core',''))<8?.72:.28):.5))*scale-ox,sy+.16,(z+h*.5)*scale-oz,layer==='all'?.16:.23,false,'#203647');
-        }else if(['bdie','ldie','xdie'].includes(d.id))this.cube(w*scale,.01,h*scale,(x+w/2)*scale-ox,sy+.008,(z+h/2)*scale-oz,d.id==='xdie'?0x46be95:0x4f8ce0,.22);
+          if(role(d.id)==='xdie'){const ioLeft=Number(frame.core.replace('core',''))<8,iw=w*.43,ix=ioLeft?x:x+w-iw;const io=this.cube(iw*scale,.025,h*scale,(ix+iw/2)*scale-ox,sy+.085,(z+h/2)*scale-oz,0x91cb48);io.userData.core=frame.core;this.coreMeshes.push(io);this.label('3 × UCIE',(ix+iw/2)*scale-ox,sy+.15,(z+h/2)*scale-oz,.11);}
+          if(role(d.id)==='bdie')for(const f of [.13,.37,.62,.87])this.line([new THREE.Vector3((x+80)*scale-ox,sy+.08,(z+h*f)*scale-oz),new THREE.Vector3((x+w-80)*scale-ox,sy+.08,(z+h*f)*scale-oz)],0xd7c8fa);
+          this.label(frame.core,(x+w*(role(d.id)==='xdie'?(Number(frame.core.replace('core',''))<8?.72:.28):.5))*scale-ox,sy+.16,(z+h*.5)*scale-oz,layer==='all'?.16:.23,false,'#203647');
+        }else if(['bdie','ldie','xdie'].includes(role(d.id)))this.cube(w*scale,.01,h*scale,(x+w/2)*scale-ox,sy+.008,(z+h/2)*scale-oz,role(d.id)==='xdie'?0x46be95:0x4f8ce0,.22);
         this.line([[x,z],[x+w,z],[x+w,z+h],[x,z+h],[x,z]].map(([a,b])=>new THREE.Vector3(a*scale-ox,sy+.012,b*scale-oz)),0x8bb5c0);
         if(!core&&!overview)this.label(`${frame.core} · 布局区\n${fmt(w/1000)} × ${fmt(h/1000)} mm · ${fmt(w*h/1e6)} mm²`,(x+w/2)*scale-ox,sy+.14,(z+h)*scale-oz,core?.20:layer==='all'?.07:.105,Boolean(core)||layer!=='all');
       }
-      if(core&&d.id==='bdie'&&localFrame){
+      if(core&&role(d.id)==='bdie'&&localFrame){
         const rx=localFrame.x_um+120,rz=localFrame.y_um+120,sx=5060/6000,sz=6720/7689;
         for(const [x,z,w,h,c] of [[0,0,3600,938,0xc8e5cf],[3600,0,2400,938,0xffedb2],[0,1388,3600,522,0xc8e5cf],[0,3299,6000,411,0xffedb2],[0,3710,6000,1050,0xf1c7c7],[0,7121,6000,568,0xf1c7c7]])this.cube(w*sx*scale,.008,h*sz*scale,(rx+(x+w/2)*sx)*scale-ox,sy+faceOffset(d.id,.012),(rz+(z+h/2)*sz)*scale-oz,c,.45);
       }
@@ -136,8 +138,8 @@ export class Viewer {
     for(const m of report.modules){
       if(overview&&!m.shared_cores?.length&&!m.id.includes('__edge_UCIE'))continue;
       if(core&&m.shared_cores?.length)continue;
-      if(!(m.die in origins)||(core&&m.core!==core)||report.dies.find(d=>d.id===m.die)?.kind==='dram')continue;const color=overlay==='util'?(m.cell_utilization==null?0x78818c:gradient(m.cell_utilization)):overlay==='power'?(m.power_density_W_mm2==null?0x78818c:gradient(m.power_density_W_mm2/maxPower)):(m.kind==='io'?(m.die==='xdie'?0x538be8:0x48c88b):(['bdie','ldie','xdie'].includes(m.die)?(m.die==='xdie'?0x59b78c:0x709ce6):(colors[m.kind]||0x51c8c0)));
-      const detailColor=core&&report.project.architecture.chip==='blx_scheme1'&&overlay==='kind'?(m.die==='xdie'?(m.id.includes('UCIE')?0x91cb48:/x2p|__io_sub|__comm_core|__sche_core/.test(m.id)?0xc7cbce:0xffedb2):m.id.includes('__MC')?0xc9bffc:/TC[0-3]|__scalar|__vector/.test(m.id)?0xf1c7c7:/vlink|rssram/.test(m.id)?0xc8e5cf:0xffedb2):color;
+      if(!(m.die in origins)||(core&&m.core!==core)||report.dies.find(d=>d.id===m.die)?.kind==='dram')continue;const color=overlay==='util'?(m.cell_utilization==null?0x78818c:gradient(m.cell_utilization)):overlay==='power'?(m.power_density_W_mm2==null?0x78818c:gradient(m.power_density_W_mm2/maxPower)):(m.kind==='io'?(role(m.die)==='xdie'?0x538be8:0x48c88b):(['bdie','ldie','xdie'].includes(role(m.die))?(role(m.die)==='xdie'?0x59b78c:0x709ce6):(colors[m.kind]||0x51c8c0)));
+      const detailColor=core&&report.project.architecture.chip==='blx_scheme1'&&overlay==='kind'?(role(m.die)==='xdie'?(m.id.includes('UCIE')?0x91cb48:/x2p|__io_sub|__comm_core|__sche_core/.test(m.id)?0xc7cbce:0xffedb2):m.id.includes('__MC')?0xc9bffc:/TC[0-3]|__scalar|__vector/.test(m.id)?0xf1c7c7:/vlink|rssram/.test(m.id)?0xc8e5cf:0xffedb2):color;
       const selected=m.id===this.selectedModule;const mesh=this.cube(m.width_um*scale,.10,m.height_um*scale,(m.x_um+m.width_um/2)*scale-ox,origins[m.die]+faceOffset(m.die,.06),(m.y_um+m.height_um/2)*scale-oz,selected?0x8affec:overview?0x91cb48:detailColor,this.selectedModule&&!selected?.25:overlay==='congestion'?.42:.92);if(selected){mesh.material.emissive.setHex(0x3cbda9);mesh.material.emissiveIntensity=.7;}mesh.userData.module=m;this.meshes.push(mesh);
       const halo=report.project.architecture.modules.find(def=>def.id===m.id)?.halo_um||0;
       if($('clearances').checked&&halo){const bounds=[[m.x_um-halo,m.y_um-halo],[m.x_um+m.width_um+halo,m.y_um-halo],[m.x_um+m.width_um+halo,m.y_um+m.height_um+halo],[m.x_um-halo,m.y_um+m.height_um+halo],[m.x_um-halo,m.y_um-halo]];this.line(bounds.map(([x,y])=>new THREE.Vector3(x*scale-ox,origins[m.die]+.02,y*scale-oz)),0xcbaaff);}
@@ -151,10 +153,10 @@ export class Viewer {
       if(!v.region)continue;
       const lower=origins[v.lower_die],upper=origins[v.upper_die];if(lower==null&&upper==null)continue;
       const hb=v.interconnect==='HB',color=hb?0xa5d7ff:0xe59b60;
-      if(hb){if(lower!=null&&upper!=null&&this.view!=='2d')this.label(`B ↔ L · F2F / HB 混合键合\n${core?'每核约 44.7 kbit':fmt(v.signal_vias,0)+' bit 整片 · 每核约 44.7 kbit'} · 不计独立预留面积`,(bounds.x+bounds.width/2)*scale-ox,(lower+upper)/2,(bounds.y+bounds.height)*scale-oz,.24,true);continue;}
+      if(hb){if(lower!=null&&upper!=null&&this.view!=='2d')this.label(`${v.upper_die} ↔ ${v.lower_die} · F2F / HB 混合键合\n${core?'每核约 44.7 kbit':fmt(v.signal_vias,0)+' bit 整片 · 每核约 44.7 kbit'} · 不计独立预留面积`,(bounds.x+bounds.width/2)*scale-ox,(lower+upper)/2,(bounds.y+bounds.height)*scale-oz,.24,true);continue;}
       if(core&&v.region.core&&v.region.core!==core)continue;
       // Shared interface budgets are illustrated at each core without duplicating resource demand.
-      const frames=!v.region.core&&report.project.architecture.chip==='blx_scheme1'?coreFrames(report,v.lower_die==='dram_8layers'?v.upper_die:v.lower_die).filter(f=>!core||f.core===core):[];
+      const frames=!v.region.core&&report.project.architecture.chip==='blx_scheme1'?coreFrames(report,role(v.lower_die)==='dram_8layers'?v.upper_die:v.lower_die).filter(f=>!core||f.core===core):[];
       if(overview&&!hb)continue;
       const regions=frames.length?frames.map(f=>({x_um:f.x_um+f.width_um*.86,y_um:f.y_um+f.height_um*.78,width_um:f.width_um*.08,height_um:f.height_um*.12})):(!core||v.region.core===core?[v.region]:[]);
       for(const r of regions){
@@ -218,7 +220,7 @@ export class Viewer {
         }else if(link.id===this.selectedLink){const d=sequence.find(d=>d in origins);if(d)this.label(`${sequence[0]===v.lower_die?'↑':'↓'} TSV · ${sequence[0]} → ${sequence[1]}`,v.point[0]*scale-ox,height(d)+.25,v.point[1]*scale-oz,.25,true);}
       }
     }
-    $('scene-dimensions').textContent=(core?`${core} 局部布局区（非整片 die）： `:'整片尺寸： ')+visible.map(d=>{const f=core&&d.kind!=='dram'?coreFrames(report,d.id).find(f=>f.core===core):null;if(d.kind==='dram')return 'DRAM ×8：存储平台（不展示芯片面积）';return `${d.id}: ${fmt((f?.width_um??d.width_um)/1000)} × ${fmt((f?.height_um??d.height_um)/1000)} mm · ${fmt(f?f.width_um*f.height_um/1e6:d.area_mm2)} mm²${core&&d.kind==='dram'?'（整片 DRAM，图中为局部）':''}`;}).join('　 |　 ')+(report.dies.some(d=>d.id==='dram_8layers')?'。DRAM 为 8 层封装抽象，仅计算外部 TSV 接口；未评估内部层间布线。':'。DRAM 隐藏内部模块；资源预算保持不变。');
+    $('scene-dimensions').textContent=(core?`${core} 局部布局区（非整片 die）： `:'整片尺寸： ')+visible.map(d=>{const f=core&&d.kind!=='dram'?coreFrames(report,d.id).find(f=>f.core===core):null;if(d.kind==='dram')return 'DRAM ×8：存储平台（不展示芯片面积）';return `${d.id}: ${fmt((f?.width_um??d.width_um)/1000)} × ${fmt((f?.height_um??d.height_um)/1000)} mm · ${fmt(f?f.width_um*f.height_um/1e6:d.area_mm2)} mm²${core&&d.kind==='dram'?'（整片 DRAM，图中为局部）':''}`;}).join('　 |　 ')+(report.dies.some(d=>role(d.id)==='dram_8layers')?'。DRAM 为 8 层封装抽象，仅计算外部 TSV 接口；未评估内部层间布线。':'。DRAM 隐藏内部模块；资源预算保持不变。');
     const hasPower=report.modules.some(m=>m.power_density_W_mm2!=null);
     $('color-scale').textContent={kind:'亮青色：选中模块 · 高亮线：直接关联连接',util:'利用率 0 → 100% · 灰色：未知',power:hasPower?`功耗密度 0 → ${fmt(maxPower)} W/mm² · 灰色：未知`:'功耗数据缺失 · 灰色不代表低功耗',congestion:pending?'拥塞指标暂不可用':'拥塞需求/容量 0 → 1 及以上'}[overlay];
   }

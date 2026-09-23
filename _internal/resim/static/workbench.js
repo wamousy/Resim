@@ -1,5 +1,5 @@
 // Workspace navigation changes presentation only; drafts and selections stay in memory.
-const names=['inputs','layout','difficulties','connections','resources','reports'];
+const names=['inputs','layout','connections','resources','difficulties','reports'];
 const titles={inputs:['ARCHITECTURE','架构输入'],layout:['FLOORPLAN / PARTITION','布局规划'],difficulties:['FEASIBILITY','实现难点'],connections:['INTERCONNECT','连接与布线'],resources:['RESOURCE BUDGET','资源与计算'],reports:['RESULTS','结果管理']};
 export function openWorkspace(name,{scroll=false}={}){
   if(!names.includes(name))return;
@@ -39,9 +39,6 @@ export function initWorkbench(){
     openWorkspace('inputs',{scroll:true});
     document.getElementById('project-options-panel').hidden=false;
     document.getElementById('project-options').setAttribute('aria-expanded','true');
-  };
-  document.querySelector('label[for="file"]').onkeydown=event=>{
-    if(event.key==='Enter'||event.key===' '){event.preventDefault();document.getElementById('file').click();}
   };
   document.getElementById('focus-view').onclick=()=>{
     const focused=document.body.classList.toggle('focused-view');
