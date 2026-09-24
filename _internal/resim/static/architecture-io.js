@@ -1,4 +1,5 @@
 import {load,dump,JSON_SCHEMA} from './vendor/js-yaml.mjs';
+import {readStack,writeStack,plainDescription,assertStack} from './stack-model.js?v=2';
 
 export function readYaml(text){
   if(!text.trim())throw new Error('YAML 内容为空');
@@ -10,11 +11,11 @@ export function readYaml(text){
 export const writeYaml=value=>dump(value,{noRefs:true,lineWidth:110,sortKeys:false});
 const allowed=(value,keys,label)=>{for(const key of Object.keys(value))if(!keys.includes(key))throw new Error(`${label} 不支持字段 ${key}`);};
 export function architectureDocument(value){
-  allowed(value,['schema_version','name','architecture','constraints','floorplan','search','resources'],'芯片架构文件');
+  allowed(value,['schema_version','name','architecture','constraints','floorplan','search','resources','stack'],'芯片架构文件');
   if(!['resim-architecture/1','resim/0.1',undefined].includes(value.schema_version))throw new Error('芯片架构文件版本不支持');
   if(!value.architecture||!value.name)throw new Error('芯片架构文件需要 name 和 architecture');
-  const {resources,schema_version,...chip}=value;
-  return structuredClone(chip);
+  const {resources,schema_version,stack,...chip}=value;
+  return stack?writeStack(chip,stack):structuredClone(chip);
 }
 export function technologyDocument(value){
   allowed(value,['schema_version','resources'],'工艺库文件');
@@ -26,10 +27,11 @@ export function mergeInputFiles(chipText,techText){
   const chip=readYaml(chipText),architecture=architectureDocument(chip);
   const resources=techText.trim()?technologyDocument(readYaml(techText)):chip.resources;
   if(!resources)throw new Error('请提供工艺库 YAML，或导入含 resources 的旧版完整输入');
-  return {schema_version:'resim/0.1',...architecture,resources:structuredClone(resources)};
+  return assertStack({schema_version:'resim/0.1',...architecture,resources:structuredClone(resources)});
 }
 export function splitInputFiles(project){
   const {resources,schema_version,...chip}=structuredClone(project);
+  const stack=readStack(project);if(Object.keys(stack.die_faces).length){chip.stack=stack;chip.architecture.description=plainDescription(project);}
   return {chip:writeYaml({schema_version:'resim-architecture/1',...chip}),technology:writeYaml({schema_version:'resim-technology/1',resources})};
 }
 export function numeric(value,label,{nullable=false,min=0,positive=false,integer=false}={}){

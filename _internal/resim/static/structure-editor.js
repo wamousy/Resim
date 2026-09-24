@@ -1,4 +1,5 @@
-export function updateStructure(project, rows){
+import {readStack,writeStack,stackModel,applyStack} from './stack-model.js?v=2';
+export function updateStructure(project, rows, interfaceKinds=[]){
   const next=structuredClone(project),old=new Map(project.architecture.dies.map(d=>[d.id,d]));
   if(!rows.length)throw new Error('至少保留一层 Die');
   const normalized=rows.map(r=>({...r,id:String(r.id??'').trim(),originalId:r.originalId===undefined?(old.has(r.id)?r.id:null):r.originalId}));
@@ -21,6 +22,13 @@ export function updateStructure(project, rows){
   for(const p of next.floorplan.placements)p.die=rename(p.die);
   for(const r of next.floorplan.tsv_regions||[]){r.lower_die=rename(r.lower_die);r.upper_die=rename(r.upper_die);}
   for(const list of [next.floorplan.supply_ports,next.constraints.blockages,next.constraints.routing_channels])for(const r of list||[])r.die=rename(r.die);
+  const explicit=readStack(project).die_faces;
+  if(rows.some(r=>r.face!==undefined)){
+    const inferred=stackModel(project).faces;
+    const faces=Object.fromEntries(normalized.map(r=>[r.id,r.face??inferred.get(r.originalId)?.face??'unknown']));
+    return applyStack(next,faces,interfaceKinds.map(p=>({...p,lower:rename(p.lower),upper:rename(p.upper)})));
+  }
+  if(Object.keys(explicit).length)return writeStack(next,{die_faces:Object.fromEntries(Object.entries(explicit).filter(([id])=>originals.includes(id)).map(([id,face])=>[rename(id),face]))});
   return next;
 }
 
@@ -31,6 +39,12 @@ export function dieDisplayRoles(project){
   if(project.architecture.chip==='blx_scheme1')for(const r of project.floorplan.tsv_regions||[]){
     if(r.interconnect==='HB'&&r.orientation==='F2F'){roles.set(r.lower_die,'ldie');roles.set(r.upper_die,'bdie');}
     if(r.orientation==='B2B'){roles.set(r.lower_die,'xdie');roles.set(r.upper_die,'ldie');}
+  }
+  // Functional roles survive a legitimate change to bonding type or face direction.
+  if(project.architecture.chip==='blx_scheme1')for(const p of project.floorplan.placements||[]){
+    if(/__rssram_wrapper$/.test(p.module))roles.set(p.die,'bdie');
+    if(/__TC[0-3]$/.test(p.module))roles.set(p.die,'ldie');
+    if(/__iox_subsystem__UCIE[0-2]$/.test(p.module))roles.set(p.die,'xdie');
   }
   return roles;
 }

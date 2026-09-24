@@ -7,7 +7,7 @@ export function openWorkspace(name,{scroll=false}={}){
   document.body.dataset.workspace=name;
   document.getElementById('workspace-kicker').textContent=titles[name][0];
   document.getElementById('workspace-title').textContent=titles[name][1];
-  document.getElementById('project-options').setAttribute('aria-expanded',String(name==='inputs'));
+  document.getElementById('evaluate').hidden=!['layout','reports'].includes(name);
   for(const key of names){
     document.getElementById('page-'+key).hidden=key!==name;
     const tab=document.getElementById('tab-'+key);
@@ -36,9 +36,9 @@ export function initWorkbench(){
     event.preventDefault();openWorkspace(names[next]);document.getElementById('tab-'+names[next]).focus();
   });
   document.getElementById('project-options').onclick=()=>{
-    openWorkspace('inputs',{scroll:true});
-    document.getElementById('project-options-panel').hidden=false;
-    document.getElementById('project-options').setAttribute('aria-expanded','true');
+    const panel=document.getElementById('project-options-panel');
+    panel.hidden=!panel.hidden;
+    document.getElementById('project-options').setAttribute('aria-expanded',String(!panel.hidden));
   };
   document.getElementById('focus-view').onclick=()=>{
     const focused=document.body.classList.toggle('focused-view');

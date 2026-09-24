@@ -1,4 +1,5 @@
-import {mergeInputFiles,splitInputFiles,readYaml,technologyDocument,updateModule,removeModule,updateLink} from './architecture-io.js';
+import {TechnologyForm} from './technology-form.js?v=1';
+import {mergeInputFiles,splitInputFiles,readYaml,writeYaml,technologyDocument,updateModule,removeModule,updateLink} from './architecture-io.js?v=2';
 
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -10,15 +11,19 @@ export class InputEditor{
   constructor({apply,notice,download,onDirty}){
     Object.assign(this,{apply,notice,download,onDirty,project:null,moduleId:null,linkId:null});
     this.pending=new Set();
-    $('input-workflow').innerHTML=`<div class="input-mode-bar"><div role="group" aria-label="架构输入方式"><button id="input-mode-import" aria-pressed="false">导入 YAML</button><button id="input-mode-custom" aria-pressed="true">自定义</button></div><span id="input-pending" role="status"></span><button id="export-chip">下载芯片架构</button><button id="export-technology">下载工艺库</button></div>
-    <section id="import-input-pane" class="panel input-card" hidden><div class="section-label">01 / CHIP ARCHITECTURE</div><h2>芯片架构文件</h2><p>芯片层级、模块、连接与布局约束。</p><label class="file-field">选择芯片架构 YAML<input id="chip-file" type="file" accept=".yml,.yaml"></label><label class="yaml-label">芯片架构 YAML<textarea id="chip-yaml" spellcheck="false" aria-label="芯片架构 YAML"></textarea></label><div class="input-actions"><button id="apply-import" class="primary">导入为新工程并预览</button><button id="reset-import">恢复当前架构文本</button><span>兼容旧版完整 YAML。</span></div></section>
-    <div id="custom-input-pane"><div id="die-editor-slot"></div><details class="panel input-card" id="module-input" open><summary><b>模块定义与资源需求</b><span>大小、类型、归属与功耗</span></summary><div class="form-selector">${select('module','select','选择要编辑的模块')}<button id="new-module">新增模块</button><span id="module-count"></span></div><div class="input-form-grid" id="module-form">
+    $('input-workflow').innerHTML=`<span id="input-pending" role="status"></span><details class="panel input-step" id="architecture-input-step"><summary class="input-step-head"><span class="step-number">02</span><div><h2>架构输入与布局约束</h2></div></summary><div class="input-step-body"><div class="input-mode-bar"><div role="group" aria-label="架构输入方式"><button id="input-mode-import" aria-pressed="false">导入 YAML</button><button id="input-mode-custom" aria-pressed="false">自定义</button></div><button id="export-chip">下载芯片架构</button></div>
+    <section id="import-input-pane" class="panel input-card" hidden><label class="file-field">选择芯片架构 YAML<input id="chip-file" type="file" accept=".yml,.yaml"></label><label class="yaml-label">芯片架构 YAML<textarea id="chip-yaml" spellcheck="false" aria-label="芯片架构 YAML"></textarea></label><div class="input-actions"><button id="apply-import" class="primary">应用架构并预览</button><button id="reset-import">恢复当前架构文本</button><span>兼容旧版完整 YAML。</span></div></section>
+    <div id="custom-input-pane" hidden><div id="die-editor-slot"></div><details class="panel input-card" id="module-input"><summary><b>模块定义与资源需求</b><span>大小、类型、归属与功耗</span></summary><div class="form-selector">${select('module','select','选择要编辑的模块')}<button id="new-module">新增模块</button><span id="module-count"></span></div><div class="input-form-grid" id="module-form">
     ${field('module','id','模块 ID','text')}${field('module','core','Core ID','text')}${field('module','kind','模块类型','text')}${select('module','die','所属 Die')}${field('module','allowed','允许分配的 Die（逗号分隔）','text')}
     ${field('module','width','模块宽度 / µm')}${field('module','height','模块高度 / µm')}${field('module','x','布局 X / µm')}${field('module','y','布局 Y / µm')}${field('module','power','模块功耗 / W')}${field('module','stdcell','标准单元面积 / µm²')}${field('module','macro','硬宏面积 / µm²')}${field('module','utilization','目标单元利用率（0–1）')}
     ${field('module','compute','算力需求 / TOPS')}${field('module','bandwidth','带宽需求 / GB/s')}${field('module','capacity','容量需求 / KiB')}${field('module','frequency','频率 / MHz')}${field('module','bitwidth','计算位宽 / bit')}${field('module','precision','计算精度','text')}${field('module','provenance','资源数据依据','text')}<label class="check"><input id="module-fixed" type="checkbox">固定模块位置</label></div><p class="hint">功耗、资源面积留空表示未知；外框面积与资源面积分别输入。</p><div class="input-actions"><button id="apply-module" class="primary">应用模块并预览</button><button id="reset-module">撤销模块表单修改</button><button id="remove-module">删除模块</button></div></details>
     <details class="panel input-card" id="link-input"><summary><b>模块连接与传输需求</b><span>发送 → 接收；双向用两条连接</span></summary><div class="form-selector">${select('link','select','选择要编辑的连接')}<button id="new-link">新增连接</button></div><div class="input-form-grid" id="link-form">${field('link','id','连接 ID','text')}${select('link','source','发送模块')}${select('link','target','接收模块')}${field('link','sourcePort','发送端口','text')}${field('link','targetPort','接收端口','text')}${field('link','width','逻辑位宽 / bit')}${field('link','bandwidth','传输带宽需求 / GB/s')}${field('link','rate','每线速率 / Gbit/s')}${field('link','wires','物理数据线数（空白自动推算）')}${field('link','control','控制线数')}${field('link','spare','冗余比例（0–1）')}</div><div class="input-actions"><button id="apply-link" class="primary">应用连接并预览</button><button id="reset-link">撤销连接表单修改</button><button id="remove-link">删除连接</button></div></details></div>
-    <section class="panel input-card technology-input"><div class="section-label">02 / TECHNOLOGY LIBRARY</div><h2>工艺库与连线资源</h2><p>金属层线宽、pitch、可用比例及 TSV / 键合参数。</p><div id="technology-summary" class="technology-summary"></div><label class="file-field">选择工艺库 YAML<input id="technology-file" type="file" accept=".yml,.yaml"></label><details id="technology-editor"><summary>查看或编辑工艺库 YAML</summary><textarea id="technology-yaml" spellcheck="false" aria-label="工艺库 YAML"></textarea></details><div class="input-actions"><button id="apply-technology">应用工艺库并预览</button><button id="reset-technology">恢复当前工艺库</button><span>可独立更换工艺库。</span></div></section>`;
-    $('die-editor-slot').append($('structure-panel'));
+    <div id="constraint-editor-slot"></div><div id="architecture-advanced-actions"></div><div id="advanced-input-slot"></div></div></details>
+    <details class="panel input-step" id="technology-input-step"><summary class="input-step-head"><span class="step-number">03</span><div><h2>工艺库与连线资源</h2></div></summary><div class="input-step-body"><div class="input-mode-bar"><div role="group" aria-label="工艺库输入方式"><button id="technology-mode-import" aria-pressed="false">导入 YAML</button><button id="technology-mode-custom" aria-pressed="false">自定义</button></div><button id="export-technology">下载工艺库</button></div><div id="technology-input-body" hidden><div id="technology-summary" class="technology-summary"></div><div id="technology-import-pane" hidden><label class="file-field">选择工艺库 YAML<input id="technology-file" type="file" accept=".yml,.yaml"></label><label class="yaml-label">工艺库 YAML<textarea id="technology-yaml" spellcheck="false" aria-label="工艺库 YAML"></textarea></label></div><div id="technology-custom-pane" hidden></div><div class="input-actions"><button id="apply-technology">应用工艺库并预览</button><button id="reset-technology">恢复当前工艺库</button></div></div></div></details>`;
+    $('architecture-advanced-actions').append($('input-advanced-actions'));
+    $('die-editor-slot').append($('structure-panel'));$('constraint-editor-slot').append($('layout-constraints-input'));$('advanced-input-slot').append($('editor-panel'));
+    this.technologyForm=new TechnologyForm($('technology-custom-pane'),()=>this.mark('technology'));
+    for(const mode of ['import','custom'])$('technology-mode-'+mode).onclick=()=>this.setTechnologyMode(mode);
     for(const mode of ['import','custom'])$('input-mode-'+mode).onclick=()=>this.setMode(mode);
     for(const [area,host] of [['module','module-form'],['link','link-form'],['chip','chip-yaml'],['technology','technology-yaml']])$(host).addEventListener('input',()=>this.mark(area));
     for(const kind of ['module','link']){
@@ -31,40 +36,48 @@ export class InputEditor{
     $('remove-link').onclick=()=>this.commit('link',()=>{if(!this.linkId)throw new Error('请先选择已有连接');const p=structuredClone(this.requireProject());p.architecture.links=p.architecture.links.filter(l=>l.id!==this.linkId);return p;});
     $('chip-file').onchange=event=>this.loadFile(event,'chip');
     $('technology-file').onchange=event=>this.loadFile(event,'technology');
-    $('apply-import').onclick=()=>this.commit('import',()=>mergeInputFiles($('chip-yaml').value,$('technology-yaml').value),true);
-    $('apply-technology').onclick=()=>this.commit('technology',()=>({...structuredClone(this.requireProject()),resources:technologyDocument(readYaml($('technology-yaml').value))}));
+    $('apply-import').onclick=()=>this.commit('import',()=>{const p=mergeInputFiles($('chip-yaml').value,this.technologyText());p.name=$('project-name').value.trim()||p.name;return p;});
+    $('apply-technology').onclick=()=>this.commit('technology',()=>({...structuredClone(this.requireProject()),resources:this.technologyResources()}));
     $('reset-import').onclick=()=>{this.pending.delete('chip');if(this.project)$('chip-yaml').value=splitInputFiles(this.project).chip;this.status();};
-    $('reset-technology').onclick=()=>{this.pending.delete('technology');if(this.project)$('technology-yaml').value=splitInputFiles(this.project).technology;this.technologySummary();this.status();};
+    $('reset-technology').onclick=()=>{this.pending.delete('technology');if(this.project){$('technology-yaml').value=splitInputFiles(this.project).technology;this.technologyForm.fill(this.project.resources);}this.technologySummary();this.status();};
     for(const [id,key] of [['export-chip','chip'],['export-technology','technology']])$(id).onclick=()=>{try{if(this.hasPending())throw new Error('请先应用或撤销未应用的输入修改，再下载文件');const files=splitInputFiles(this.requireProject());this.download(key==='chip'?'chip-architecture.yml':'technology.yml',files[key],'application/yaml');}catch(e){this.notice(e.message,true);}};
-    this.setMode('custom');
+    this.setMode(null);this.setTechnologyMode(null);
   }
-  setMode(mode){this.mode=mode;$('import-input-pane').hidden=mode!=='import';$('custom-input-pane').hidden=mode!=='custom';for(const m of ['import','custom'])$('input-mode-'+m).setAttribute('aria-pressed',String(m===mode));$('apply-technology').hidden=mode==='import';}
+  setMode(mode){this.mode=mode;$('import-input-pane').hidden=mode!=='import';$('custom-input-pane').hidden=mode!=='custom';$('constraint-editor-slot').hidden=mode!=='custom';for(const m of ['import','custom'])$('input-mode-'+m).setAttribute('aria-pressed',String(m===mode));}
+  technologyResources(){return this.technologyMode==='custom'?this.technologyForm.read():technologyDocument(readYaml($('technology-yaml').value));}
+  technologyText(){return writeYaml({schema_version:'resim-technology/1',resources:this.technologyResources()});}
+  setTechnologyMode(mode){try{
+    if(mode===this.technologyMode)return;
+    if(mode&&this.technologyMode==='custom')$('technology-yaml').value=this.technologyText();
+    if(mode==='custom'&&$('technology-yaml').value.trim())this.technologyForm.fill(technologyDocument(readYaml($('technology-yaml').value)));
+    this.technologyMode=mode;$('technology-summary').hidden=mode==='custom';$('technology-input-body').hidden=!mode;$('technology-import-pane').hidden=mode!=='import';$('technology-custom-pane').hidden=mode!=='custom';for(const m of ['import','custom'])$('technology-mode-'+m).setAttribute('aria-pressed',String(m===mode));
+  }catch(e){this.notice(e.message,true);}}
   renameDies(renames,dies){
     if(!this.pending.has('module'))return;
     const selected=$('module-die').value;
     $('module-die').innerHTML=dies.map(d=>option(d.id)).join('');$('module-die').value=renames.get(selected)||selected;
     $('module-allowed').value=$('module-allowed').value.split(',').map(id=>renames.get(id.trim())||id.trim()).filter(Boolean).join(', ');
   }
-  requireProject(){if(!this.project)throw new Error('请先网页新建工程或载入工程');return {...this.project,name:$('project-name').value||this.project.name};}
+  requireProject(){if(!this.project)throw new Error('请先在“定义项目”中新建或载入项目');return {...this.project,name:$('project-name').value||this.project.name};}
   hasPending(){return this.pending.size>0;}
   mark(kind){this.pending.add(kind);this.status();}
   status(){$('input-pending').textContent=this.hasPending()?'修改待应用':'';$('input-pending').classList.toggle('pending',this.hasPending());this.onDirty?.();}
   reset(){this.pending.clear();this.project=null;this.moduleId=null;this.linkId=null;this.status();}
-  busy(value){for(const e of $('input-workflow').querySelectorAll('input,select,textarea,button'))e.disabled=value;}
+  busy(value){for(const e of $('input-workflow').querySelectorAll('input,select,textarea,button'))e.disabled=value||e.dataset.unavailable==='true';}
   async loadFile(event,kind){const file=event.target.files[0];event.target.value='';if(!file)return;try{if(file.size>4_000_000)throw new Error('文件超过 4 MB');const text=await file.text(),doc=readYaml(text);if(kind==='chip'){
       if(!doc.architecture||!doc.name)throw new Error('请选择芯片架构文件，工艺库请在下方导入');
-      if(doc.resources){const files=splitInputFiles({...doc,schema_version:'resim/0.1'});$('chip-yaml').value=files.chip;$('technology-yaml').value=files.technology;this.mark('technology');}else $('chip-yaml').value=text;
-    }else{technologyDocument(doc);$('technology-yaml').value=text;}
+      if(doc.resources){const files=splitInputFiles({...doc,schema_version:'resim/0.1'});$('chip-yaml').value=files.chip;$('technology-yaml').value=files.technology;this.technologyForm.fill(doc.resources);this.mark('technology');}else $('chip-yaml').value=text;
+    }else{const resources=technologyDocument(doc);$('technology-yaml').value=text;this.technologyForm.fill(resources);}
     this.mark(kind);this.notice('已读取 '+file.name+'，应用预览后生效。');if(kind==='technology')this.technologySummary(true);
   }catch(e){this.notice(e.message,true);}}
   async commit(kind,build,asNew=false){try{
     const allowed=kind==='import'?['chip','technology']:[kind];
-    if((asNew||this.pending.has('chip'))&&[...this.pending].some(p=>!allowed.includes(p)))throw new Error('其他输入表单仍有未应用修改，请先应用或撤销，避免互相覆盖');
+    if((asNew||kind==='import'||this.pending.has('chip'))&&[...this.pending].some(p=>!allowed.includes(p)))throw new Error('其他输入表单仍有未应用修改，请先应用或撤销，避免互相覆盖');
     const p=build();await this.apply(p,{asNew,accepted:()=>{for(const key of allowed)this.pending.delete(key);if(kind==='module')this.moduleId=$('module-id').value;if(kind==='link')this.linkId=$('link-id').value;this.status();}});
   }catch(e){this.notice(e.message,true);}}
   update(project){this.project=project;const files=splitInputFiles(project);
     if(!this.pending.has('chip'))$('chip-yaml').value=files.chip;
-    if(!this.pending.has('technology')){$('technology-yaml').value=files.technology;this.technologySummary();}
+    if(!this.pending.has('technology')){$('technology-yaml').value=files.technology;this.technologyForm.fill(project.resources);this.technologySummary();}
     for(const kind of ['module','link'])if(!this.pending.has(kind)){
       const list=project.architecture[kind==='module'?'modules':'links'];if(!list.some(m=>m.id===this[kind+'Id']))this[kind+'Id']=list[0]?.id||null;this.fill(kind);
     }

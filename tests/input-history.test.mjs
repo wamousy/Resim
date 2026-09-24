@@ -36,6 +36,8 @@ test('comparison finds migration, resizing, new modules and resolved/new issue i
 test('duplicate issue identities are grouped; engine/library changes are disclosed',()=>{
   const a=report(),b=report();b.issues.push({...b.issues[0]});b.simulator_version='0.12';b.project.resources.routing_availability=.3;const d=historyDiff(a,b);assert.equal(d.issues.persistent.length,1);assert.equal(d.warnings.length,3);
 });
-test('historical optimization exposes baseline and every candidate, including empty results',()=>{
-  assert.deepEqual(savedCandidates({mode:'optimize',result:{candidates:[]}}),[]);assert.equal(savedCandidates({mode:'evaluate',result:report()})[0].id,'current');const options=savedCandidates({mode:'optimize',result:{baseline:report(),candidates:[report(),report()]}});assert.deepEqual(options.map(o=>o.id),['base','0','1']);
+test('history lists unique candidate layouts, preserving stored IDs and excluding baseline',()=>{
+  assert.deepEqual(savedCandidates({mode:'optimize',result:{candidates:[]}}),[]);assert.equal(savedCandidates({mode:'evaluate',result:report()})[0].id,'current');
+  const moved=report();moved.project.floorplan.placements[0].x_um=50;
+  const options=savedCandidates({mode:'optimize',result:{baseline:report(),candidates:[report(),report(),moved]}});assert.deepEqual(options.map(o=>o.id),['0','2']);
 });
