@@ -5,6 +5,6 @@ test_invalid_journal_never_writes_input (test_storage.StorageTests.test_invalid_
 test_real_process_exit_at_each_commit_boundary_recovers_complete_generation (test_storage.StorageTests.test_real_process_exit_at_each_commit_boundary_recovers_complete_generation) ... ok
 
 ----------------------------------------------------------------------
-Ran 5 tests in 1.191s
+Ran 5 tests in 1.147s
 
 OK

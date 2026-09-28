@@ -19,7 +19,7 @@
 
 ## 当前前端文件
 
-本仓库当前使用发布包目录 `app/_internal/resim/static/` 中的前端文件。`index.html` 定义页面，`studio.css` 定义工作台布局，`workbench.js` 负责导航，`app.js` 连接现有评估数据。运行中的程序直接提供这些静态文件，刷新页面即可载入更新。
+前端源码统一在 `src/web/` 编辑。`index.html` 定义页面，`studio.css` 定义工作台布局，`workbench.js` 负责导航，`app.js` 连接现有评估数据。修改后从 Resim 目录执行 `node src/tools/sync-web.mjs`，发布到 `app/_internal/resim/static/`；运行中的程序提供发布副本，刷新页面即可载入更新。完整验收会检查两个目录逐文件一致。
 
 input-editor.js / architecture-io.js 负责双输入入口与两文件格式；multi-comparison.js 负责按需读取、选择和并列比较历史结果，layout-variants.js 按实际模块布局识别不同方案。
 

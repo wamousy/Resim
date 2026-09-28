@@ -1,6 +1,6 @@
 # Windows 本地程序入口
 
-双击 `app/Resim.exe` 会启动 Web 并打开浏览器；双击根目录 `启动Resim.cmd` 也可打开。已运行且使用相同工程目录时直接复用，不重复占用端口。双击启动失败会显示错误对话框。仓库内默认使用与 Resim 同级的 ResimProjects，独立分发时默认使用程序目录旁的 ResimProjects。其他 CLI 命令仍保持原用法。
+双击 `app/Resim.exe` 会启动 Web 并打开浏览器；双击 `app/启动Resim.cmd` 也可打开。已运行且使用相同工程目录时直接复用，不重复占用端口。双击启动失败会显示错误对话框。仓库内默认使用与 Resim 同级的 ResimProjects，独立分发时默认使用程序目录旁的 ResimProjects。其他 CLI 命令仍保持原用法。
 
 `Resim.exe` 是轻量 Windows 入口，`Resim.Engine.exe` 是计算引擎。入口转发原 CLI 命令；`serve` 将计算引擎放在临时回环端口，对外继续提供原端口（默认 8770），增加同源目录浏览/创建接口。现有静态页面、评估、历史与结果导出由引擎处理。启动网页应使用 `Resim.exe serve`，直接启动 Engine 不含目录选择服务。
 
@@ -14,10 +14,10 @@
 
 ```powershell
 & "$env:WINDIR\Microsoft.NET\Framework64\v4.0.30319\csc.exe" /nologo /target:exe /optimize+ /reference:System.Web.Extensions.dll "/out:$PWD\app\Resim.Host.test.exe" "$PWD\src\ResimHost.cs"
-node --test tests/output-folders.test.mjs
+node --test src/tests/output-folders.test.mjs
 ```
 
-集成测试启动独立端口，使用临时项目和结果目录，验证真实创建、Unicode/空格路径、重名、越界名称、同源限制及实际评估落盘，最后清理测试目录。Windows 受限执行环境可能不支持 HttpListener，需在普通本地环境运行。测试通过后，停止当前 Resim 入口，将测试入口替换为 `Resim.exe`；保留 `Resim.Engine.exe` 与 `_internal` 的相对位置。更新引擎时替换 `Resim.Engine.exe`，前端依然位于 `app/_internal/resim/static/`。
+集成测试启动独立端口，使用临时项目和结果目录，验证真实创建、Unicode/空格路径、重名、越界名称、同源限制及实际评估落盘，最后清理测试目录。Windows 受限执行环境可能不支持 HttpListener，需在普通本地环境运行。测试通过后，用 `src/tools/update-host.ps1 -ExpectedProcessId <已核实的进程ID>` 更新入口；保留 `Resim.Engine.exe` 与 `_internal` 的相对位置。更新引擎时替换 `Resim.Engine.exe`。前端编辑 `src/web/`，经 `node src/tools/sync-web.mjs` 发布到 `app/_internal/resim/static/`。
 
 ## 候选数量策略
 
@@ -26,9 +26,9 @@ node --test tests/output-folders.test.mjs
 由于本地保留的是打包引擎及原模块字节码，`build_search_engine.py` 向现有 PyInstaller CArchive 插入上述有源码的启动钩子。构建会校验 Python 版本、档案边界和入口名称，逐项确认原始档案内容及 bootloader 未改；不替换求解器或评估代码。CArchive 格式依据 [PyInstaller 官方读取器](https://github.com/pyinstaller/pyinstaller/blob/develop/PyInstaller/archive/readers.py)。
 
 ```powershell
-python tools/build_search_engine.py
-node --test tests/planning-controls.test.mjs tests/search-capacity.test.mjs
-.\tools\update-engine.ps1 -ExpectedProcessId <当前8770监听进程ID> -Port 8770
+python src/tools/build_search_engine.py
+node --test src/tests/planning-controls.test.mjs src/tests/search-capacity.test.mjs
+.\src\tools\update-engine.ps1 -ExpectedProcessId <当前8770监听进程ID> -Port 8770
 ```
 
 使用 Python 3.13 构建 `Resim.Engine.next.exe`；测试从独立临时目录启动新引擎，验证 12 个不同候选真实落盘、百万级请求数量输入校验、非法数量拒绝、固定布局搜索穷尽。更新脚本核对监听进程和路径，保留原项目目录，失败时恢复原引擎。成功后可删除 staging 文件；已安装引擎不依赖本机 Python。
@@ -41,4 +41,4 @@ node --test tests/planning-controls.test.mjs tests/search-capacity.test.mjs
 
 更新脚本识别直接监听及 Windows HTTP.sys 两种模式。TCP 显示 PID 4 时，`http-listener.ps1` 要求同一请求队列中同时匹配目标应用 PID 和 127.0.0.1 端口；不能确认时拒绝更新。
 
-完整检查执行 `node tools/verify.mjs`。测试使用 `tests/fixtures/minimal-project.mjs` 的合成输入，不要求存在使用人员的示例工程。正式交接和源码缺口见 [docs/HANDOVER.md](HANDOVER.md)。
+完整检查执行 `node src/tools/verify.mjs`。测试使用 `src/tests/fixtures/minimal-project.mjs` 的合成输入，不要求存在使用人员的示例工程。正式交接和源码缺口见 [docs/HANDOVER.md](HANDOVER.md)。

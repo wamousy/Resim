@@ -13,7 +13,7 @@ Resim 当前可作为**架构阶段资源估算和三维布局规划工具**交�
 交付时必须同时说明以下边界：
 
 - **不能承诺实际芯片可实现或物理全局最优。** 布线、TSV、功耗与延迟均受输入完整度和估算模型限制。
-- **现有后端不是完整源码交付。** `src/resim/` 只有 19 个 Python 字节码文件，没有对应 `.py` 源文件；原有 Python 测试也仅留有字节码。已检查当前目录和现有最早提交的文件清单，未找到完整 Python 工程、依赖锁文件和原始打包配置。
+- **现有后端不是完整源码交付。** `src/resim/` 保留 18 个 Python 字节码文件，没有对应 `.py` 源文件；12 个原测试字节码另存于 `src/tests/legacy-bytecode/`。已检查当前目录和现有最早提交的文件清单，未找到完整 Python 工程、依赖锁文件和原始打包配置。
 - **BLX 示例主要验证布局和接口预算。** 功耗、TSV 工艺及细分模块互联存在缺失，示例上的零布线面积不能理解为实际芯片无需布线。
 
 当前适合架构人员探索方案；若要正式移交长期研发维护，首先需要恢复完整后端源码和可复现构建。
@@ -47,11 +47,16 @@ arch/
 ├─ Resim/                           仓库；运行、源码、资料和测试分开
 │  ├─ app/                         可独立分发的运行程序
 │  │  ├─ Resim.exe / Resim.Engine.exe
-│  │  └─ _internal/resim/static/    随包运行时与前端源码（唯一维护位置）
-│  ├─ src/                         C# 入口与有源码的 Python 扩展
-│  │  └─ resim/__pycache__/         原后端字节码证据，非源码
-│  ├─ tools/                       启动、构建、更新、验证脚本
-│  ├─ tests/                       Node / Python 回归与合成输入
+│  │  ├─ 启动Resim.cmd             双击打开页面
+│  │  └─ _internal/                运行依赖及前端发布副本
+│  ├─ src/                         可维护源码与开发配套
+│  │  ├─ ResimHost.cs              Windows 入口
+│  │  ├─ resim_*.py                有源码的 Python 扩展
+│  │  ├─ web/                     前端唯一编辑入口
+│  │  ├─ tools/                   启动、同步、构建、更新、验证脚本
+│  │  ├─ tests/                   Node / Python 回归与合成输入
+│  │  │  └─ legacy-bytecode/       原测试字节码证据，非源码
+│  │  └─ resim/__pycache__/        原后端字节码证据，非源码
 │  └─ docs/                        使用交接说明、契约、验证记录
 └─ ResimProjects/                  独立用户工程和示例
    ├─ <project-id>/
@@ -63,7 +68,9 @@ arch/
    └─ _templates/                  示例输入模板
 ```
 
-自定义结果根目录只改变后续结果位置，不会搬迁旧记录。使用结果页面显示的实际路径和 `run.json`，不要自行拼接历史位置。跨机器交接可用 `pack-project` 收集工程及外置结果，再用 `unpack-project` 校验并重定位路径；命令见 [本次实施与迁移说明](RELEASE-0.12.md)。只复制 app 即可运行，不需要 docs/tests/src/tools。
+Resim 只保留 app、src、docs 三个业务目录；根目录的 `.git` / `.gitignore` 属于版本管理元数据。测试与工具跟随 src 交接，说明文件统一放在 docs。原测试字节码保留在 `src/tests/legacy-bytecode/`，不计入可复跑测试覆盖。
+
+自定义结果根目录只改变后续结果位置，不会搬迁旧记录。使用结果页面显示的实际路径和 `run.json`，不要自行拼接历史位置。跨机器交接可用 `pack-project` 收集工程及外置结果，再用 `unpack-project` 校验并重定位路径；命令见 [本次实施与迁移说明](RELEASE-0.12.md)。只复制 app 即可运行，不依赖 src 和 docs。
 
 ### 3.2 环境
 
@@ -73,7 +80,7 @@ arch/
 
 ### 3.3 启动
 
-在 Resim 目录打开 PowerShell：
+双击 `app/启动Resim.cmd` 或 `app/Resim.exe`。也可在 Resim 目录打开 PowerShell：
 
 ```powershell
 .\app\Resim.exe serve --port 8770 --projects-dir "..\ResimProjects" --open-browser
@@ -247,14 +254,16 @@ arch/
 | 文件 / 目录 | 责任 | 接手提示 |
 | --- | --- | --- |
 | `src/ResimHost.cs` | Windows 启动、反向转发、目录浏览/创建、子进程管理 | .NET Framework 编译；完整运行需此入口 |
+| `src/web/` | 前端源码及本地第三方依赖 | 唯一编辑位置，发布副本位于 `app/_internal/resim/static/` |
+| `src/tools/sync-web.mjs` | 同步前端到 app，或以 `--check` 校验一致性 | 同步会清理 app 静态目录内已从源码移除的文件，不处理工程数据 |
 | `app/Resim.Engine.exe` + `app/_internal` | 校验、评估、优化、导出、工程存储 | 发布包可运行；缺完整原始源码与构建工程 |
-| `src/resim/__pycache__` | 19 个后端模块字节码 | 不当作可维护源码或测试覆盖证明 |
+| `src/resim/__pycache__` | 18 个后端模块字节码 | 不当作可维护源码或测试覆盖证明 |
 | `src/resim_search_policy.py` | 候选上限策略、双文件存储、stack 格式适配 | 属于打包引擎启动补丁，不是完整后端 |
 | `src/resim_policy_stack.py` | 引擎统一堆叠几何检查 | 与网页兼容规则做跨入口回归 |
 | `src/resim_policy_storage.py` | 输入恢复日志、文件替换和进程写锁 | 不代表整个运行目录已具备 ACID |
 | `src/resim_policy_portable.py` | 工程打包、完整性检查与迁移 | CLI 使用；旧 HTML 原样保留 |
-| `tools/build_search_engine.py` | 在保留引擎中插入可维护启动钩子 | 依赖现有 Engine 和 Python 3.13，不能从零重建引擎 |
-| `tools/update-engine.ps1` / `http-listener.ps1` | 校验进程归属、替换、重启与回滚 | HttpListener 经 HTTP.sys 时 TCP 显示 PID 4，必须关联请求队列 |
+| `src/tools/build_search_engine.py` | 在保留引擎中插入可维护启动钩子 | 依赖现有 Engine 和 Python 3.13，不能从零重建引擎 |
+| `src/tools/update-engine.ps1` / `http-listener.ps1` | 校验进程归属、替换、重启与回滚 | HttpListener 经 HTTP.sys 时 TCP 显示 PID 4，必须关联请求队列 |
 | `app.js` | 页面状态、预览、保存、对象选择、事件组织 | 当前约 460 行且责任较多，后续应按业务状态拆分 |
 | `architecture-io.js` / `input-editor.js` / `technology-form.js` | 双文件输入、表单与校验 | 保持未知值、未编辑字段和跨表单草稿 |
 | `structure-editor.js` / `stack-model.js` / `stack-panel.js` | Die 引用重命名、朝向、堆叠关系 | 统一几何规则，避免复制到多个页面 |
@@ -263,38 +272,45 @@ arch/
 | `report-assessment.js` | 主页面与历史对比共用的附加堆叠检查 | 保持幂等，不修改原历史快照 |
 | `multi-comparison.js` / `layout-variants.js` | 多方案对比、布局差异、去重 | 必须保留真实候选索引，确保下载文件对应 |
 | `output-folders.js` | 选择和创建结果目录 | 服务端仍需独立做路径及来源校验 |
-| `tests/*.test.mjs` | 可维护的自动检查 | 测试使用合成输入和临时工程，不依赖用户示例 |
-| `tools/verify.mjs` | 语法检查、全套测试、生成交接证据 | 运行会更新 `docs/verification.json` / `.tap` |
+| `src/tests/*.test.mjs` | 可维护的自动检查 | 测试使用合成输入和临时工程，不依赖用户示例 |
+| `src/tools/verify.mjs` | 语法检查、全套测试、生成交接证据 | 运行会更新 `docs/verification.json` / `.tap` |
 
-前端主要依赖本地 Three.js、OrbitControls、js-yaml；引擎包包含 OR-Tools、Pydantic、NumPy、Shapely 等组件。供应链记录目前不是完整可复现依赖锁；Three.js/js-yaml 的版本、来源及许可证可在 static/vendor 目录查阅。示例工艺依据在工程侧 `_references`，不能仅凭引擎打包依赖推断实现精度。
+表中未带目录的前端文件均位于 `src/web/`。前端主要依赖本地 Three.js、OrbitControls、js-yaml；引擎包包含 OR-Tools、Pydantic、NumPy、Shapely 等组件。供应链记录目前不是完整可复现依赖锁；Three.js/js-yaml 的版本、来源及许可证可在 `src/web/vendor/` 查阅。示例工艺依据在工程侧 `_references`，不能仅凭引擎打包依赖推断实现精度。
 
 ## 10. 维护、构建和验证
 
 ### 10.1 一条命令检查
 
 ```powershell
-node tools/verify.mjs
+node src/tools/verify.mjs
 ```
 
-检查退出码为 0 且 `verification.json.passed=true` 才算本轮通过。它检查前端语法，执行全部 Node 和 Python 测试，记录 exe/扩展 SHA-256、数量和目标引擎。测试服务使用临时端口、临时工程，完成后清理。可通过 RESIM_PYTHON 环境变量指定 Python 路径。
+检查退出码为 0 且 `verification.json.passed=true` 才算本轮通过。它核对前端源码与 app 发布副本逐文件一致，检查前端语法，执行全部 Node 和 Python 测试，记录 exe/扩展 SHA-256、数量和目标引擎。测试服务使用临时端口、临时工程，完成后清理。可通过 RESIM_PYTHON 环境变量指定 Python 路径。
 
 Windows 沙箱环境可能不支持 HttpListener，表现为入口启动阶段“此平台上不支持操作”。应在普通本地环境重跑同一测试，不能直接删掉该测试或把环境失败描述为通过。本次已在普通本地环境验证。
 
 ### 10.2 修改前端
 
-编辑 `app/_internal/resim/static/` 后，更新相关入口/import 查询版本，运行检查，刷新页面进行实际操作验证。切勿为了刷新而丢弃使用人员未保存的草稿。当前没有正式前端构建链、自动内容哈希或覆盖完整交互的浏览器回归套件。
+仅编辑 `src/web/`，更新相关入口/import 查询版本，然后在 Resim 目录执行：
+
+```powershell
+node src/tools/sync-web.mjs
+node src/tools/verify.mjs
+```
+
+同步后，运行程序从 `app/_internal/resim/static/` 提供发布副本，刷新页面进行实际操作验证。只核对一致性可用 `node src/tools/sync-web.mjs --check`。切勿为了刷新而丢弃使用人员未保存的草稿。当前没有打包压缩、自动内容哈希或覆盖完整交互的浏览器回归套件。
 
 ### 10.3 修改 Windows 入口
 
-构建和目录服务测试命令见 [HOST.md](HOST.md)。先编译成测试入口并通过 `tests/output-folders.test.mjs`，再替换发布入口。不要在未核实路径和进程的情况下停止所有同名程序。
+构建和目录服务测试命令见 [HOST.md](HOST.md)。先编译成测试入口并通过 `src/tests/output-folders.test.mjs`，再替换发布入口。不要在未核实路径和进程的情况下停止所有同名程序。
 
 ### 10.4 修改引擎启动补丁
 
 ```powershell
-python tools/build_search_engine.py
-node --test tests/search-capacity.test.mjs
-.\tools\update-engine.ps1 -ExpectedProcessId <已核实的Resim进程ID> -Port 8770
-node tools/verify.mjs
+python src/tools/build_search_engine.py
+node --test src/tests/search-capacity.test.mjs
+.\src\tools\update-engine.ps1 -ExpectedProcessId <已核实的Resim进程ID> -Port 8770
+node src/tools/verify.mjs
 ```
 
 构建生成 `Resim.Engine.next.exe`；search-capacity 测试优先验证 staging。更新脚本核实程序路径与端口归属，备份旧引擎，失败自动回滚。HTTP.sys 情况使用请求队列确认应用 PID；识别失败应停止人工核查，不绕过保护。验证安装版本后清理相同内容的 staging，并再次确认交付记录的测试目标。
@@ -324,7 +340,7 @@ Web 使用的主要接口包括 `/api/health`、`/api/validate`、`/api/preview`
 | 模拟过程的“刚创建项目 ID”使用实例共享状态 | 改为请求上下文变量，并在 finally 恢复 | 顺序与保存回归通过；高并发压力测试仍待补 |
 | 主页面追加堆叠问题，方案对比只读原始引擎问题 | 共用 `assessedReport`，去重且不修改原始报告；对比标记评估口径 | 页面/对比一致、重复调用幂等测试通过 |
 | 更新脚本把 HTTP.sys 的 PID 4 误认为非目标程序 | 增加同一请求队列内 PID+URL 双重校验 | 正例、跨队列与部分 PID 误匹配检查通过；本机实际更新成功 |
-| 缺少可复跑的交接检查入口 | 增加 `tools/verify.mjs` 与验证记录 | 51/51 测试、29/29 前端语法检查通过 |
+| 缺少可复跑的交接检查入口 | 增加 `src/tools/verify.mjs` 与验证记录 | 51/51 测试、29/29 前端语法检查通过 |
 | 原始后端源码和 Python 测试源码缺失 | 明确列为最高优先级交接缺口 | 本次没有把字节码还原结果当作原始源码，也未宣称完整可重建 |
 
 本次没有重写核心求解器、提高工艺标定精度或给示例补造未知参数；这些属于下一阶段工作。

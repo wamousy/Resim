@@ -1,10 +1,12 @@
 {
-  "checked_at": "2026-09-28T10:11:45.357Z",
+  "checked_at": "2026-09-28T10:35:46.888Z",
   "platform": "win32",
   "node": "v24.19.0",
+  "host_test_target": "app/Resim.exe",
   "engine_test_target": "app/Resim.Engine.exe",
   "files": {
-    "app/Resim.exe": "03941bcb0f39e4fe4762f4b292d7732db6f807087b30f93f182de9aefd603bd8",
+    "app/Resim.exe": "bd996516dcb7d86dfa4e715747121b7356455be44c4d31a138309a5c3d119cd3",
+    "app/Resim.Host.test.exe": null,
     "app/Resim.Engine.exe": "643da0ed103c19fba61fa93b3bdc0d381778e75ff28f7ddcf77b1ab5da4bce1d",
     "app/Resim.Engine.next.exe": null,
     "src/resim_policy_portable.py": "66f845c75bb29ccd2d34c96d2b4f5ad4c2be1ab4243698662bc8ed657e2dd826",
@@ -12,136 +14,143 @@
     "src/resim_policy_storage.py": "ed0866a1c4fc92a4034b6327c780b56903cef70041e31d7e2012a65ae23249b7",
     "src/resim_search_policy.py": "d96cae8ce33cb57077f908b1a1ad0caff8caa6e7bdb5122e02269d95ab062955"
   },
+  "web": {
+    "passed": true,
+    "source_files": 41,
+    "missing": [],
+    "changed": [],
+    "extra": []
+  },
   "syntax": [
     {
-      "file": "app/_internal/resim/static/app.js",
+      "file": "src/web/app.js",
       "passed": true
     },
     {
-      "file": "app/_internal/resim/static/architecture-io.js",
+      "file": "src/web/architecture-io.js",
       "passed": true
     },
     {
-      "file": "app/_internal/resim/static/calculations.js",
+      "file": "src/web/calculations.js",
       "passed": true
     },
     {
-      "file": "app/_internal/resim/static/candidate-browser.js",
+      "file": "src/web/candidate-browser.js",
       "passed": true
     },
     {
-      "file": "app/_internal/resim/static/connection-view.js",
+      "file": "src/web/connection-view.js",
       "passed": true
     },
     {
-      "file": "app/_internal/resim/static/connections.js",
+      "file": "src/web/connections.js",
       "passed": true
     },
     {
-      "file": "app/_internal/resim/static/core-view.js",
+      "file": "src/web/core-view.js",
       "passed": true
     },
     {
-      "file": "app/_internal/resim/static/difficulty-view.js",
+      "file": "src/web/difficulty-view.js",
       "passed": true
     },
     {
-      "file": "app/_internal/resim/static/history-comparison.js",
+      "file": "src/web/history-comparison.js",
       "passed": true
     },
     {
-      "file": "app/_internal/resim/static/input-editor.js",
+      "file": "src/web/input-editor.js",
       "passed": true
     },
     {
-      "file": "app/_internal/resim/static/layout-model.js",
+      "file": "src/web/layout-model.js",
       "passed": true
     },
     {
-      "file": "app/_internal/resim/static/layout-variants.js",
+      "file": "src/web/layout-variants.js",
       "passed": true
     },
     {
-      "file": "app/_internal/resim/static/logical-routes.js",
+      "file": "src/web/logical-routes.js",
       "passed": true
     },
     {
-      "file": "app/_internal/resim/static/methods.js",
+      "file": "src/web/methods.js",
       "passed": true
     },
     {
-      "file": "app/_internal/resim/static/multi-comparison.js",
+      "file": "src/web/multi-comparison.js",
       "passed": true
     },
     {
-      "file": "app/_internal/resim/static/object-details.js",
+      "file": "src/web/object-details.js",
       "passed": true
     },
     {
-      "file": "app/_internal/resim/static/output-folders.js",
+      "file": "src/web/output-folders.js",
       "passed": true
     },
     {
-      "file": "app/_internal/resim/static/report-assessment.js",
+      "file": "src/web/report-assessment.js",
       "passed": true
     },
     {
-      "file": "app/_internal/resim/static/resource-workspace.js",
+      "file": "src/web/resource-workspace.js",
       "passed": true
     },
     {
-      "file": "app/_internal/resim/static/routing-resources.js",
+      "file": "src/web/routing-resources.js",
       "passed": true
     },
     {
-      "file": "app/_internal/resim/static/stack-model.js",
+      "file": "src/web/stack-model.js",
       "passed": true
     },
     {
-      "file": "app/_internal/resim/static/stack-panel.js",
+      "file": "src/web/stack-panel.js",
       "passed": true
     },
     {
-      "file": "app/_internal/resim/static/structure-editor.js",
+      "file": "src/web/structure-editor.js",
       "passed": true
     },
     {
-      "file": "app/_internal/resim/static/technology-form.js",
+      "file": "src/web/technology-form.js",
       "passed": true
     },
     {
-      "file": "app/_internal/resim/static/tsv-display.js",
+      "file": "src/web/tsv-display.js",
       "passed": true
     },
     {
-      "file": "app/_internal/resim/static/ui-state.js",
+      "file": "src/web/ui-state.js",
       "passed": true
     },
     {
-      "file": "app/_internal/resim/static/viewer.js",
+      "file": "src/web/viewer.js",
       "passed": true
     },
     {
-      "file": "app/_internal/resim/static/wire-detail.js",
+      "file": "src/web/wire-detail.js",
       "passed": true
     },
     {
-      "file": "app/_internal/resim/static/workbench.js",
+      "file": "src/web/workbench.js",
       "passed": true
     }
   ],
   "test_files": [
-    "tests/input-history.test.mjs",
-    "tests/multi-comparison.test.mjs",
-    "tests/output-folders.test.mjs",
-    "tests/planning-controls.test.mjs",
-    "tests/report-assessment.test.mjs",
-    "tests/resource-workspace.test.mjs",
-    "tests/routing-resources.test.mjs",
-    "tests/search-capacity.test.mjs",
-    "tests/stack-model.test.mjs",
-    "tests/structure-editor.test.mjs",
-    "tests/technology-form.test.mjs"
+    "src/tests/input-history.test.mjs",
+    "src/tests/multi-comparison.test.mjs",
+    "src/tests/output-folders.test.mjs",
+    "src/tests/planning-controls.test.mjs",
+    "src/tests/report-assessment.test.mjs",
+    "src/tests/resource-workspace.test.mjs",
+    "src/tests/routing-resources.test.mjs",
+    "src/tests/search-capacity.test.mjs",
+    "src/tests/stack-model.test.mjs",
+    "src/tests/structure-editor.test.mjs",
+    "src/tests/technology-form.test.mjs"
   ],
   "test_exit_code": 0,
   "counts": {

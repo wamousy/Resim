@@ -73,7 +73,7 @@ public static class ResimHost {
         // uses its sibling project directory and does not depend on developer files.
         string parent = Path.GetFullPath(Path.Combine(AppRoot, ".."));
         bool checkout = String.Equals(new DirectoryInfo(AppRoot).Name, "app", StringComparison.OrdinalIgnoreCase)
-            && File.Exists(Path.Combine(parent, "tools", "start.ps1"));
+            && File.Exists(Path.Combine(parent, "src", "tools", "start.ps1"));
         return Path.GetFullPath(Path.Combine(parent, checkout ? ".." : ".", "ResimProjects"));
     }
     static bool ExistingService() {

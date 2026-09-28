@@ -4,9 +4,9 @@
 
 ## 1. 目录与交付
 
-程序集中在 `app/`；可维护扩展在 `src/`；文档在 `docs/`；测试在 `tests/`；构建、更新和验证在 `tools/`。用户工程 `ResimProjects` 保持原位置。前端源码位于 `app/_internal/resim/static/`，这是运行和开发共用的唯一版本。
+Resim 分为三个业务目录：`app/` 存放完整运行程序；`src/` 存放可维护源码，测试和工具归入 `src/tests/`、`src/tools/`；`docs/` 存放说明、交接和验证记录。用户工程 `ResimProjects` 保持原位置。前端源码唯一编辑入口为 `src/web/`，通过 `node src/tools/sync-web.mjs` 发布到 `app/_internal/resim/static/`，完整验收会检查两者一致。
 
-使用人员只需要 app 全部内容，包括 `_internal`，不要加入 `.next.exe` 或测试入口。维护人员另接收 src/tools/tests/docs。`tools/start.ps1` 使用仓库旁的原工程目录；直接运行 exe 时建议显式指定 `--projects-dir`。
+使用人员只需要 app 全部内容，包括 `_internal`，双击其中的 `启动Resim.cmd` 或 `Resim.exe`；不要加入 `.next.exe` 或测试入口。维护人员另接收 src 和 docs。`src/tools/start.ps1` 与仓库内 exe 均默认使用 Resim 旁的原工程目录；独立复制 app 后默认使用 app 旁的 ResimProjects，也可显式指定 `--projects-dir`。
 
 ## 2. 原清单实施状态
 
@@ -72,7 +72,7 @@
 
 ## 5. 验证与后续交接
 
-执行 `node tools/verify.mjs`，需要 Node 和 Python 3.13；Windows 目录服务测试需要普通本地环境支持 HttpListener。
+执行 `node src/tools/verify.mjs`，需要 Node 和 Python 3.13；Windows 目录服务测试需要普通本地环境支持 HttpListener。
 
 - 在输入提交的四个边界分别真实终止进程，恢复完整同一代输入。
 - 三个进程各保存 12 次，锁内读取未出现混代。

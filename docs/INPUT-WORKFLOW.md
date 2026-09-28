@@ -80,7 +80,7 @@ resources:
 
 ## 检查
 
-`node --test tests/input-history.test.mjs tests/multi-comparison.test.mjs` 覆盖输入兼容、布局去重、多方案比较、未知值、问题分布和重复选择。`tests/output-folders.test.mjs` 在临时工程中验证真实寻优落盘：可移动布局生成三个不同候选，全部固定后只生成一个候选。
+`node --test src/tests/input-history.test.mjs src/tests/multi-comparison.test.mjs` 覆盖输入兼容、布局去重、多方案比较、未知值、问题分布和重复选择。`src/tests/output-folders.test.mjs` 在临时工程中验证真实寻优落盘：可移动布局生成三个不同候选，全部固定后只生成一个候选。
 
 YAML 解析使用本地打包的 js-yaml 4.1.1；许可证与来源摘要见 `app/_internal/resim/static/vendor/LICENSE.js-yaml` 和 `js-yaml-source.json`，运行时无需从外网加载解析器。
 
