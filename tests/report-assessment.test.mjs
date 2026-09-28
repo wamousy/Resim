@@ -1,9 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {assessedReport} from '../_internal/resim/static/report-assessment.js';
-import {compareSelections} from '../_internal/resim/static/multi-comparison.js';
+import {assessedReport} from '../app/_internal/resim/static/report-assessment.js';
+import {compareSelections} from '../app/_internal/resim/static/multi-comparison.js';
 import {minimalProject} from './fixtures/minimal-project.mjs';
-import {writeStack} from '../_internal/resim/static/stack-model.js';
+import {writeStack} from '../app/_internal/resim/static/stack-model.js';
 
 test('display and history comparison include the same additional stack findings',()=>{
  const project=minimalProject(),raw={project,summary:{errors:0,unknowns:0,warnings:0},issues:[]};

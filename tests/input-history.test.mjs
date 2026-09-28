@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {readYaml,writeYaml,mergeInputFiles,splitInputFiles,updateModule,removeModule,updateLink} from '../_internal/resim/static/architecture-io.js';
-import {historyDiff,savedCandidates} from '../_internal/resim/static/history-comparison.js';
+import {readYaml,writeYaml,mergeInputFiles,splitInputFiles,updateModule,removeModule,updateLink} from '../app/_internal/resim/static/architecture-io.js';
+import {historyDiff,savedCandidates} from '../app/_internal/resim/static/history-comparison.js';
 
 const fixture=()=>({schema_version:'resim/0.1',name:'test',architecture:{chip:'test',dies:[{id:'logic0'},{id:'logic1'}],cores:[{id:'core0'}],modules:[{id:'compute',core:'core0',kind:'compute',allowed_dies:['logic0'],ports:['in','out'],metrics:{},halo_um:2},{id:'memory',core:'core0',allowed_dies:['logic0']}],links:[]},resources:{technology:'sample',technology_provenance:'test',metals:[{name:'M2',direction:'HORIZONTAL',width_um:.1,pitch_um:.2}],routing_availability:.15},floorplan:{placements:[{module:'compute',die:'logic0',x_um:0,y_um:0,width_um:100,height_um:100}]},constraints:{},search:{}});
 const form=()=>({id:'compute',core:'core0',kind:'compute',die:'logic0',allowed:'logic0, logic1',width:'120',height:'100',x:'10',y:'20',stdcell:'',macro:'',power:'',utilization:'.65',fixed:false,provenance:'user',compute:'64',bandwidth:'128',capacity:'',frequency:'1000',bitwidth:'16',precision:'FP16'});

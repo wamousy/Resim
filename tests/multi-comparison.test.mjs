@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {compareSelections} from '../_internal/resim/static/multi-comparison.js';
-import {layoutSignature,layoutDifference,distinctCandidates} from '../_internal/resim/static/layout-variants.js';
+import {compareSelections} from '../app/_internal/resim/static/multi-comparison.js';
+import {layoutSignature,layoutDifference,distinctCandidates} from '../app/_internal/resim/static/layout-variants.js';
 const report=()=>({summary:{power_W:5,errors:0,unknowns:0},simulator_version:'1',plan_id:'id',project:{resources:{pitch:1},floorplan:{placements:[{module:'a',die:'B',x_um:0,y_um:0,width_um:20,height_um:30},{module:'b',die:'L',x_um:20,y_um:30,width_um:10,height_um:10}]}},issues:[]});
 const selection=(i,r=report())=>({project_id:'project',run_id:'run'+i,candidate:'0',candidate_name:'候选 1',report:r});
 test('geometry identity ignores score, plan ID and placement order, not actual location',()=>{

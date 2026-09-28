@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {candidateCount,searchCompletion} from '../_internal/resim/static/candidate-browser.js';
-import {difficultyPage} from '../_internal/resim/static/difficulty-view.js';
+import {candidateCount,searchCompletion} from '../app/_internal/resim/static/candidate-browser.js';
+import {difficultyPage} from '../app/_internal/resim/static/difficulty-view.js';
 test('candidate requests have no fixed 10-item ceiling, retaining positive integer validation',()=>{
   for(const count of [1,3,11,50,1000000])assert.equal(candidateCount(String(count)),count);
   for(const input of ['',0,-1,1.5,'12x','Infinity','9007199254740992'])assert.throws(()=>candidateCount(input));

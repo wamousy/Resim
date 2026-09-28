@@ -7,7 +7,7 @@ import {tmpdir} from 'node:os';
 import {createServer} from 'node:net';
 import {fileURLToPath} from 'node:url';
 import {minimalProject} from './fixtures/minimal-project.mjs';
-const app=resolve(dirname(fileURLToPath(import.meta.url)),'..');
+const app=resolve(dirname(fileURLToPath(import.meta.url)),'../app');
 const root=await mkdtemp(join(tmpdir(),'resim-planning-ui-'));
 const stopFile=join(root,'stop-ui-fixture');
 const probe=createServer();await new Promise(r=>probe.listen(0,'127.0.0.1',r));const port=probe.address().port;await new Promise(r=>probe.close(r));

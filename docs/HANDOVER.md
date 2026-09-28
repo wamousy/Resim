@@ -1,6 +1,6 @@
 # Resim 资源模拟器使用与开发交接文档
 
-审视日期：2026-09-28。适用版本：本目录当前发布包及本次修复。仓库最近提交为 `73e81a7 / Resim v0.4`，本次工作尚未形成新提交；服务和历史报告的引擎版本为 `0.11.0`，运行时输入格式为 `resim/0.1`。三者用途不同，不能混作同一个版本号。
+更新日期：2026-09-28。发布与引擎版本统一为 **0.12.0**；运行输入版本保持 `resim/0.1`（新增可选原生 `stack` 字段），两类输入文件版本保持 `/1`。旧版 0.11.0 历史结果原样保留。当前变更尚未提交 Git。
 
 程序校验信息、环境与自动检查结果见 [verification.json](verification.json)，原始测试记录见 [verification.tap](verification.tap)。后续接手时应重新运行检查，不将本次结果当作所有未来版本的保证。
 
@@ -8,12 +8,12 @@
 
 Resim 当前可作为**架构阶段资源估算和三维布局规划工具**交付试用。核心目标是识别当前架构的实现难点，并辅助架构与前后端人员讨论模块分区、Die 归属和 floorplan。
 
-已形成“架构与工艺输入 → 布局编辑或自动寻优 → 资源计算 → 实现难点 → 保存及历史对比”的闭环。本次对已安装版本执行了 **51 项自动测试，全部通过；29 个前端 JavaScript 文件语法检查通过**。
+已形成“架构与工艺输入 → 布局编辑或自动寻优 → 资源计算 → 实现难点 → 保存及历史对比”的闭环。最新自动检查结果以本目录 `verification.json` 为准，包含 Node 回归、Python 存储故障测试与前端语法检查。
 
 交付时必须同时说明以下边界：
 
 - **不能承诺实际芯片可实现或物理全局最优。** 布线、TSV、功耗与延迟均受输入完整度和估算模型限制。
-- **现有后端不是完整源码交付。** `source/resim/` 只有 19 个 Python 字节码文件，没有对应 `.py` 源文件；原有 Python 测试也仅留有字节码。已检查当前目录和现有最早提交的文件清单，未找到完整 Python 工程、依赖锁文件和原始打包配置。
+- **现有后端不是完整源码交付。** `src/resim/` 只有 19 个 Python 字节码文件，没有对应 `.py` 源文件；原有 Python 测试也仅留有字节码。已检查当前目录和现有最早提交的文件清单，未找到完整 Python 工程、依赖锁文件和原始打包配置。
 - **BLX 示例主要验证布局和接口预算。** 功耗、TSV 工艺及细分模块互联存在缺失，示例上的零布线面积不能理解为实际芯片无需布线。
 
 当前适合架构人员探索方案；若要正式移交长期研发维护，首先需要恢复完整后端源码和可复现构建。
@@ -25,14 +25,14 @@ Resim 当前可作为**架构阶段资源估算和三维布局规划工具**交�
 | 项目管理 | 新建、复制、命名、载入独立工程 | 本地单用户工作流；不提供协同权限与多人编辑冲突处理 |
 | 双 YAML 输入 | 芯片架构、工艺资源分别导入、保存、下载 | 工艺 YAML 是 Resim 参数格式，不是任意厂商 PDK 的直接导入接口 |
 | 网页自定义 | Die、模块、连接、面积、功耗、利用率、金属层等 | 部分高级约束及新增接口区域仍需 YAML |
-| 数据校验 | ID、引用、尺寸、数值范围、部分堆叠关系 | Web 附加检查尚未全部进入后端和静态报告 |
+| 数据校验 | ID、引用、尺寸、数值范围、原生 stack；离线双文件检查 | 新评估的 Web / CLI / JSON / HTML 共用引擎堆叠检查；旧结果只做只读兼容 |
 | 三维布局 | 堆叠、展开、单层、正反面、整体/单 Core、旋转/平移/缩放 | 视觉高度、线宽及 TSV 柱数为示意，不是制造尺寸模型 |
 | 交互规划 | 选中对象详情、模块拖动、坐标修改、跨层迁移、撤销/重做 | 受允许 Die、固定模块等约束限制；已有模块不自动切割 |
 | 连接展示 | 单向逻辑连接、方向、位宽/带宽、金属实现、Core 内/间区分 | 双向需两条有向连接；不是详细布线网表 |
 | 资源评估 | 面积、占用率、预留、供电预算、TSV/HB、线长、金属面积、逐层拥塞 | 是架构级近似；不能代替布局布线签核 |
 | 实现难点 | 违例、风险、缺失数据、原因、建议及对象定位 | 建议以规则解释为主，尚无完整自动修复闭环 |
 | 自动分区与布局 | OR-Tools CP-SAT 为模块选择 Die 与坐标；多候选、去重、资源复核 | 保持模块长宽、TSV 区和供电端口固定；不拆分模块，不执行 RTL/netlist partition |
-| 历史与结果 | 自定义目录、新建文件夹、独立运行记录、报告/输入导出 | 多文件写入尚非完整事务；并发与中断恢复需要加强 |
+| 历史与结果 | 双输入与 manifest 恢复事务、写入锁、中断标记；命令行便携工程包 | 完整运行目录的原子提交与失败运行续算仍待实现；目前本地单用户工作流 |
 | 多方案对比 | 自定义方案数量，跨运行/跨工程/候选对比 | 按模块 ID 对齐；尚不自动判断因果或给出综合最优方案 |
 | 性能/热/电气签核 | 未实现 | 不模拟大模型运行性能；无温度求解、STA、IR drop、EM、DRC/LVS |
 
@@ -44,25 +44,26 @@ Resim 当前可作为**架构阶段资源估算和三维布局规划工具**交�
 
 ```text
 arch/
-├─ Resim/                         程序与维护资料
-│  ├─ Resim.exe                   Windows 入口 / 本地请求转发
-│  ├─ Resim.Engine.exe            打包计算引擎
-│  ├─ _internal/                  随包运行时与网页资源，必须保留
-│  │  └─ resim/static/            可维护的前端源码
-│  ├─ source/                     C# 入口、Python 启动补丁、更新和检查脚本
-│  ├─ tests/                      可执行 Node 测试与合成测试输入
-│  └─ docs/                       本交接文档与验证记录
-└─ ResimProjects/                 用户工程和示例，不放进程序目录
+├─ Resim/                           仓库；运行、源码、资料和测试分开
+│  ├─ app/                         可独立分发的运行程序
+│  │  ├─ Resim.exe / Resim.Engine.exe
+│  │  └─ _internal/resim/static/    随包运行时与前端源码（唯一维护位置）
+│  ├─ src/                         C# 入口与有源码的 Python 扩展
+│  │  └─ resim/__pycache__/         原后端字节码证据，非源码
+│  ├─ tools/                       启动、构建、更新、验证脚本
+│  ├─ tests/                       Node / Python 回归与合成输入
+│  └─ docs/                        使用交接说明、契约、验证记录
+└─ ResimProjects/                  独立用户工程和示例
    ├─ <project-id>/
    │  ├─ project.json
    │  ├─ inputs/chip-architecture.yml
    │  ├─ inputs/technology.yml
-   │  └─ runs/<run-id>/           默认结果位置
-   ├─ _references/                示例工艺原件、来源、哈希等
-   └─ _templates/                 示例输入模板
+   │  └─ runs/<run-id>/
+   ├─ _references/                 示例工艺原件、来源、哈希
+   └─ _templates/                  示例输入模板
 ```
 
-自定义结果根目录只改变后续结果位置，不会搬迁旧记录。使用结果页面显示的实际路径和 `run.json`，不要自行拼接历史位置。跨机器交接时，除了复制程序，还应复制工程及所有外置结果目录，并核对记录中的绝对路径；目前没有一键可移植打包/路径重定位功能。
+自定义结果根目录只改变后续结果位置，不会搬迁旧记录。使用结果页面显示的实际路径和 `run.json`，不要自行拼接历史位置。跨机器交接可用 `pack-project` 收集工程及外置结果，再用 `unpack-project` 校验并重定位路径；命令见 [本次实施与迁移说明](RELEASE-0.12.md)。只复制 app 即可运行，不需要 docs/tests/src/tools。
 
 ### 3.2 环境
 
@@ -75,7 +76,7 @@ arch/
 在 Resim 目录打开 PowerShell：
 
 ```powershell
-.\Resim.exe serve --port 8770 --projects-dir "..\ResimProjects" --open-browser
+.\app\Resim.exe serve --port 8770 --projects-dir "..\ResimProjects" --open-browser
 ```
 
 页面地址为 `http://127.0.0.1:8770/`。必须通过 `Resim.exe` 启动完整 Web 功能；直接启动 Engine 不包含目录浏览/创建服务。不要只复制单个 exe，不要删除 `_internal`。
@@ -151,11 +152,11 @@ arch/
 
 ### 5.4 存储与兼容
 
-工程根目录维护两份独立输入。引擎执行前合并为 `resim/0.1`；历史运行保留当次完整输入快照。现有旧版完整输入可通过网页导入；只剩旧 `inputs/architecture.yml` 的工程目录不应期待直接载入，应先备份，再通过网页重新导入并保存为双文件。
+工程根目录维护两份独立输入。引擎执行前合并为 `resim/0.1`；历史运行保留当次完整输入快照。现有旧版完整输入可通过网页导入；仅有旧 `inputs/architecture.yml` 的有效工程会在首次读取时迁移为双文件；迁移使用恢复日志，旧运行快照不变。
 
-后端严格模型暂无原生 `stack` 字段。Web 与存储补丁把其编码为 description 尾部 `[resim-stack/1]` JSON 块传给引擎；双文件保存/导出时还原为 `stack`。不要手动修改历史快照中的兼容块。应在后续 schema 升级中迁移为正式字段。
+0.12.0 后端与网页使用正式 `stack.die_faces` 字段。旧 description 兼容块在载入时转为该字段并保留原文字说明；两种输入同时给出且矛盾时拒绝。旧历史快照不批量改写。
 
-格式示意和完整示例入口见 [INPUT-WORKFLOW.md](../INPUT-WORKFLOW.md)；朝向细节见 [STACK-MODEL.md](../STACK-MODEL.md)。
+格式示意和完整示例入口见 [INPUT-WORKFLOW.md](INPUT-WORKFLOW.md)；朝向细节见 [STACK-MODEL.md](STACK-MODEL.md)。
 
 ## 6. 输出规范与查找方法
 
@@ -201,7 +202,7 @@ arch/
 | `project` | 对应方案的完整输入快照 |
 | `storage` | 实际工程、运行与结果位置 |
 
-原始引擎 JSON/静态 HTML 与 Web 的附加堆叠检查仍有边界：Web 会根据快照补充 `STACK_GEOMETRY`，本次已使主页面和多方案对比统一使用同一补充函数，对比 JSON 用 `assessment_scope` 标明口径。旧原始报告文件不会被重写，CLI/静态 HTML 尚未统一纳入这些附加检查。
+0.12.0 新报告由引擎统一写入 `STACK_GEOMETRY` 和汇总状态，Web / CLI / JSON / HTML 一致。Web 仍会只读补充旧版报告；因此旧 HTML 可能与兼容显示的问题数不同。新报告记录 release_version、engine_sha256、schema_sha256、model_fingerprint、依赖版本及输入哈希；这些是追溯依据，不代表物理精度已校准。
 
 ## 7. 计算口径
 
@@ -245,12 +246,15 @@ arch/
 
 | 文件 / 目录 | 责任 | 接手提示 |
 | --- | --- | --- |
-| `source/ResimHost.cs` | Windows 启动、反向转发、目录浏览/创建、子进程管理 | .NET Framework 编译；完整运行需此入口 |
-| `Resim.Engine.exe` + `_internal` | 校验、评估、优化、导出、工程存储 | 发布包可运行；缺完整原始源码与构建工程 |
-| `source/resim/__pycache__` | 19 个后端模块字节码 | 不当作可维护源码或测试覆盖证明 |
-| `source/resim_search_policy.py` | 候选上限策略、双文件存储、stack 格式适配 | 属于打包引擎启动补丁，不是完整后端 |
-| `source/build_search_engine.py` | 在保留引擎中插入可维护启动钩子 | 依赖现有 Engine 和 Python 3.13，不能从零重建引擎 |
-| `source/update-engine.ps1` / `http-listener.ps1` | 校验进程归属、替换、重启与回滚 | HttpListener 经 HTTP.sys 时 TCP 显示 PID 4，必须关联请求队列 |
+| `src/ResimHost.cs` | Windows 启动、反向转发、目录浏览/创建、子进程管理 | .NET Framework 编译；完整运行需此入口 |
+| `app/Resim.Engine.exe` + `app/_internal` | 校验、评估、优化、导出、工程存储 | 发布包可运行；缺完整原始源码与构建工程 |
+| `src/resim/__pycache__` | 19 个后端模块字节码 | 不当作可维护源码或测试覆盖证明 |
+| `src/resim_search_policy.py` | 候选上限策略、双文件存储、stack 格式适配 | 属于打包引擎启动补丁，不是完整后端 |
+| `src/resim_policy_stack.py` | 引擎统一堆叠几何检查 | 与网页兼容规则做跨入口回归 |
+| `src/resim_policy_storage.py` | 输入恢复日志、文件替换和进程写锁 | 不代表整个运行目录已具备 ACID |
+| `src/resim_policy_portable.py` | 工程打包、完整性检查与迁移 | CLI 使用；旧 HTML 原样保留 |
+| `tools/build_search_engine.py` | 在保留引擎中插入可维护启动钩子 | 依赖现有 Engine 和 Python 3.13，不能从零重建引擎 |
+| `tools/update-engine.ps1` / `http-listener.ps1` | 校验进程归属、替换、重启与回滚 | HttpListener 经 HTTP.sys 时 TCP 显示 PID 4，必须关联请求队列 |
 | `app.js` | 页面状态、预览、保存、对象选择、事件组织 | 当前约 460 行且责任较多，后续应按业务状态拆分 |
 | `architecture-io.js` / `input-editor.js` / `technology-form.js` | 双文件输入、表单与校验 | 保持未知值、未编辑字段和跨表单草稿 |
 | `structure-editor.js` / `stack-model.js` / `stack-panel.js` | Die 引用重命名、朝向、堆叠关系 | 统一几何规则，避免复制到多个页面 |
@@ -260,7 +264,7 @@ arch/
 | `multi-comparison.js` / `layout-variants.js` | 多方案对比、布局差异、去重 | 必须保留真实候选索引，确保下载文件对应 |
 | `output-folders.js` | 选择和创建结果目录 | 服务端仍需独立做路径及来源校验 |
 | `tests/*.test.mjs` | 可维护的自动检查 | 测试使用合成输入和临时工程，不依赖用户示例 |
-| `source/verify.mjs` | 语法检查、全套测试、生成交接证据 | 运行会更新 `docs/verification.json` / `.tap` |
+| `tools/verify.mjs` | 语法检查、全套测试、生成交接证据 | 运行会更新 `docs/verification.json` / `.tap` |
 
 前端主要依赖本地 Three.js、OrbitControls、js-yaml；引擎包包含 OR-Tools、Pydantic、NumPy、Shapely 等组件。供应链记录目前不是完整可复现依赖锁；Three.js/js-yaml 的版本、来源及许可证可在 static/vendor 目录查阅。示例工艺依据在工程侧 `_references`，不能仅凭引擎打包依赖推断实现精度。
 
@@ -269,28 +273,28 @@ arch/
 ### 10.1 一条命令检查
 
 ```powershell
-node source/verify.mjs
+node tools/verify.mjs
 ```
 
-检查退出码为 0 且 `verification.json.passed=true` 才算本轮通过。它检查前端语法并执行全部 Node 测试，记录 Node 版本、exe/启动补丁 SHA-256、测试数量和目标引擎。测试服务使用临时端口、临时工程，完成后清理。
+检查退出码为 0 且 `verification.json.passed=true` 才算本轮通过。它检查前端语法，执行全部 Node 和 Python 测试，记录 exe/扩展 SHA-256、数量和目标引擎。测试服务使用临时端口、临时工程，完成后清理。可通过 RESIM_PYTHON 环境变量指定 Python 路径。
 
 Windows 沙箱环境可能不支持 HttpListener，表现为入口启动阶段“此平台上不支持操作”。应在普通本地环境重跑同一测试，不能直接删掉该测试或把环境失败描述为通过。本次已在普通本地环境验证。
 
 ### 10.2 修改前端
 
-编辑 `_internal/resim/static/` 后，更新相关入口/import 查询版本，运行检查，刷新页面进行实际操作验证。切勿为了刷新而丢弃使用人员未保存的草稿。当前没有正式前端构建链、自动内容哈希或覆盖完整交互的浏览器回归套件。
+编辑 `app/_internal/resim/static/` 后，更新相关入口/import 查询版本，运行检查，刷新页面进行实际操作验证。切勿为了刷新而丢弃使用人员未保存的草稿。当前没有正式前端构建链、自动内容哈希或覆盖完整交互的浏览器回归套件。
 
 ### 10.3 修改 Windows 入口
 
-构建和目录服务测试命令见 [source/HOST.md](../source/HOST.md)。先编译成测试入口并通过 `tests/output-folders.test.mjs`，再替换发布入口。不要在未核实路径和进程的情况下停止所有同名程序。
+构建和目录服务测试命令见 [HOST.md](HOST.md)。先编译成测试入口并通过 `tests/output-folders.test.mjs`，再替换发布入口。不要在未核实路径和进程的情况下停止所有同名程序。
 
 ### 10.4 修改引擎启动补丁
 
 ```powershell
-python source/build_search_engine.py
+python tools/build_search_engine.py
 node --test tests/search-capacity.test.mjs
-.\source\update-engine.ps1 -ExpectedProcessId <已核实的Resim进程ID> -Port 8770
-node source/verify.mjs
+.\tools\update-engine.ps1 -ExpectedProcessId <已核实的Resim进程ID> -Port 8770
+node tools/verify.mjs
 ```
 
 构建生成 `Resim.Engine.next.exe`；search-capacity 测试优先验证 staging。更新脚本核实程序路径与端口归属，备份旧引擎，失败自动回滚。HTTP.sys 情况使用请求队列确认应用 PID；识别失败应停止人工核查，不绕过保护。验证安装版本后清理相同内容的 staging，并再次确认交付记录的测试目标。
@@ -302,14 +306,16 @@ node source/verify.mjs
 已确认 CLI 有 `validate`、`evaluate`、`optimize`、`init`、`list-projects`、`serve`、`import-lef`。查看参数以 `Resim.exe <命令> --help` 为准。对现有双文件工程使用项目入口，例如：
 
 ```powershell
-.\Resim.exe evaluate --project gcd16-nangate45 --projects-dir "..\ResimProjects"
+.\app\Resim.exe evaluate --project gcd16-nangate45 --projects-dir "..\ResimProjects"
 ```
 
 此命令会保存新运行。CLI 的单个 `input` 参数仍是合并后的完整输入，不应把一份缺工艺的芯片 YAML 直接当成完整输入。
 
-Web 使用的主要接口包括 `/api/health`、`/api/validate`、`/api/preview`、`/api/layout/preview`、`/api/evaluate`、`/api/optimize`、工程输入/历史读取与导出，以及 Host 提供的 `/api/output-folders` 和 `/api/output-folders/create`。当前没有独立发布的稳定 API 版本契约；外部集成前需补接口 schema、错误码、认证和兼容测试。
+Web 使用的主要接口包括 `/api/health`、`/api/validate`、`/api/preview`、`/api/layout/preview`、`/api/evaluate`、`/api/optimize`、工程输入/历史读取与导出，以及 Host 提供的 `/api/output-folders` 和 `/api/output-folders/create`。当前提供从运行引擎导出的 [OpenAPI](contracts/engine.openapi.json) 和三份 JSON Schema；详见 [接口与校验](API-CONTRACT.md)。部分旧接口响应没有强类型 schema，错误码兼容与认证仍需补齐。
 
-## 11. 本次审视与修复记录
+## 11. 前次审视记录（0.11.0）
+
+以下保留前次修复背景；0.12.0 的实施状态以第 12 节及 RELEASE-0.12.md 为准。
 
 | 发现 | 处理 | 验证 |
 | --- | --- | --- |
@@ -318,32 +324,32 @@ Web 使用的主要接口包括 `/api/health`、`/api/validate`、`/api/preview`
 | 模拟过程的“刚创建项目 ID”使用实例共享状态 | 改为请求上下文变量，并在 finally 恢复 | 顺序与保存回归通过；高并发压力测试仍待补 |
 | 主页面追加堆叠问题，方案对比只读原始引擎问题 | 共用 `assessedReport`，去重且不修改原始报告；对比标记评估口径 | 页面/对比一致、重复调用幂等测试通过 |
 | 更新脚本把 HTTP.sys 的 PID 4 误认为非目标程序 | 增加同一请求队列内 PID+URL 双重校验 | 正例、跨队列与部分 PID 误匹配检查通过；本机实际更新成功 |
-| 缺少可复跑的交接检查入口 | 增加 `source/verify.mjs` 与验证记录 | 51/51 测试、29/29 前端语法检查通过 |
+| 缺少可复跑的交接检查入口 | 增加 `tools/verify.mjs` 与验证记录 | 51/51 测试、29/29 前端语法检查通过 |
 | 原始后端源码和 Python 测试源码缺失 | 明确列为最高优先级交接缺口 | 本次没有把字节码还原结果当作原始源码，也未宣称完整可重建 |
 
 本次没有重写核心求解器、提高工艺标定精度或给示例补造未知参数；这些属于下一阶段工作。
 
 ## 12. 待完善清单与验收条件
 
-下表是建议实施顺序，不代表已经实现或已获得真实后端校准数据。
+本次按清单完成当前可验证的项目。完整状态、验证依据和剩余范围见 [实施清单](RELEASE-0.12.md)。下表保留原始验收目标，不能把部分完成视为整项完成。
 
 | 级别 / 编号 | 待完善项 | 建议负责人 | 完成判据 |
 | --- | --- | --- | --- |
 | P0-01 | 找回/重建完整后端工程与 Python 测试，固定依赖和打包步骤 | 后端维护人员 | 新机器从源码构建，无需预先存在 Engine.exe；全部回归通过 |
-| P0-02 | 统一 Web、CLI、JSON、HTML 的 schema 和堆叠评估规则 | 后端 + 前端 | 同一输入在所有入口得到同一问题清单；stack 不再藏入 description |
+| P0-02 · 本版完成 | 统一 Web、CLI、JSON、HTML 的 schema 和堆叠评估规则 | 后端 + 前端 | 同一输入在所有入口得到同一问题清单；stack 不再藏入 description |
 | P1-01 | 补齐项目真实面积、功耗、互联拓扑、TSV/HB 参数与校准依据 | 架构 + 后端 + 封装 | 缺失项有负责人，样本与综合/布局布线结果比对并报告误差 |
-| P1-02 | 输入双文件、manifest、运行记录的事务和中断恢复 | 后端 | 写到任一步骤强制中断均能恢复；并发保存不串工程、不产生半套输入 |
-| P1-03 | 结果可移植打包、路径重定位、统一发布版本及计算模型指纹 | 工具维护人员 | 工程和外置结果移动到新机器后可载入；报告可追溯到二进制和规则版本 |
-| P1-04 | 独立正式输入 JSON Schema 和 API 契约 | 后端 | 双文件能离线校验，错误含字段路径；变更兼容有自动测试 |
-| P1-05 | 资源精度校准和不确定度表达 | 架构 + 物理设计 | 明确哪些是输入/估算/实测，提供误差范围与适用工艺条件 |
+| P1-02 · 部分完成 | 输入双文件、manifest、运行记录的事务和中断恢复 | 后端 | 写到任一步骤强制中断均能恢复；并发保存不串工程、不产生半套输入 |
+| P1-03 · 本机验收通过 | 结果可移植打包、路径重定位、统一发布版本及计算模型指纹 | 工具维护人员 | 工程和外置结果移动到新机器后可载入；报告可追溯到二进制和规则版本 |
+| P1-04 · 部分完成 | 独立正式输入 JSON Schema 和 API 契约 | 后端 | 双文件能离线校验，错误含字段路径；变更兼容有自动测试 |
+| P1-05 · 仅追溯框架 | 资源精度校准和不确定度表达 | 架构 + 物理设计 | 明确哪些是输入/估算/实测，提供误差范围与适用工艺条件 |
 | P1-06 | 自动寻优任务取消、进度、资源配额及更强候选多样性 | 算法 + 前端 | 长任务可停止，区别显著的方案可控，实际数量和停止原因准确 |
 | P2-01 | 绕障、端口拥挤、过孔、跨层落点和拥塞反馈优化 | 物理算法 | 在独立布局样本上与后端路由结果比对；不再仅是中心/边缘代理路径 |
 | P2-02 | 热网络、IR drop/EM 或外部求解工具连接 | 电气/热负责人 | 参数来源、求解条件、误差验证齐备后才显示为分析结果 |
-| P2-03 | 长表分页/虚拟化、错误筛选、更多资源→三维定位联动 | 前端 | 16 Core 大项目操作流畅，数万条间距记录无需一次渲染全部 |
-| P2-04 | 拆分 app.js 状态管理、持续集成、浏览器端回归、端到端故障注入 | 工具开发人员 | 草稿、项目切换、请求乱序、导出、升级/回滚均有可重复测试 |
+| P2-03 · 间距表完成 | 长表分页/虚拟化、错误筛选、更多资源→三维定位联动 | 前端 | 16 Core 大项目操作流畅，数万条间距记录无需一次渲染全部 |
+| P2-04 · 测试入口增强 | 拆分 app.js 状态管理、持续集成、浏览器端回归、端到端故障注入 | 工具开发人员 | 草稿、项目切换、请求乱序、导出、升级/回滚均有可重复测试 |
 | P2-05 | 多用户与服务安全边界 | 平台维护人员 | 正式定义身份、同源策略、输出路径授权、并发、请求大小/资源限制后再开放网络 |
 
-针对近期交接，优先完成 P0-01、P0-02，再做项目参数和工程存储可靠性。热分析和性能模拟器不应掩盖当前资源数据与可维护性缺口。
+后续优先恢复 P0-01 原后端源码，补齐 P1-01 工程参数，再完成 P1-02 的完整运行事务及 P1-06 任务控制。热分析和性能模拟器不应掩盖当前资源数据与可维护性缺口。
 
 ## 13. 交付验收与常见排查
 
@@ -368,17 +374,19 @@ Web 使用的主要接口包括 `/api/health`、`/api/validate`、`/api/preview`
 | 功耗/TSV 合计未知 | 是否缺模块功耗、电源/地 TSV、pitch、容量或预算，不要补成 0 |
 | 线面积为 0 / 拥塞未知 | 是否只输入接口预算而没有细分模块连接；已定义连接数量是否为 0 |
 | 方案数不足 | 搜索时间、固定约束、可行空间和求解状态；不要人为复制布局补数 |
-| 页面与旧 HTML 问题数不同 | Web 是否追加了堆叠检查；查看 assessment_scope 和生成版本 |
+| 页面与旧 HTML 问题数不同 | 0.11 及更早历史仍有兼容差异；0.12 新报告应一致，检查 assessment_scope 与版本 |
 | 不知道结果在哪里 | 到结果管理查看实际目录；外置输出不一定在项目 runs 下 |
 | 更新脚本拒绝进程 | 核查程序完整路径与 HTTP 请求队列；TCP PID 4 不能直接当作 Resim PID |
 | 新机器无法重建引擎 | 本交付尚缺完整后端源码；启动补丁构建不能替代从零构建 |
 
 ## 14. 资料索引
 
-- [架构输入与历史结果](../INPUT-WORKFLOW.md)
-- [页面组织与交互约定](../UI-LAYOUT.md)
-- [Die 朝向与层间接口](../STACK-MODEL.md)
-- [Windows 入口与打包补丁维护](../source/HOST.md)
+- [架构输入与历史结果](INPUT-WORKFLOW.md)
+- [页面组织与交互约定](UI-LAYOUT.md)
+- [Die 朝向与层间接口](STACK-MODEL.md)
+- [Windows 入口与打包补丁维护](HOST.md)
+- [0.12 实施状态、迁移和新增命令](RELEASE-0.12.md)
+- [输入校验与 API 契约](API-CONTRACT.md)
 - [本次验证摘要与文件哈希](verification.json)
 - [本次完整自动测试记录](verification.tap)
 

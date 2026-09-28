@@ -1,0 +1,2124 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Resim local resource simulator",
+    "version": "0.12.0"
+  },
+  "paths": {
+    "/api/exports/{plan_id}/{format}": {
+      "get": {
+        "summary": "Export Result",
+        "operationId": "export_result_api_exports__plan_id___format__get",
+        "parameters": [
+          {
+            "name": "plan_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Plan Id"
+            }
+          },
+          {
+            "name": "format",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Format"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/": {
+      "get": {
+        "summary": "Index",
+        "operationId": "index__get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/health": {
+      "get": {
+        "summary": "Health",
+        "operationId": "health_api_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/projects": {
+      "get": {
+        "summary": "Projects",
+        "operationId": "projects_api_projects_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/projects/{project_id}/input": {
+      "get": {
+        "summary": "Project Input",
+        "operationId": "project_input_api_projects__project_id__input_get",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Project Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/projects/{project_id}/runs": {
+      "get": {
+        "summary": "History",
+        "operationId": "history_api_projects__project_id__runs_get",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Project Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/projects/{project_id}/runs/{run_id}/input": {
+      "get": {
+        "summary": "Run Input",
+        "operationId": "run_input_api_projects__project_id__runs__run_id__input_get",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Project Id"
+            }
+          },
+          {
+            "name": "run_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Run Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/projects/{project_id}/runs/{run_id}/result": {
+      "get": {
+        "summary": "Historical Result",
+        "operationId": "historical_result_api_projects__project_id__runs__run_id__result_get",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Project Id"
+            }
+          },
+          {
+            "name": "run_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Run Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/projects/{project_id}/runs/{run_id}/export/{format}": {
+      "get": {
+        "summary": "Historical Export",
+        "operationId": "historical_export_api_projects__project_id__runs__run_id__export__format__get",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Project Id"
+            }
+          },
+          {
+            "name": "run_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Run Id"
+            }
+          },
+          {
+            "name": "format",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Format"
+            }
+          },
+          {
+            "name": "candidate",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "current",
+              "title": "Candidate"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/projects/{project_id}/runs/{run_id}/open-folder": {
+      "post": {
+        "summary": "Open Run Folder",
+        "operationId": "open_run_folder_api_projects__project_id__runs__run_id__open_folder_post",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Project Id"
+            }
+          },
+          {
+            "name": "run_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Run Id"
+            }
+          },
+          {
+            "name": "candidate",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "current",
+              "title": "Candidate"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/schema": {
+      "get": {
+        "summary": "Schema",
+        "operationId": "schema_api_schema_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/sources": {
+      "get": {
+        "summary": "Sources",
+        "operationId": "sources_api_sources_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/validate": {
+      "post": {
+        "summary": "Validate",
+        "operationId": "validate_api_validate_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Request"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/layout/preview": {
+      "post": {
+        "summary": "Preview Layout",
+        "description": "Re-evaluate an interactive draft without writing project or run files.",
+        "operationId": "preview_layout_api_layout_preview_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NativeProject"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/preview": {
+      "post": {
+        "summary": "Preview Yaml",
+        "description": "Validate YAML and evaluate it without changing projects or saved histories.",
+        "operationId": "preview_yaml_api_preview_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Request"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/evaluate": {
+      "post": {
+        "summary": "Assess",
+        "operationId": "assess_api_evaluate_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Request"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/optimize": {
+      "post": {
+        "summary": "Search",
+        "operationId": "search_api_optimize_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Request"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/yaml": {
+      "post": {
+        "summary": "Normalized",
+        "operationId": "normalized_api_yaml_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Request"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/starter": {
+      "get": {
+        "summary": "Starter",
+        "operationId": "starter_api_starter_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Architecture": {
+        "properties": {
+          "chip": {
+            "type": "string",
+            "title": "Chip"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "metrics": {
+            "$ref": "#/components/schemas/Metrics"
+          },
+          "dies": {
+            "items": {
+              "$ref": "#/components/schemas/Die"
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "Dies"
+          },
+          "cores": {
+            "items": {
+              "$ref": "#/components/schemas/Core"
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "Cores"
+          },
+          "modules": {
+            "items": {
+              "$ref": "#/components/schemas/Module"
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "Modules"
+          },
+          "links": {
+            "items": {
+              "$ref": "#/components/schemas/Link"
+            },
+            "type": "array",
+            "title": "Links"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "chip",
+          "description",
+          "dies",
+          "cores",
+          "modules"
+        ],
+        "title": "Architecture"
+      },
+      "Blockage": {
+        "properties": {
+          "x_um": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "X Um"
+          },
+          "y_um": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Y Um"
+          },
+          "width_um": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Width Um"
+          },
+          "height_um": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Height Um"
+          },
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "die": {
+            "type": "string",
+            "title": "Die"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "x_um",
+          "y_um",
+          "width_um",
+          "height_um",
+          "id",
+          "die"
+        ],
+        "title": "Blockage"
+      },
+      "Constraints": {
+        "properties": {
+          "die_area_limit_mm2": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Die Area Limit Mm2",
+            "default": 800
+          },
+          "max_congestion_ratio": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Max Congestion Ratio",
+            "default": 1
+          },
+          "max_power_density_W_mm2": {
+            "anyOf": [
+              {
+                "type": "number",
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Power Density W Mm2"
+          },
+          "same_die_groups": {
+            "items": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "type": "array",
+            "title": "Same Die Groups"
+          },
+          "blockages": {
+            "items": {
+              "$ref": "#/components/schemas/Blockage"
+            },
+            "type": "array",
+            "title": "Blockages"
+          },
+          "min_module_spacing_um": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Min Module Spacing Um",
+            "default": 0
+          },
+          "routing_channels": {
+            "items": {
+              "$ref": "#/components/schemas/RoutingChannel"
+            },
+            "type": "array",
+            "title": "Routing Channels"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "Constraints"
+      },
+      "Core": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "keep_on_same_die": {
+            "type": "boolean",
+            "title": "Keep On Same Die",
+            "default": false
+          },
+          "metrics": {
+            "$ref": "#/components/schemas/Metrics"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id"
+        ],
+        "title": "Core"
+      },
+      "DelayModel": {
+        "properties": {
+          "planar_ps_per_um": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Planar Ps Per Um"
+          },
+          "tier_ps": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Tier Ps"
+          },
+          "provenance": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Provenance"
+          },
+          "calibrated": {
+            "type": "boolean",
+            "title": "Calibrated",
+            "default": false
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "planar_ps_per_um",
+          "tier_ps",
+          "provenance"
+        ],
+        "title": "DelayModel"
+      },
+      "Die": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "display_platform": {
+            "type": "boolean",
+            "title": "Display Platform",
+            "default": false
+          },
+          "package_layers": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Package Layers",
+            "default": 1
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "logic",
+              "dram",
+              "other"
+            ],
+            "title": "Kind"
+          },
+          "order": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Order"
+          },
+          "width_um": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Width Um"
+          },
+          "height_um": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Height Um"
+          },
+          "thickness_um": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Thickness Um"
+          },
+          "voltage_V": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Voltage V"
+          },
+          "power_budget_W": {
+            "anyOf": [
+              {
+                "type": "number",
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Power Budget W"
+          },
+          "max_utilization": {
+            "type": "number",
+            "maximum": 1.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Max Utilization",
+            "default": 0.85
+          },
+          "metrics": {
+            "$ref": "#/components/schemas/Metrics"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "kind",
+          "order",
+          "width_um",
+          "height_um",
+          "thickness_um",
+          "voltage_V"
+        ],
+        "title": "Die"
+      },
+      "Floorplan": {
+        "properties": {
+          "placements": {
+            "items": {
+              "$ref": "#/components/schemas/Placement"
+            },
+            "type": "array",
+            "title": "Placements"
+          },
+          "tsv_regions": {
+            "items": {
+              "$ref": "#/components/schemas/Region"
+            },
+            "type": "array",
+            "title": "Tsv Regions"
+          },
+          "supply_ports": {
+            "items": {
+              "$ref": "#/components/schemas/SupplyPort"
+            },
+            "type": "array",
+            "title": "Supply Ports"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "Floorplan"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "Link": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "target": {
+            "type": "string",
+            "title": "Target"
+          },
+          "source_port": {
+            "type": "string",
+            "title": "Source Port",
+            "default": "out"
+          },
+          "target_port": {
+            "type": "string",
+            "title": "Target Port",
+            "default": "in"
+          },
+          "bus_width_bits": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bus Width Bits",
+            "description": "Logical payload width; independent of serialized physical data lanes"
+          },
+          "bandwidth_GBps": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Bandwidth Gbps"
+          },
+          "lane_rate_Gbps": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Lane Rate Gbps"
+          },
+          "data_wires": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Data Wires"
+          },
+          "control_wires": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Control Wires",
+            "default": 8
+          },
+          "spare_fraction": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Spare Fraction",
+            "default": 0.1
+          },
+          "max_planar_length_um": {
+            "anyOf": [
+              {
+                "type": "number",
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Planar Length Um"
+          },
+          "max_tier_hops": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Tier Hops"
+          },
+          "latency_weight": {
+            "type": "integer",
+            "maximum": 1000.0,
+            "minimum": 1.0,
+            "title": "Latency Weight",
+            "default": 1
+          },
+          "area_reference": {
+            "$ref": "#/components/schemas/WireAreaReference",
+            "description": "Reference metals for area budgeting only; not a routed layer assignment"
+          },
+          "routing_layers": {
+            "additionalProperties": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "propertyNames": {
+              "enum": [
+                "horizontal",
+                "vertical"
+              ]
+            },
+            "type": "object",
+            "title": "Routing Layers",
+            "description": "Allowed metals by direction. Wires may be split across these layers. Omitted direction uses all matching enabled layers."
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "source",
+          "target",
+          "bandwidth_GBps",
+          "lane_rate_Gbps"
+        ],
+        "title": "Link"
+      },
+      "Metal": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "direction": {
+            "type": "string",
+            "enum": [
+              "HORIZONTAL",
+              "VERTICAL"
+            ],
+            "title": "Direction"
+          },
+          "pitch_um": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Pitch Um"
+          },
+          "width_um": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Width Um"
+          },
+          "availability": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 1.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Availability",
+            "description": "Per-layer usable fraction; overrides routing_availability. Zero disables automatic allocation."
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "name",
+          "direction",
+          "pitch_um",
+          "width_um"
+        ],
+        "title": "Metal"
+      },
+      "Metrics": {
+        "properties": {
+          "compute_TOPS": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Compute Tops"
+          },
+          "bandwidth_GBps": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bandwidth Gbps"
+          },
+          "capacity_KiB": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Capacity Kib"
+          },
+          "precision": {
+            "type": "string",
+            "title": "Precision",
+            "default": "unspecified"
+          },
+          "frequency_MHz": {
+            "anyOf": [
+              {
+                "type": "number",
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Frequency Mhz"
+          },
+          "bit_width": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bit Width"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "Metrics"
+      },
+      "Module": {
+        "properties": {
+          "shared_cores": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Shared Cores",
+            "description": "Cores served by one shared physical instance; core is its placement anchor, not a duplicate instance"
+          },
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "area_known": {
+            "type": "boolean",
+            "title": "Area Known",
+            "default": true
+          },
+          "core": {
+            "type": "string",
+            "title": "Core"
+          },
+          "kind": {
+            "type": "string",
+            "title": "Kind"
+          },
+          "allowed_dies": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "Allowed Dies"
+          },
+          "stdcell_area_um2": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Stdcell Area Um2"
+          },
+          "macro_area_um2": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Macro Area Um2"
+          },
+          "power_W": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Power W"
+          },
+          "width_um": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Width Um"
+          },
+          "height_um": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Height Um"
+          },
+          "target_cell_utilization": {
+            "type": "number",
+            "maximum": 1.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Target Cell Utilization",
+            "default": 0.65
+          },
+          "utilization_basis": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Utilization Basis",
+            "description": "Owner or evidence for target utilization; not a PDK rule"
+          },
+          "halo_um": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Halo Um",
+            "description": "External placement clearance on every side, not internal whitespace",
+            "default": 0
+          },
+          "voltage_domain": {
+            "type": "string",
+            "title": "Voltage Domain",
+            "default": "VDD"
+          },
+          "fixed": {
+            "type": "boolean",
+            "title": "Fixed",
+            "default": false
+          },
+          "placement_window": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PlacementWindow"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "ports": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Ports"
+          },
+          "port_locations": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/PortLocation"
+            },
+            "type": "object",
+            "title": "Port Locations"
+          },
+          "metrics": {
+            "$ref": "#/components/schemas/Metrics"
+          },
+          "provenance": {
+            "type": "string",
+            "title": "Provenance"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "core",
+          "kind",
+          "allowed_dies",
+          "stdcell_area_um2",
+          "macro_area_um2",
+          "width_um",
+          "height_um",
+          "provenance"
+        ],
+        "title": "Module"
+      },
+      "NativeProject": {
+        "properties": {
+          "schema_version": {
+            "type": "string",
+            "const": "resim/0.1",
+            "title": "Schema Version",
+            "default": "resim/0.1"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "architecture": {
+            "$ref": "#/components/schemas/Architecture"
+          },
+          "resources": {
+            "$ref": "#/components/schemas/Resources"
+          },
+          "constraints": {
+            "$ref": "#/components/schemas/Constraints"
+          },
+          "floorplan": {
+            "$ref": "#/components/schemas/Floorplan"
+          },
+          "search": {
+            "$ref": "#/components/schemas/Search"
+          },
+          "stack": {
+            "$ref": "#/components/schemas/Stack"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "name",
+          "architecture",
+          "resources"
+        ],
+        "title": "NativeProject"
+      },
+      "Placement": {
+        "properties": {
+          "x_um": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "X Um"
+          },
+          "y_um": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Y Um"
+          },
+          "width_um": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Width Um"
+          },
+          "height_um": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Height Um"
+          },
+          "module": {
+            "type": "string",
+            "title": "Module"
+          },
+          "die": {
+            "type": "string",
+            "title": "Die"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "x_um",
+          "y_um",
+          "width_um",
+          "height_um",
+          "module",
+          "die"
+        ],
+        "title": "Placement"
+      },
+      "PlacementWindow": {
+        "properties": {
+          "x_um": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "X Um"
+          },
+          "y_um": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Y Um"
+          },
+          "width_um": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Width Um"
+          },
+          "height_um": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Height Um"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "x_um",
+          "y_um",
+          "width_um",
+          "height_um"
+        ],
+        "title": "PlacementWindow"
+      },
+      "PortLocation": {
+        "properties": {
+          "side": {
+            "type": "string",
+            "enum": [
+              "east",
+              "west",
+              "north",
+              "south"
+            ],
+            "title": "Side"
+          },
+          "offset": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Offset",
+            "description": "Fraction along edge; west/east from bottom, north/south from left",
+            "default": 0.5
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "side"
+        ],
+        "title": "PortLocation"
+      },
+      "Region": {
+        "properties": {
+          "x_um": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "X Um"
+          },
+          "y_um": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Y Um"
+          },
+          "width_um": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Width Um"
+          },
+          "height_um": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Height Um"
+          },
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "interconnect": {
+            "type": "string",
+            "enum": [
+              "TSV",
+              "HB"
+            ],
+            "title": "Interconnect",
+            "default": "TSV"
+          },
+          "orientation": {
+            "type": "string",
+            "enum": [
+              "F2F",
+              "B2B",
+              "unspecified"
+            ],
+            "title": "Orientation",
+            "default": "unspecified"
+          },
+          "signal_budget_bits": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Signal Budget Bits"
+          },
+          "budget_paths": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Budget Paths"
+          },
+          "interface_pitch_um": {
+            "anyOf": [
+              {
+                "type": "number",
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Interface Pitch Um"
+          },
+          "lower_die": {
+            "type": "string",
+            "title": "Lower Die"
+          },
+          "upper_die": {
+            "type": "string",
+            "title": "Upper Die"
+          },
+          "core": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Core",
+            "description": "Optional owner core/tile used to select one of several TSV regions on the same interface"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "x_um",
+          "y_um",
+          "width_um",
+          "height_um",
+          "id",
+          "lower_die",
+          "upper_die"
+        ],
+        "title": "Region"
+      },
+      "Request": {
+        "properties": {
+          "yaml": {
+            "type": "string",
+            "maxLength": 4000000,
+            "title": "Yaml"
+          },
+          "project_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Project Id"
+          },
+          "project_name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Project Name"
+          },
+          "output_dir": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Output Dir"
+          }
+        },
+        "type": "object",
+        "required": [
+          "yaml"
+        ],
+        "title": "Request"
+      },
+      "Resources": {
+        "properties": {
+          "technology": {
+            "type": "string",
+            "title": "Technology"
+          },
+          "technology_provenance": {
+            "type": "string",
+            "title": "Technology Provenance"
+          },
+          "metals": {
+            "items": {
+              "$ref": "#/components/schemas/Metal"
+            },
+            "type": "array",
+            "title": "Metals"
+          },
+          "routing_availability": {
+            "type": "number",
+            "maximum": 1.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Routing Availability",
+            "default": 0.15
+          },
+          "tsv": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TSV"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "delay_model": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DelayModel"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "notes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Notes"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "technology",
+          "technology_provenance"
+        ],
+        "title": "Resources"
+      },
+      "RoutingChannel": {
+        "properties": {
+          "x_um": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "X Um"
+          },
+          "y_um": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Y Um"
+          },
+          "width_um": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Width Um"
+          },
+          "height_um": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Height Um"
+          },
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "die": {
+            "type": "string",
+            "title": "Die"
+          },
+          "direction": {
+            "type": "string",
+            "enum": [
+              "HORIZONTAL",
+              "VERTICAL"
+            ],
+            "title": "Direction"
+          },
+          "min_width_um": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Min Width Um",
+            "default": 0
+          },
+          "metals": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "Metals"
+          },
+          "links": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Links",
+            "description": "Bound connections must remain on this die and traverse the corridor centerline"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "x_um",
+          "y_um",
+          "width_um",
+          "height_um",
+          "id",
+          "die",
+          "direction",
+          "metals"
+        ],
+        "title": "RoutingChannel"
+      },
+      "Search": {
+        "properties": {
+          "objective": {
+            "type": "string",
+            "enum": [
+              "wirelength",
+              "latency"
+            ],
+            "title": "Objective",
+            "default": "wirelength"
+          },
+          "time_limit_s": {
+            "type": "number",
+            "maximum": 300.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Time Limit S",
+            "default": 12
+          },
+          "candidates": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Candidates",
+            "default": 3
+          },
+          "grid_um": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Grid Um",
+            "default": 10
+          },
+          "seed": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Seed",
+            "default": 7
+          },
+          "wirelength_weight": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Wirelength Weight",
+            "default": 1
+          },
+          "tier_crossing_weight": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Tier Crossing Weight",
+            "default": 500
+          },
+          "congestion_grid": {
+            "type": "integer",
+            "maximum": 64.0,
+            "minimum": 4.0,
+            "title": "Congestion Grid",
+            "default": 16
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "Search"
+      },
+      "Stack": {
+        "properties": {
+          "die_faces": {
+            "additionalProperties": {
+              "type": "string",
+              "enum": [
+                "up",
+                "down",
+                "unknown"
+              ]
+            },
+            "type": "object",
+            "title": "Die Faces"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "Stack"
+      },
+      "SupplyPort": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "die": {
+            "type": "string",
+            "title": "Die"
+          },
+          "x_um": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "X Um"
+          },
+          "y_um": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Y Um"
+          },
+          "domain": {
+            "type": "string",
+            "title": "Domain",
+            "default": "VDD"
+          },
+          "voltage_V": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Voltage V"
+          },
+          "max_current_A": {
+            "anyOf": [
+              {
+                "type": "number",
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Current A"
+          },
+          "core": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Core"
+          },
+          "provenance": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Provenance"
+          },
+          "feed": {
+            "type": "string",
+            "enum": [
+              "external",
+              "stack_base"
+            ],
+            "title": "Feed",
+            "default": "external"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "die",
+          "x_um",
+          "y_um",
+          "voltage_V"
+        ],
+        "title": "SupplyPort"
+      },
+      "TSV": {
+        "properties": {
+          "diameter_um": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Diameter Um"
+          },
+          "pitch_um": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Pitch Um"
+          },
+          "keepout_um": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Keepout Um"
+          },
+          "bond_pitch_um": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Bond Pitch Um"
+          },
+          "max_current_mA": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Max Current Ma"
+          },
+          "provenance": {
+            "type": "string",
+            "title": "Provenance"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "diameter_um",
+          "pitch_um",
+          "keepout_um",
+          "bond_pitch_um",
+          "max_current_mA",
+          "provenance"
+        ],
+        "title": "TSV"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      },
+      "WireAreaReference": {
+        "properties": {
+          "horizontal": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Horizontal"
+          },
+          "vertical": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Vertical"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "WireAreaReference"
+      }
+    }
+  }
+}

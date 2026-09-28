@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {stackModel,applyStack,readStack,writeStack,plainDescription,contactOrientation,assertStack,surfaceOffset} from '../_internal/resim/static/stack-model.js';
-import {splitInputFiles,mergeInputFiles} from '../_internal/resim/static/architecture-io.js';
-import {updateStructure} from '../_internal/resim/static/structure-editor.js';
+import {stackModel,applyStack,readStack,writeStack,plainDescription,contactOrientation,assertStack,surfaceOffset} from '../app/_internal/resim/static/stack-model.js';
+import {splitInputFiles,mergeInputFiles} from '../app/_internal/resim/static/architecture-io.js';
+import {updateStructure} from '../app/_internal/resim/static/structure-editor.js';
 const fixture=()=>({schema_version:'resim/0.1',name:'stack-test',architecture:{description:'Keep this engineering note.',dies:[{id:'X',order:0},{id:'L',order:1},{id:'B',order:2},{id:'D',order:3,display_platform:true}],modules:[]},floorplan:{placements:[],tsv_regions:[{id:'XL',lower_die:'X',upper_die:'L',orientation:'B2B',interconnect:'TSV',signal_budget_bits:44700,x_um:25,y_um:40,width_um:100,height_um:500,core:'c0'},{id:'LB',lower_die:'L',upper_die:'B',orientation:'F2F',interconnect:'HB',signal_budget_bits:44700},{id:'BD',lower_die:'B',upper_die:'D',orientation:'unspecified',interconnect:'TSV',signal_budget_bits:29200}]},constraints:{},resources:{metals:[]}});
 test('face-down module and metal planes sit below silicon, while standalone views normalize the face',()=>{
   assert.equal(surfaceOffset('down',100,20),-120);assert.equal(surfaceOffset('up',100,20),20);

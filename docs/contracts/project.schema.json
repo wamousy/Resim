@@ -1,0 +1,1390 @@
+{
+  "$defs": {
+    "Architecture": {
+      "additionalProperties": false,
+      "properties": {
+        "chip": {
+          "title": "Chip",
+          "type": "string"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "metrics": {
+          "$ref": "#/$defs/Metrics"
+        },
+        "dies": {
+          "items": {
+            "$ref": "#/$defs/Die"
+          },
+          "minItems": 1,
+          "title": "Dies",
+          "type": "array"
+        },
+        "cores": {
+          "items": {
+            "$ref": "#/$defs/Core"
+          },
+          "minItems": 1,
+          "title": "Cores",
+          "type": "array"
+        },
+        "modules": {
+          "items": {
+            "$ref": "#/$defs/Module"
+          },
+          "minItems": 1,
+          "title": "Modules",
+          "type": "array"
+        },
+        "links": {
+          "items": {
+            "$ref": "#/$defs/Link"
+          },
+          "title": "Links",
+          "type": "array"
+        }
+      },
+      "required": [
+        "chip",
+        "description",
+        "dies",
+        "cores",
+        "modules"
+      ],
+      "title": "Architecture",
+      "type": "object"
+    },
+    "Blockage": {
+      "additionalProperties": false,
+      "properties": {
+        "x_um": {
+          "minimum": 0,
+          "title": "X Um",
+          "type": "number"
+        },
+        "y_um": {
+          "minimum": 0,
+          "title": "Y Um",
+          "type": "number"
+        },
+        "width_um": {
+          "exclusiveMinimum": 0,
+          "title": "Width Um",
+          "type": "number"
+        },
+        "height_um": {
+          "exclusiveMinimum": 0,
+          "title": "Height Um",
+          "type": "number"
+        },
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "die": {
+          "title": "Die",
+          "type": "string"
+        }
+      },
+      "required": [
+        "x_um",
+        "y_um",
+        "width_um",
+        "height_um",
+        "id",
+        "die"
+      ],
+      "title": "Blockage",
+      "type": "object"
+    },
+    "Constraints": {
+      "additionalProperties": false,
+      "properties": {
+        "die_area_limit_mm2": {
+          "default": 800,
+          "exclusiveMinimum": 0,
+          "title": "Die Area Limit Mm2",
+          "type": "number"
+        },
+        "max_congestion_ratio": {
+          "default": 1,
+          "exclusiveMinimum": 0,
+          "title": "Max Congestion Ratio",
+          "type": "number"
+        },
+        "max_power_density_W_mm2": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Max Power Density W Mm2"
+        },
+        "same_die_groups": {
+          "items": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "title": "Same Die Groups",
+          "type": "array"
+        },
+        "blockages": {
+          "items": {
+            "$ref": "#/$defs/Blockage"
+          },
+          "title": "Blockages",
+          "type": "array"
+        },
+        "min_module_spacing_um": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Min Module Spacing Um",
+          "type": "number"
+        },
+        "routing_channels": {
+          "items": {
+            "$ref": "#/$defs/RoutingChannel"
+          },
+          "title": "Routing Channels",
+          "type": "array"
+        }
+      },
+      "title": "Constraints",
+      "type": "object"
+    },
+    "Core": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "keep_on_same_die": {
+          "default": false,
+          "title": "Keep On Same Die",
+          "type": "boolean"
+        },
+        "metrics": {
+          "$ref": "#/$defs/Metrics"
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "title": "Core",
+      "type": "object"
+    },
+    "DelayModel": {
+      "additionalProperties": false,
+      "properties": {
+        "planar_ps_per_um": {
+          "exclusiveMinimum": 0,
+          "title": "Planar Ps Per Um",
+          "type": "number"
+        },
+        "tier_ps": {
+          "minimum": 0,
+          "title": "Tier Ps",
+          "type": "number"
+        },
+        "provenance": {
+          "minLength": 1,
+          "title": "Provenance",
+          "type": "string"
+        },
+        "calibrated": {
+          "default": false,
+          "title": "Calibrated",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "planar_ps_per_um",
+        "tier_ps",
+        "provenance"
+      ],
+      "title": "DelayModel",
+      "type": "object"
+    },
+    "Die": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "display_platform": {
+          "default": false,
+          "title": "Display Platform",
+          "type": "boolean"
+        },
+        "package_layers": {
+          "default": 1,
+          "minimum": 1,
+          "title": "Package Layers",
+          "type": "integer"
+        },
+        "kind": {
+          "enum": [
+            "logic",
+            "dram",
+            "other"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "order": {
+          "minimum": 0,
+          "title": "Order",
+          "type": "integer"
+        },
+        "width_um": {
+          "exclusiveMinimum": 0,
+          "title": "Width Um",
+          "type": "number"
+        },
+        "height_um": {
+          "exclusiveMinimum": 0,
+          "title": "Height Um",
+          "type": "number"
+        },
+        "thickness_um": {
+          "exclusiveMinimum": 0,
+          "title": "Thickness Um",
+          "type": "number"
+        },
+        "voltage_V": {
+          "exclusiveMinimum": 0,
+          "title": "Voltage V",
+          "type": "number"
+        },
+        "power_budget_W": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Power Budget W"
+        },
+        "max_utilization": {
+          "default": 0.85,
+          "exclusiveMinimum": 0,
+          "maximum": 1,
+          "title": "Max Utilization",
+          "type": "number"
+        },
+        "metrics": {
+          "$ref": "#/$defs/Metrics"
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "order",
+        "width_um",
+        "height_um",
+        "thickness_um",
+        "voltage_V"
+      ],
+      "title": "Die",
+      "type": "object"
+    },
+    "Floorplan": {
+      "additionalProperties": false,
+      "properties": {
+        "placements": {
+          "items": {
+            "$ref": "#/$defs/Placement"
+          },
+          "title": "Placements",
+          "type": "array"
+        },
+        "tsv_regions": {
+          "items": {
+            "$ref": "#/$defs/Region"
+          },
+          "title": "Tsv Regions",
+          "type": "array"
+        },
+        "supply_ports": {
+          "items": {
+            "$ref": "#/$defs/SupplyPort"
+          },
+          "title": "Supply Ports",
+          "type": "array"
+        }
+      },
+      "title": "Floorplan",
+      "type": "object"
+    },
+    "Link": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "source": {
+          "title": "Source",
+          "type": "string"
+        },
+        "target": {
+          "title": "Target",
+          "type": "string"
+        },
+        "source_port": {
+          "default": "out",
+          "title": "Source Port",
+          "type": "string"
+        },
+        "target_port": {
+          "default": "in",
+          "title": "Target Port",
+          "type": "string"
+        },
+        "bus_width_bits": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Logical payload width; independent of serialized physical data lanes",
+          "title": "Bus Width Bits"
+        },
+        "bandwidth_GBps": {
+          "minimum": 0,
+          "title": "Bandwidth Gbps",
+          "type": "number"
+        },
+        "lane_rate_Gbps": {
+          "exclusiveMinimum": 0,
+          "title": "Lane Rate Gbps",
+          "type": "number"
+        },
+        "data_wires": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Data Wires"
+        },
+        "control_wires": {
+          "default": 8,
+          "minimum": 0,
+          "title": "Control Wires",
+          "type": "integer"
+        },
+        "spare_fraction": {
+          "default": 0.1,
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Spare Fraction",
+          "type": "number"
+        },
+        "max_planar_length_um": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Max Planar Length Um"
+        },
+        "max_tier_hops": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Max Tier Hops"
+        },
+        "latency_weight": {
+          "default": 1,
+          "maximum": 1000,
+          "minimum": 1,
+          "title": "Latency Weight",
+          "type": "integer"
+        },
+        "area_reference": {
+          "$ref": "#/$defs/WireAreaReference",
+          "description": "Reference metals for area budgeting only; not a routed layer assignment"
+        },
+        "routing_layers": {
+          "additionalProperties": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "description": "Allowed metals by direction. Wires may be split across these layers. Omitted direction uses all matching enabled layers.",
+          "propertyNames": {
+            "enum": [
+              "horizontal",
+              "vertical"
+            ]
+          },
+          "title": "Routing Layers",
+          "type": "object"
+        }
+      },
+      "required": [
+        "id",
+        "source",
+        "target",
+        "bandwidth_GBps",
+        "lane_rate_Gbps"
+      ],
+      "title": "Link",
+      "type": "object"
+    },
+    "Metal": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "direction": {
+          "enum": [
+            "HORIZONTAL",
+            "VERTICAL"
+          ],
+          "title": "Direction",
+          "type": "string"
+        },
+        "pitch_um": {
+          "exclusiveMinimum": 0,
+          "title": "Pitch Um",
+          "type": "number"
+        },
+        "width_um": {
+          "exclusiveMinimum": 0,
+          "title": "Width Um",
+          "type": "number"
+        },
+        "availability": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Per-layer usable fraction; overrides routing_availability. Zero disables automatic allocation.",
+          "title": "Availability"
+        }
+      },
+      "required": [
+        "name",
+        "direction",
+        "pitch_um",
+        "width_um"
+      ],
+      "title": "Metal",
+      "type": "object"
+    },
+    "Metrics": {
+      "additionalProperties": false,
+      "properties": {
+        "compute_TOPS": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Compute Tops"
+        },
+        "bandwidth_GBps": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Bandwidth Gbps"
+        },
+        "capacity_KiB": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Capacity Kib"
+        },
+        "precision": {
+          "default": "unspecified",
+          "title": "Precision",
+          "type": "string"
+        },
+        "frequency_MHz": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Frequency Mhz"
+        },
+        "bit_width": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Bit Width"
+        }
+      },
+      "title": "Metrics",
+      "type": "object"
+    },
+    "Module": {
+      "additionalProperties": false,
+      "properties": {
+        "shared_cores": {
+          "description": "Cores served by one shared physical instance; core is its placement anchor, not a duplicate instance",
+          "items": {
+            "type": "string"
+          },
+          "title": "Shared Cores",
+          "type": "array"
+        },
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "area_known": {
+          "default": true,
+          "title": "Area Known",
+          "type": "boolean"
+        },
+        "core": {
+          "title": "Core",
+          "type": "string"
+        },
+        "kind": {
+          "title": "Kind",
+          "type": "string"
+        },
+        "allowed_dies": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Allowed Dies",
+          "type": "array"
+        },
+        "stdcell_area_um2": {
+          "minimum": 0,
+          "title": "Stdcell Area Um2",
+          "type": "number"
+        },
+        "macro_area_um2": {
+          "minimum": 0,
+          "title": "Macro Area Um2",
+          "type": "number"
+        },
+        "power_W": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Power W"
+        },
+        "width_um": {
+          "exclusiveMinimum": 0,
+          "title": "Width Um",
+          "type": "number"
+        },
+        "height_um": {
+          "exclusiveMinimum": 0,
+          "title": "Height Um",
+          "type": "number"
+        },
+        "target_cell_utilization": {
+          "default": 0.65,
+          "exclusiveMinimum": 0,
+          "maximum": 1,
+          "title": "Target Cell Utilization",
+          "type": "number"
+        },
+        "utilization_basis": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Owner or evidence for target utilization; not a PDK rule",
+          "title": "Utilization Basis"
+        },
+        "halo_um": {
+          "default": 0,
+          "description": "External placement clearance on every side, not internal whitespace",
+          "minimum": 0,
+          "title": "Halo Um",
+          "type": "number"
+        },
+        "voltage_domain": {
+          "default": "VDD",
+          "title": "Voltage Domain",
+          "type": "string"
+        },
+        "fixed": {
+          "default": false,
+          "title": "Fixed",
+          "type": "boolean"
+        },
+        "placement_window": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PlacementWindow"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "ports": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Ports",
+          "type": "array"
+        },
+        "port_locations": {
+          "additionalProperties": {
+            "$ref": "#/$defs/PortLocation"
+          },
+          "title": "Port Locations",
+          "type": "object"
+        },
+        "metrics": {
+          "$ref": "#/$defs/Metrics"
+        },
+        "provenance": {
+          "title": "Provenance",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "core",
+        "kind",
+        "allowed_dies",
+        "stdcell_area_um2",
+        "macro_area_um2",
+        "width_um",
+        "height_um",
+        "provenance"
+      ],
+      "title": "Module",
+      "type": "object"
+    },
+    "Placement": {
+      "additionalProperties": false,
+      "properties": {
+        "x_um": {
+          "minimum": 0,
+          "title": "X Um",
+          "type": "number"
+        },
+        "y_um": {
+          "minimum": 0,
+          "title": "Y Um",
+          "type": "number"
+        },
+        "width_um": {
+          "exclusiveMinimum": 0,
+          "title": "Width Um",
+          "type": "number"
+        },
+        "height_um": {
+          "exclusiveMinimum": 0,
+          "title": "Height Um",
+          "type": "number"
+        },
+        "module": {
+          "title": "Module",
+          "type": "string"
+        },
+        "die": {
+          "title": "Die",
+          "type": "string"
+        }
+      },
+      "required": [
+        "x_um",
+        "y_um",
+        "width_um",
+        "height_um",
+        "module",
+        "die"
+      ],
+      "title": "Placement",
+      "type": "object"
+    },
+    "PlacementWindow": {
+      "additionalProperties": false,
+      "properties": {
+        "x_um": {
+          "minimum": 0,
+          "title": "X Um",
+          "type": "number"
+        },
+        "y_um": {
+          "minimum": 0,
+          "title": "Y Um",
+          "type": "number"
+        },
+        "width_um": {
+          "exclusiveMinimum": 0,
+          "title": "Width Um",
+          "type": "number"
+        },
+        "height_um": {
+          "exclusiveMinimum": 0,
+          "title": "Height Um",
+          "type": "number"
+        }
+      },
+      "required": [
+        "x_um",
+        "y_um",
+        "width_um",
+        "height_um"
+      ],
+      "title": "PlacementWindow",
+      "type": "object"
+    },
+    "PortLocation": {
+      "additionalProperties": false,
+      "properties": {
+        "side": {
+          "enum": [
+            "east",
+            "west",
+            "north",
+            "south"
+          ],
+          "title": "Side",
+          "type": "string"
+        },
+        "offset": {
+          "default": 0.5,
+          "description": "Fraction along edge; west/east from bottom, north/south from left",
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Offset",
+          "type": "number"
+        }
+      },
+      "required": [
+        "side"
+      ],
+      "title": "PortLocation",
+      "type": "object"
+    },
+    "Region": {
+      "additionalProperties": false,
+      "properties": {
+        "x_um": {
+          "minimum": 0,
+          "title": "X Um",
+          "type": "number"
+        },
+        "y_um": {
+          "minimum": 0,
+          "title": "Y Um",
+          "type": "number"
+        },
+        "width_um": {
+          "exclusiveMinimum": 0,
+          "title": "Width Um",
+          "type": "number"
+        },
+        "height_um": {
+          "exclusiveMinimum": 0,
+          "title": "Height Um",
+          "type": "number"
+        },
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "interconnect": {
+          "default": "TSV",
+          "enum": [
+            "TSV",
+            "HB"
+          ],
+          "title": "Interconnect",
+          "type": "string"
+        },
+        "orientation": {
+          "default": "unspecified",
+          "enum": [
+            "F2F",
+            "B2B",
+            "unspecified"
+          ],
+          "title": "Orientation",
+          "type": "string"
+        },
+        "signal_budget_bits": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Signal Budget Bits"
+        },
+        "budget_paths": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Budget Paths",
+          "type": "array"
+        },
+        "interface_pitch_um": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Interface Pitch Um"
+        },
+        "lower_die": {
+          "title": "Lower Die",
+          "type": "string"
+        },
+        "upper_die": {
+          "title": "Upper Die",
+          "type": "string"
+        },
+        "core": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Optional owner core/tile used to select one of several TSV regions on the same interface",
+          "title": "Core"
+        }
+      },
+      "required": [
+        "x_um",
+        "y_um",
+        "width_um",
+        "height_um",
+        "id",
+        "lower_die",
+        "upper_die"
+      ],
+      "title": "Region",
+      "type": "object"
+    },
+    "Resources": {
+      "additionalProperties": false,
+      "properties": {
+        "technology": {
+          "title": "Technology",
+          "type": "string"
+        },
+        "technology_provenance": {
+          "title": "Technology Provenance",
+          "type": "string"
+        },
+        "metals": {
+          "items": {
+            "$ref": "#/$defs/Metal"
+          },
+          "title": "Metals",
+          "type": "array"
+        },
+        "routing_availability": {
+          "default": 0.15,
+          "exclusiveMinimum": 0,
+          "maximum": 1,
+          "title": "Routing Availability",
+          "type": "number"
+        },
+        "tsv": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TSV"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "delay_model": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/DelayModel"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "notes": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Notes",
+          "type": "array"
+        }
+      },
+      "required": [
+        "technology",
+        "technology_provenance"
+      ],
+      "title": "Resources",
+      "type": "object"
+    },
+    "RoutingChannel": {
+      "additionalProperties": false,
+      "properties": {
+        "x_um": {
+          "minimum": 0,
+          "title": "X Um",
+          "type": "number"
+        },
+        "y_um": {
+          "minimum": 0,
+          "title": "Y Um",
+          "type": "number"
+        },
+        "width_um": {
+          "exclusiveMinimum": 0,
+          "title": "Width Um",
+          "type": "number"
+        },
+        "height_um": {
+          "exclusiveMinimum": 0,
+          "title": "Height Um",
+          "type": "number"
+        },
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "die": {
+          "title": "Die",
+          "type": "string"
+        },
+        "direction": {
+          "enum": [
+            "HORIZONTAL",
+            "VERTICAL"
+          ],
+          "title": "Direction",
+          "type": "string"
+        },
+        "min_width_um": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Min Width Um",
+          "type": "number"
+        },
+        "metals": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Metals",
+          "type": "array"
+        },
+        "links": {
+          "description": "Bound connections must remain on this die and traverse the corridor centerline",
+          "items": {
+            "type": "string"
+          },
+          "title": "Links",
+          "type": "array"
+        }
+      },
+      "required": [
+        "x_um",
+        "y_um",
+        "width_um",
+        "height_um",
+        "id",
+        "die",
+        "direction",
+        "metals"
+      ],
+      "title": "RoutingChannel",
+      "type": "object"
+    },
+    "Search": {
+      "additionalProperties": false,
+      "properties": {
+        "objective": {
+          "default": "wirelength",
+          "enum": [
+            "wirelength",
+            "latency"
+          ],
+          "title": "Objective",
+          "type": "string"
+        },
+        "time_limit_s": {
+          "default": 12,
+          "exclusiveMinimum": 0,
+          "maximum": 300,
+          "title": "Time Limit S",
+          "type": "number"
+        },
+        "candidates": {
+          "default": 3,
+          "minimum": 1,
+          "title": "Candidates",
+          "type": "integer"
+        },
+        "grid_um": {
+          "default": 10,
+          "exclusiveMinimum": 0,
+          "title": "Grid Um",
+          "type": "number"
+        },
+        "seed": {
+          "default": 7,
+          "minimum": 0,
+          "title": "Seed",
+          "type": "integer"
+        },
+        "wirelength_weight": {
+          "default": 1,
+          "minimum": 0,
+          "title": "Wirelength Weight",
+          "type": "integer"
+        },
+        "tier_crossing_weight": {
+          "default": 500,
+          "minimum": 0,
+          "title": "Tier Crossing Weight",
+          "type": "integer"
+        },
+        "congestion_grid": {
+          "default": 16,
+          "maximum": 64,
+          "minimum": 4,
+          "title": "Congestion Grid",
+          "type": "integer"
+        }
+      },
+      "title": "Search",
+      "type": "object"
+    },
+    "Stack": {
+      "additionalProperties": false,
+      "properties": {
+        "die_faces": {
+          "additionalProperties": {
+            "enum": [
+              "up",
+              "down",
+              "unknown"
+            ],
+            "type": "string"
+          },
+          "title": "Die Faces",
+          "type": "object"
+        }
+      },
+      "title": "Stack",
+      "type": "object"
+    },
+    "SupplyPort": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "die": {
+          "title": "Die",
+          "type": "string"
+        },
+        "x_um": {
+          "minimum": 0,
+          "title": "X Um",
+          "type": "number"
+        },
+        "y_um": {
+          "minimum": 0,
+          "title": "Y Um",
+          "type": "number"
+        },
+        "domain": {
+          "default": "VDD",
+          "title": "Domain",
+          "type": "string"
+        },
+        "voltage_V": {
+          "exclusiveMinimum": 0,
+          "title": "Voltage V",
+          "type": "number"
+        },
+        "max_current_A": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Max Current A"
+        },
+        "core": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Core"
+        },
+        "provenance": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Provenance"
+        },
+        "feed": {
+          "default": "external",
+          "enum": [
+            "external",
+            "stack_base"
+          ],
+          "title": "Feed",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "die",
+        "x_um",
+        "y_um",
+        "voltage_V"
+      ],
+      "title": "SupplyPort",
+      "type": "object"
+    },
+    "TSV": {
+      "additionalProperties": false,
+      "properties": {
+        "diameter_um": {
+          "exclusiveMinimum": 0,
+          "title": "Diameter Um",
+          "type": "number"
+        },
+        "pitch_um": {
+          "exclusiveMinimum": 0,
+          "title": "Pitch Um",
+          "type": "number"
+        },
+        "keepout_um": {
+          "minimum": 0,
+          "title": "Keepout Um",
+          "type": "number"
+        },
+        "bond_pitch_um": {
+          "exclusiveMinimum": 0,
+          "title": "Bond Pitch Um",
+          "type": "number"
+        },
+        "max_current_mA": {
+          "exclusiveMinimum": 0,
+          "title": "Max Current Ma",
+          "type": "number"
+        },
+        "provenance": {
+          "title": "Provenance",
+          "type": "string"
+        }
+      },
+      "required": [
+        "diameter_um",
+        "pitch_um",
+        "keepout_um",
+        "bond_pitch_um",
+        "max_current_mA",
+        "provenance"
+      ],
+      "title": "TSV",
+      "type": "object"
+    },
+    "WireAreaReference": {
+      "additionalProperties": false,
+      "properties": {
+        "horizontal": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Horizontal"
+        },
+        "vertical": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Vertical"
+        }
+      },
+      "title": "WireAreaReference",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "resim/0.1",
+      "default": "resim/0.1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "name": {
+      "title": "Name",
+      "type": "string"
+    },
+    "architecture": {
+      "$ref": "#/$defs/Architecture"
+    },
+    "resources": {
+      "$ref": "#/$defs/Resources"
+    },
+    "constraints": {
+      "$ref": "#/$defs/Constraints"
+    },
+    "floorplan": {
+      "$ref": "#/$defs/Floorplan"
+    },
+    "search": {
+      "$ref": "#/$defs/Search"
+    },
+    "stack": {
+      "$ref": "#/$defs/Stack"
+    }
+  },
+  "required": [
+    "name",
+    "architecture",
+    "resources"
+  ],
+  "title": "NativeProject",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

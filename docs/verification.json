@@ -1,129 +1,132 @@
 {
-  "checked_at": "2026-09-28T08:08:15.840Z",
+  "checked_at": "2026-09-28T10:11:45.357Z",
   "platform": "win32",
   "node": "v24.19.0",
-  "engine_test_target": "Resim.Engine.exe",
+  "engine_test_target": "app/Resim.Engine.exe",
   "files": {
-    "Resim.exe": "969219e05e14a7d9b485c46f62ef98a4d53a38813038c0422196eaa0c4e881f0",
-    "Resim.Engine.exe": "8476af8c29a25911c3840e55400c4e14088c1fa8a1addc035e8428f56184019b",
-    "Resim.Engine.next.exe": null,
-    "source/resim_search_policy.py": "d88120c10395ee4d255f7a58a33d559bd1b1accb93618db796d396a70581f9bf"
+    "app/Resim.exe": "03941bcb0f39e4fe4762f4b292d7732db6f807087b30f93f182de9aefd603bd8",
+    "app/Resim.Engine.exe": "643da0ed103c19fba61fa93b3bdc0d381778e75ff28f7ddcf77b1ab5da4bce1d",
+    "app/Resim.Engine.next.exe": null,
+    "src/resim_policy_portable.py": "66f845c75bb29ccd2d34c96d2b4f5ad4c2be1ab4243698662bc8ed657e2dd826",
+    "src/resim_policy_stack.py": "20377c632b67c002180fc66d1e1e3d96cc0fad754afd28e9943eeb33757d3d9f",
+    "src/resim_policy_storage.py": "ed0866a1c4fc92a4034b6327c780b56903cef70041e31d7e2012a65ae23249b7",
+    "src/resim_search_policy.py": "d96cae8ce33cb57077f908b1a1ad0caff8caa6e7bdb5122e02269d95ab062955"
   },
   "syntax": [
     {
-      "file": "_internal/resim/static/app.js",
+      "file": "app/_internal/resim/static/app.js",
       "passed": true
     },
     {
-      "file": "_internal/resim/static/architecture-io.js",
+      "file": "app/_internal/resim/static/architecture-io.js",
       "passed": true
     },
     {
-      "file": "_internal/resim/static/calculations.js",
+      "file": "app/_internal/resim/static/calculations.js",
       "passed": true
     },
     {
-      "file": "_internal/resim/static/candidate-browser.js",
+      "file": "app/_internal/resim/static/candidate-browser.js",
       "passed": true
     },
     {
-      "file": "_internal/resim/static/connection-view.js",
+      "file": "app/_internal/resim/static/connection-view.js",
       "passed": true
     },
     {
-      "file": "_internal/resim/static/connections.js",
+      "file": "app/_internal/resim/static/connections.js",
       "passed": true
     },
     {
-      "file": "_internal/resim/static/core-view.js",
+      "file": "app/_internal/resim/static/core-view.js",
       "passed": true
     },
     {
-      "file": "_internal/resim/static/difficulty-view.js",
+      "file": "app/_internal/resim/static/difficulty-view.js",
       "passed": true
     },
     {
-      "file": "_internal/resim/static/history-comparison.js",
+      "file": "app/_internal/resim/static/history-comparison.js",
       "passed": true
     },
     {
-      "file": "_internal/resim/static/input-editor.js",
+      "file": "app/_internal/resim/static/input-editor.js",
       "passed": true
     },
     {
-      "file": "_internal/resim/static/layout-model.js",
+      "file": "app/_internal/resim/static/layout-model.js",
       "passed": true
     },
     {
-      "file": "_internal/resim/static/layout-variants.js",
+      "file": "app/_internal/resim/static/layout-variants.js",
       "passed": true
     },
     {
-      "file": "_internal/resim/static/logical-routes.js",
+      "file": "app/_internal/resim/static/logical-routes.js",
       "passed": true
     },
     {
-      "file": "_internal/resim/static/methods.js",
+      "file": "app/_internal/resim/static/methods.js",
       "passed": true
     },
     {
-      "file": "_internal/resim/static/multi-comparison.js",
+      "file": "app/_internal/resim/static/multi-comparison.js",
       "passed": true
     },
     {
-      "file": "_internal/resim/static/object-details.js",
+      "file": "app/_internal/resim/static/object-details.js",
       "passed": true
     },
     {
-      "file": "_internal/resim/static/output-folders.js",
+      "file": "app/_internal/resim/static/output-folders.js",
       "passed": true
     },
     {
-      "file": "_internal/resim/static/report-assessment.js",
+      "file": "app/_internal/resim/static/report-assessment.js",
       "passed": true
     },
     {
-      "file": "_internal/resim/static/resource-workspace.js",
+      "file": "app/_internal/resim/static/resource-workspace.js",
       "passed": true
     },
     {
-      "file": "_internal/resim/static/routing-resources.js",
+      "file": "app/_internal/resim/static/routing-resources.js",
       "passed": true
     },
     {
-      "file": "_internal/resim/static/stack-model.js",
+      "file": "app/_internal/resim/static/stack-model.js",
       "passed": true
     },
     {
-      "file": "_internal/resim/static/stack-panel.js",
+      "file": "app/_internal/resim/static/stack-panel.js",
       "passed": true
     },
     {
-      "file": "_internal/resim/static/structure-editor.js",
+      "file": "app/_internal/resim/static/structure-editor.js",
       "passed": true
     },
     {
-      "file": "_internal/resim/static/technology-form.js",
+      "file": "app/_internal/resim/static/technology-form.js",
       "passed": true
     },
     {
-      "file": "_internal/resim/static/tsv-display.js",
+      "file": "app/_internal/resim/static/tsv-display.js",
       "passed": true
     },
     {
-      "file": "_internal/resim/static/ui-state.js",
+      "file": "app/_internal/resim/static/ui-state.js",
       "passed": true
     },
     {
-      "file": "_internal/resim/static/viewer.js",
+      "file": "app/_internal/resim/static/viewer.js",
       "passed": true
     },
     {
-      "file": "_internal/resim/static/wire-detail.js",
+      "file": "app/_internal/resim/static/wire-detail.js",
       "passed": true
     },
     {
-      "file": "_internal/resim/static/workbench.js",
+      "file": "app/_internal/resim/static/workbench.js",
       "passed": true
     }
   ],
@@ -134,6 +137,7 @@
     "tests/planning-controls.test.mjs",
     "tests/report-assessment.test.mjs",
     "tests/resource-workspace.test.mjs",
+    "tests/routing-resources.test.mjs",
     "tests/search-capacity.test.mjs",
     "tests/stack-model.test.mjs",
     "tests/structure-editor.test.mjs",
@@ -141,10 +145,14 @@
   ],
   "test_exit_code": 0,
   "counts": {
-    "tests": 51,
-    "pass": 51,
+    "tests": 59,
+    "pass": 59,
     "fail": 0,
     "skipped": 0
+  },
+  "python": {
+    "exit_code": 0,
+    "tests": 5
   },
   "passed": true
 }

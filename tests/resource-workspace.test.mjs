@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {interfaceGroups} from '../_internal/resim/static/resource-workspace.js';
+import {interfaceGroups} from '../app/_internal/resim/static/resource-workspace.js';
 
 test('interfaces include all dedicated cores and MC regions without mixing HB with TSV',()=>{
   const regions=[];

@@ -1,0 +1,210 @@
+{
+  "$defs": {
+    "DelayModel": {
+      "additionalProperties": false,
+      "properties": {
+        "planar_ps_per_um": {
+          "exclusiveMinimum": 0,
+          "title": "Planar Ps Per Um",
+          "type": "number"
+        },
+        "tier_ps": {
+          "minimum": 0,
+          "title": "Tier Ps",
+          "type": "number"
+        },
+        "provenance": {
+          "minLength": 1,
+          "title": "Provenance",
+          "type": "string"
+        },
+        "calibrated": {
+          "default": false,
+          "title": "Calibrated",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "planar_ps_per_um",
+        "tier_ps",
+        "provenance"
+      ],
+      "title": "DelayModel",
+      "type": "object"
+    },
+    "Metal": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "direction": {
+          "enum": [
+            "HORIZONTAL",
+            "VERTICAL"
+          ],
+          "title": "Direction",
+          "type": "string"
+        },
+        "pitch_um": {
+          "exclusiveMinimum": 0,
+          "title": "Pitch Um",
+          "type": "number"
+        },
+        "width_um": {
+          "exclusiveMinimum": 0,
+          "title": "Width Um",
+          "type": "number"
+        },
+        "availability": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Per-layer usable fraction; overrides routing_availability. Zero disables automatic allocation.",
+          "title": "Availability"
+        }
+      },
+      "required": [
+        "name",
+        "direction",
+        "pitch_um",
+        "width_um"
+      ],
+      "title": "Metal",
+      "type": "object"
+    },
+    "Resources": {
+      "additionalProperties": false,
+      "properties": {
+        "technology": {
+          "title": "Technology",
+          "type": "string"
+        },
+        "technology_provenance": {
+          "title": "Technology Provenance",
+          "type": "string"
+        },
+        "metals": {
+          "items": {
+            "$ref": "#/$defs/Metal"
+          },
+          "title": "Metals",
+          "type": "array"
+        },
+        "routing_availability": {
+          "default": 0.15,
+          "exclusiveMinimum": 0,
+          "maximum": 1,
+          "title": "Routing Availability",
+          "type": "number"
+        },
+        "tsv": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TSV"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "delay_model": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/DelayModel"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "notes": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Notes",
+          "type": "array"
+        }
+      },
+      "required": [
+        "technology",
+        "technology_provenance"
+      ],
+      "title": "Resources",
+      "type": "object"
+    },
+    "TSV": {
+      "additionalProperties": false,
+      "properties": {
+        "diameter_um": {
+          "exclusiveMinimum": 0,
+          "title": "Diameter Um",
+          "type": "number"
+        },
+        "pitch_um": {
+          "exclusiveMinimum": 0,
+          "title": "Pitch Um",
+          "type": "number"
+        },
+        "keepout_um": {
+          "minimum": 0,
+          "title": "Keepout Um",
+          "type": "number"
+        },
+        "bond_pitch_um": {
+          "exclusiveMinimum": 0,
+          "title": "Bond Pitch Um",
+          "type": "number"
+        },
+        "max_current_mA": {
+          "exclusiveMinimum": 0,
+          "title": "Max Current Ma",
+          "type": "number"
+        },
+        "provenance": {
+          "title": "Provenance",
+          "type": "string"
+        }
+      },
+      "required": [
+        "diameter_um",
+        "pitch_um",
+        "keepout_um",
+        "bond_pitch_um",
+        "max_current_mA",
+        "provenance"
+      ],
+      "title": "TSV",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "resim-technology/1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "resources": {
+      "$ref": "#/$defs/Resources"
+    }
+  },
+  "required": [
+    "schema_version",
+    "resources"
+  ],
+  "title": "TechnologyInput",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

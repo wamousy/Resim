@@ -1,6 +1,6 @@
 import test,{before,after} from 'node:test';
 import assert from 'node:assert/strict';
-import {spawn} from 'node:child_process';
+import {spawn,spawnSync} from 'node:child_process';
 import {existsSync} from 'node:fs';
 import {mkdtemp,mkdir,stat,readFile,rm,writeFile} from 'node:fs/promises';
 import {join,resolve,dirname,basename,sep} from 'node:path';
@@ -8,8 +8,8 @@ import {tmpdir} from 'node:os';
 import {createServer} from 'node:net';
 import {fileURLToPath} from 'node:url';
 import {minimalProject} from './fixtures/minimal-project.mjs';
-import {layoutSignature,distinctCandidates} from '../_internal/resim/static/layout-variants.js';
-const app=resolve(dirname(fileURLToPath(import.meta.url)),'..');
+import {layoutSignature,distinctCandidates} from '../app/_internal/resim/static/layout-variants.js';
+const app=resolve(dirname(fileURLToPath(import.meta.url)),'../app');
 const launcher=process.env.RESIM_HOST_EXE||(existsSync(join(app,'Resim.Host.test.exe'))?join(app,'Resim.Host.test.exe'):join(app,'Resim.exe'));
 let root,projects,output,child,url,logs='';
 const headers={'X-Resim-Local':'1','Content-Type':'application/json'};
@@ -40,6 +40,17 @@ test('directory listing starts in the configured project root and excludes files
  const r=await call('/api/output-folders');assert.equal(r.status,200);assert.equal(resolve(r.data.path),resolve(projects));
  await writeFile(join(output,'not-a-folder.txt'),'test');
  const listed=await call('/api/output-folders?path='+encodeURIComponent(output));assert.equal(listed.status,200);assert.deepEqual(listed.data.folders,[]);
+});
+test('repeated launch reuses the same desktop service and preserves its project root',async()=>{
+ const second=spawnSync(launcher,['serve','--port',new URL(url).port,'--projects-dir',projects],{windowsHide:true,encoding:'utf8',timeout:10000});
+ assert.equal(second.status,0,second.stderr);assert.match(second.stdout,/already running/);
+ assert.equal((await call('/api/health')).data.projects_dir,projects);
+ assert.equal(child.exitCode,null);
+});
+test('a launch for a different project root cannot silently reuse the current service',async()=>{
+ const second=spawnSync(launcher,['serve','--port',new URL(url).port,'--projects-dir',join(root,'other-projects')],{windowsHide:true,encoding:'utf8',timeout:10000});
+ assert.equal(second.status,1);assert.equal((await call('/api/health')).data.projects_dir,projects);
+ assert.equal(child.exitCode,null);
 });
 test('only local, same-origin UI requests can browse or create directories',async()=>{
  assert.equal((await fetch(url+'/api/output-folders')).status,403);

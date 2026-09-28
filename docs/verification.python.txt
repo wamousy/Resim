@@ -1,0 +1,10 @@
+test_corruption_and_traversal_fail_before_publishing_project (test_storage.PortableTests.test_corruption_and_traversal_fail_before_publishing_project) ... ok
+test_external_results_are_collected_and_relocated_without_changing_metrics (test_storage.PortableTests.test_external_results_are_collected_and_relocated_without_changing_metrics) ... ok
+test_concurrent_processes_never_read_mixed_input_generations (test_storage.StorageTests.test_concurrent_processes_never_read_mixed_input_generations) ... ok
+test_invalid_journal_never_writes_input (test_storage.StorageTests.test_invalid_journal_never_writes_input) ... ok
+test_real_process_exit_at_each_commit_boundary_recovers_complete_generation (test_storage.StorageTests.test_real_process_exit_at_each_commit_boundary_recovers_complete_generation) ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 1.191s
+
+OK

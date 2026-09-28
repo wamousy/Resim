@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {updateStructure,dieDisplayRoles} from '../_internal/resim/static/structure-editor.js';
+import {updateStructure,dieDisplayRoles} from '../app/_internal/resim/static/structure-editor.js';
 
 const project=()=>({architecture:{chip:'blx_scheme1',dies:[{id:'B',kind:'logic',voltage_V:.8,max_utilization:.72,metrics:{frequency_MHz:1000}},{id:'L',kind:'logic',voltage_V:1}],modules:[{id:'compute',allowed_dies:['B','L']}]},floorplan:{placements:[{module:'compute',die:'B',x_um:100,y_um:200}],tsv_regions:[{id:'bond',lower_die:'L',upper_die:'B',interconnect:'HB',orientation:'F2F'}],supply_ports:[{id:'power',die:'B'}]},constraints:{blockages:[{id:'keepout',die:'B'}],routing_channels:[{id:'channel',die:'L'}]}});
 const row=(id,originalId=id)=>({id,originalId,kind:'logic',width:25,height:32,area:800,thickness:100,power:null});
