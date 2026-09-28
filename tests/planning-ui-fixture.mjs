@@ -6,7 +6,7 @@ import {join,resolve,dirname,basename} from 'node:path';
 import {tmpdir} from 'node:os';
 import {createServer} from 'node:net';
 import {fileURLToPath} from 'node:url';
-import {readYaml} from '../_internal/resim/static/architecture-io.js';
+import {minimalProject} from './fixtures/minimal-project.mjs';
 const app=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const root=await mkdtemp(join(tmpdir(),'resim-planning-ui-'));
 const stopFile=join(root,'stop-ui-fixture');
@@ -22,7 +22,7 @@ async function close(){
 }
 try{
  for(let i=0;i<100;i++){try{if((await fetch(url+'/api/health')).ok)break;}catch{}await new Promise(r=>setTimeout(r,100));}
- const p=readYaml(await readFile(join(app,'..','ResimProjects','gcd16-nangate45','inputs','architecture.yml'),'utf8'));
+ const p=minimalProject();
  p.name='候选浏览验证（临时工程）';p.search={...p.search,candidates:12,time_limit_s:20};
  const r=await fetch(url+'/api/optimize',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({yaml:JSON.stringify(p),project_name:p.name})});
  if(!r.ok)throw new Error(await r.text());

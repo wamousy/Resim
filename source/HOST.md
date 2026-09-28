@@ -30,3 +30,7 @@ node --test tests/planning-controls.test.mjs tests/search-capacity.test.mjs
 ```
 
 使用 Python 3.13 构建 `Resim.Engine.next.exe`；测试从独立临时目录启动新引擎，验证 12 个不同候选真实落盘、百万级请求数量输入校验、非法数量拒绝、固定布局搜索穷尽。更新脚本核对监听进程和路径，保留原项目目录，失败时恢复原引擎。成功后可删除 staging 文件；已安装引擎不依赖本机 Python。
+
+## 新版工程输入
+
+同一启动钩子将工程存储切换为 `inputs/chip-architecture.yml` 与 `inputs/technology.yml`。工程载入时合并并执行原有 `Project` 校验；保存评估或寻优后再拆分回两份新版输入。合并后的 `resim/0.1` 只保留在各次运行目录中用于结果复现，工程根目录不再维护旧版 `inputs/architecture.yml`。

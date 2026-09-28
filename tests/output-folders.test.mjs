@@ -7,12 +7,13 @@ import {join,resolve,dirname,basename,sep} from 'node:path';
 import {tmpdir} from 'node:os';
 import {createServer} from 'node:net';
 import {fileURLToPath} from 'node:url';
-import {readYaml} from '../_internal/resim/static/architecture-io.js';
+import {minimalProject} from './fixtures/minimal-project.mjs';
 import {layoutSignature,distinctCandidates} from '../_internal/resim/static/layout-variants.js';
 const app=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const launcher=process.env.RESIM_HOST_EXE||(existsSync(join(app,'Resim.Host.test.exe'))?join(app,'Resim.Host.test.exe'):join(app,'Resim.exe'));
 let root,projects,output,child,url,logs='';
 const headers={'X-Resim-Local':'1','Content-Type':'application/json'};
+const sampleProject=async()=>minimalProject();
 const call=async(path,body,extra={})=>{
  const r=await fetch(url+path,{method:body?'POST':'GET',headers:{...headers,...extra},...(body?{body:JSON.stringify(body)}:{})});
  return {status:r.status,data:await r.json()};
@@ -58,13 +59,13 @@ test('traversal, reserved names, missing parent and application-directory writes
  assert.equal((await call('/api/output-folders/create',{parent:app,name:'should-not-be-created'})).status,400);
 });
 test('actual evaluation writes results into the folder selected through the new API',async()=>{
- const p=readYaml(await readFile(join(app,'..','ResimProjects','gcd16-nangate45','inputs','architecture.yml'),'utf8'));
+ const p=await sampleProject();
  p.name='目录功能隔离测试';
  const selected=join(output,'方案 A 结果');
  const result=await call('/api/evaluate',{yaml:JSON.stringify(p),project_name:p.name,output_dir:selected});
  assert.equal(result.status,200,JSON.stringify(result.data));
  const run=resolve(result.data.storage.run_dir);assert.ok(run.startsWith(resolve(selected)+sep),run);
- assert.equal((await stat(run)).isDirectory(),true);assert.equal(result.data.summary.module_count,8);
+ assert.equal((await stat(run)).isDirectory(),true);assert.equal(result.data.summary.module_count,2);
  assert.equal((await call('/api/health')).data.projects_dir,projects);
 });
 test('existing web assets, validation errors and report APIs pass through unchanged',async()=>{
@@ -73,7 +74,7 @@ test('existing web assets, validation errors and report APIs pass through unchan
 });
 
 test('optimizer persists physically different candidates and never pads a fixed layout',async()=>{
- const p=readYaml(await readFile(join(app,'..','ResimProjects','gcd16-nangate45','inputs','architecture.yml'),'utf8'));
+ const p=await sampleProject();
  p.search={...p.search,candidates:3,time_limit_s:8};p.name='Distinct layout integration check';
  const result=await call('/api/optimize',{yaml:JSON.stringify(p),project_name:p.name,output_dir:output});
  assert.equal(result.status,200,JSON.stringify(result.data));
