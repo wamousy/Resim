@@ -65,3 +65,21 @@ test('stored split inputs expose stack, reload edited faces, and retain run snap
  const old=await request(`projects/${id}/runs/${saved.data.storage.run_id}/result`);
  assert.deepEqual(readStack(old.data.result.project),{die_faces:{die0:'up'}});
 });
+
+test('resource evaluation conserves geometry and power, flags overlap, and propagates unknown power',async()=>{
+ const p=minimalProject(),base=(await request('preview',p)).data.report;
+ const near=(a,b)=>assert.ok(Math.abs(a-b)<1e-9,`${a} != ${b}`);
+ near(base.dies[0].area_mm2,.01);near(base.dies[0].module_area_mm2,.0002);
+ near(base.dies[0].free_area_mm2,.0098);near(base.dies[0].footprint_utilization,.02);
+ near(base.dies[0].power_W,2);near(base.dies[0].power_margin_W,8);
+ const moved=structuredClone(p);moved.floorplan.placements[1].x_um+=20;
+ const farther=(await request('preview',moved)).data.report;
+ assert.ok(farther.summary.wiring_metal_area_um2>base.summary.wiring_metal_area_um2);
+ near(farther.dies[0].module_area_mm2,base.dies[0].module_area_mm2);near(farther.summary.power_W,2);
+ const overlap=structuredClone(p);Object.assign(overlap.floorplan.placements[1],{x_um:10,y_um:10});
+ const invalid=(await request('preview',overlap)).data.report;
+ near(invalid.dies[0].module_area_mm2,.0001);assert.ok(invalid.summary.errors>base.summary.errors);
+ p.architecture.modules[0].power_W=null;
+ const unknown=(await request('preview',p)).data.report;
+ assert.equal(unknown.summary.power_W,null);assert.equal(unknown.dies[0].power_margin_W,null);
+});

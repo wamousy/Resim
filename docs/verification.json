@@ -1,0 +1,150 @@
+{
+  "checked_at": "2026-09-28T08:08:15.840Z",
+  "platform": "win32",
+  "node": "v24.19.0",
+  "engine_test_target": "Resim.Engine.exe",
+  "files": {
+    "Resim.exe": "969219e05e14a7d9b485c46f62ef98a4d53a38813038c0422196eaa0c4e881f0",
+    "Resim.Engine.exe": "8476af8c29a25911c3840e55400c4e14088c1fa8a1addc035e8428f56184019b",
+    "Resim.Engine.next.exe": null,
+    "source/resim_search_policy.py": "d88120c10395ee4d255f7a58a33d559bd1b1accb93618db796d396a70581f9bf"
+  },
+  "syntax": [
+    {
+      "file": "_internal/resim/static/app.js",
+      "passed": true
+    },
+    {
+      "file": "_internal/resim/static/architecture-io.js",
+      "passed": true
+    },
+    {
+      "file": "_internal/resim/static/calculations.js",
+      "passed": true
+    },
+    {
+      "file": "_internal/resim/static/candidate-browser.js",
+      "passed": true
+    },
+    {
+      "file": "_internal/resim/static/connection-view.js",
+      "passed": true
+    },
+    {
+      "file": "_internal/resim/static/connections.js",
+      "passed": true
+    },
+    {
+      "file": "_internal/resim/static/core-view.js",
+      "passed": true
+    },
+    {
+      "file": "_internal/resim/static/difficulty-view.js",
+      "passed": true
+    },
+    {
+      "file": "_internal/resim/static/history-comparison.js",
+      "passed": true
+    },
+    {
+      "file": "_internal/resim/static/input-editor.js",
+      "passed": true
+    },
+    {
+      "file": "_internal/resim/static/layout-model.js",
+      "passed": true
+    },
+    {
+      "file": "_internal/resim/static/layout-variants.js",
+      "passed": true
+    },
+    {
+      "file": "_internal/resim/static/logical-routes.js",
+      "passed": true
+    },
+    {
+      "file": "_internal/resim/static/methods.js",
+      "passed": true
+    },
+    {
+      "file": "_internal/resim/static/multi-comparison.js",
+      "passed": true
+    },
+    {
+      "file": "_internal/resim/static/object-details.js",
+      "passed": true
+    },
+    {
+      "file": "_internal/resim/static/output-folders.js",
+      "passed": true
+    },
+    {
+      "file": "_internal/resim/static/report-assessment.js",
+      "passed": true
+    },
+    {
+      "file": "_internal/resim/static/resource-workspace.js",
+      "passed": true
+    },
+    {
+      "file": "_internal/resim/static/routing-resources.js",
+      "passed": true
+    },
+    {
+      "file": "_internal/resim/static/stack-model.js",
+      "passed": true
+    },
+    {
+      "file": "_internal/resim/static/stack-panel.js",
+      "passed": true
+    },
+    {
+      "file": "_internal/resim/static/structure-editor.js",
+      "passed": true
+    },
+    {
+      "file": "_internal/resim/static/technology-form.js",
+      "passed": true
+    },
+    {
+      "file": "_internal/resim/static/tsv-display.js",
+      "passed": true
+    },
+    {
+      "file": "_internal/resim/static/ui-state.js",
+      "passed": true
+    },
+    {
+      "file": "_internal/resim/static/viewer.js",
+      "passed": true
+    },
+    {
+      "file": "_internal/resim/static/wire-detail.js",
+      "passed": true
+    },
+    {
+      "file": "_internal/resim/static/workbench.js",
+      "passed": true
+    }
+  ],
+  "test_files": [
+    "tests/input-history.test.mjs",
+    "tests/multi-comparison.test.mjs",
+    "tests/output-folders.test.mjs",
+    "tests/planning-controls.test.mjs",
+    "tests/report-assessment.test.mjs",
+    "tests/resource-workspace.test.mjs",
+    "tests/search-capacity.test.mjs",
+    "tests/stack-model.test.mjs",
+    "tests/structure-editor.test.mjs",
+    "tests/technology-form.test.mjs"
+  ],
+  "test_exit_code": 0,
+  "counts": {
+    "tests": 51,
+    "pass": 51,
+    "fail": 0,
+    "skipped": 0
+  },
+  "passed": true
+}

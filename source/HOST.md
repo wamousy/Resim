@@ -34,3 +34,9 @@ node --test tests/planning-controls.test.mjs tests/search-capacity.test.mjs
 ## 新版工程输入
 
 同一启动钩子将工程存储切换为 `inputs/chip-architecture.yml` 与 `inputs/technology.yml`。工程载入时合并并执行原有 `Project` 校验；保存评估或寻优后再拆分回两份新版输入。合并后的 `resim/0.1` 只保留在各次运行目录中用于结果复现，工程根目录不再维护旧版 `inputs/architecture.yml`。
+
+双文件中的 `stack.die_faces` 在载入时校验并编码给引擎，保存时从兼容块还原为显式 `stack`，与网页下载格式一致。新建项目 ID 使用请求上下文保存，避免不同调用共用实例变量；这不代表多文件存储已具备完整事务或通过高并发压力测试。
+
+更新脚本识别直接监听及 Windows HTTP.sys 两种模式。TCP 显示 PID 4 时，`http-listener.ps1` 要求同一请求队列中同时匹配目标应用 PID 和 127.0.0.1 端口；不能确认时拒绝更新。
+
+完整检查执行 `node source/verify.mjs`。测试使用 `tests/fixtures/minimal-project.mjs` 的合成输入，不要求存在使用人员的示例工程。正式交接和源码缺口见 [docs/HANDOVER.md](../docs/HANDOVER.md)。

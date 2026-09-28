@@ -1,6 +1,7 @@
 import {METRICS,savedCandidates} from './history-comparison.js?v=3';
 import {placementRows,layoutSignature} from './layout-variants.js';
 import {runLabel} from './ui-state.js';
+import {assessedReport} from './report-assessment.js';
 const esc=s=>String(s??'—').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const finite=v=>typeof v==='number'&&Number.isFinite(v);
 const num=v=>finite(v)?v.toLocaleString('zh-CN',{maximumFractionDigits:5}):'未知';
@@ -10,6 +11,7 @@ const stable=v=>JSON.stringify(v,(_,x)=>x&&typeof x==='object'&&!Array.isArray(x
 export function compareSelections(selections){
   if(selections.length<2||selections.some(s=>!s?.report?.summary))throw new Error('至少选择两个有效方案。');
   if(new Set(selections.map(key)).size!==selections.length)throw new Error('同一个历史方案已被重复选择，请更换或移除。');
+  selections=selections.map(s=>({...s,report:assessedReport(s.report)}));
   const metrics=METRICS.map(([id,label,unit])=>({id,label,unit,values:selections.map(s=>finite(s.report.summary[id])?s.report.summary[id]:null)}));
   const maps=selections.map(s=>new Map(placementRows(s.report).map(p=>[p.id,p])));
   const ids=[...new Set(maps.flatMap(m=>[...m.keys()]))].sort();
@@ -26,7 +28,7 @@ export function compareSelections(selections){
   if(selections.some(s=>s.report.summary.unknowns))warnings.push('部分方案有缺失数据；未知值不按零计算。');
   if(new Set(selections.map(s=>layoutSignature(s.report))).size<selections.length)warnings.push('部分历史记录的模块布局相同，可继续比较其资源参数与评估结果。');
   if(new Set(selections.map(s=>s.project_id)).size>1)warnings.push('跨工程比较按模块 ID 对齐，模块语义请结合各工程确认。');
-  return {schema_version:'resim-comparison/2',created_at:new Date().toISOString(),
+  return {schema_version:'resim-comparison/2',assessment_scope:'preserved-engine-report + web-stack-geometry/1',created_at:new Date().toISOString(),
     selections:selections.map(({report,...s})=>({...s,simulator_version:report.simulator_version,plan_id:report.plan_id})),
     metrics,changes,issues:[...issues.values()],warnings};
 }

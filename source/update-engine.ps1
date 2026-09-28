@@ -8,7 +8,13 @@ if (-not (Test-Path -LiteralPath $resimStaged)) { throw 'Missing tested staging 
 $resimProcess = Get-CimInstance Win32_Process -Filter "ProcessId = $ExpectedProcessId"
 if (-not $resimProcess -or $resimProcess.ExecutablePath -notin @($resimEntry, $resimTarget)) { throw 'Unexpected process; nothing changed.' }
 $resimListeners = @(Get-NetTCPConnection -LocalPort $Port -State Listen)
-if ($ExpectedProcessId -notin $resimListeners.OwningProcess) { throw 'The expected process does not own the requested port.' }
+$resimOwnsPort = $ExpectedProcessId -in $resimListeners.OwningProcess
+if (-not $resimOwnsPort -and 4 -in $resimListeners.OwningProcess -and $resimProcess.ExecutablePath -eq $resimEntry) {
+    . (Join-Path $PSScriptRoot 'http-listener.ps1')
+    $resimQueues = netsh http show servicestate view=requestq verbose=yes | Out-String
+    if ($LASTEXITCODE -eq 0) { $resimOwnsPort = Test-ResimHttpQueueOwner $resimQueues $ExpectedProcessId $Port }
+}
+if (-not $resimOwnsPort) { throw 'The expected process does not own the requested port; no update performed.' }
 $resimHealth = Invoke-RestMethod "http://127.0.0.1:$Port/api/health" -TimeoutSec 3
 $resimProjects = [IO.Path]::GetFullPath($resimHealth.projects_dir)
 $resimBackup = Join-Path ([IO.Path]::GetTempPath()) ('resim-engine-backup-' + [guid]::NewGuid().ToString('N') + '.bin')

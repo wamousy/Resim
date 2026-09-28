@@ -1,6 +1,7 @@
 import {OutputFolders} from './output-folders.js?v=1';
 import {InputEditor} from './input-editor.js?v=8';
-import {HistoryComparison} from './multi-comparison.js?v=2';
+import {HistoryComparison} from './multi-comparison.js?v=handover-1';
+import {assessedReport} from './report-assessment.js';
 import {distinctCandidates,layoutDifference} from './layout-variants.js';
 import {CandidateBrowser,candidateCount,searchCompletion} from './candidate-browser.js';
 import {SEVERITIES,difficultyPage} from './difficulty-view.js';
@@ -28,8 +29,8 @@ let busy=false,dirty=false,draftChanged=false,rawEdited=false,revision=0,preview
 let storageMode='evaluate',activeCandidate='current',savedCandidate='current',previewController,selectedIssue=null;
 let connectionPane;let structureDirty=false;let inputEditor,historyComparison;
 function notice(message,error=false){$('notice').textContent=message;$('notice').classList.toggle('error',error);}
-function allIssues(){return report?[...report.issues,...stackModel(report.project).issues]:[];}
-function displaySummary(value=report){if(!value)return undefined;const s={...value.summary};for(const i of stackModel(value.project).issues){const key={error:'errors',unknown:'unknowns',warning:'warnings'}[i.severity];s[key]=(s[key]||0)+1;}return s;}
+function allIssues(){return assessedReport(report)?.issues||[];}
+function displaySummary(value=report){return assessedReport(value)?.summary;}
 function setInspector(open){$('selection-inspector').hidden=!open;$('layout-workbench').classList.toggle('has-detail',open);if(!open)$('inspector-diagnostics').open=false;}
 function clearSelection(){
   inspect(null);if(viewer){viewer.selectedLink=null;viewer.selectedTSV=null;viewer.selectedPort=null;viewer.selectedDie=null;}

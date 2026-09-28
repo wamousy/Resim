@@ -1,5 +1,17 @@
 # Resim
-A simulator for 3D chips Display  and resource evaluation
+面向芯片架构阶段的资源估算与三维布局规划工具，用于发现实现难点、辅助模块分区和 floorplan 决策。
+
+**交接总入口：[模拟器使用与开发交接文档](docs/HANDOVER.md)**。包含功能完成度、输入输出、计算口径、代码地图、维护步骤、测试证据和按优先级排列的待完善任务。
+
+在程序目录启动：
+
+```powershell
+.\Resim.exe serve --port 8770 --projects-dir "..\ResimProjects" --open-browser
+```
+
+维护人员运行 `node source/verify.mjs`，检查结果保存至 [docs/verification.json](docs/verification.json)。本次检查为 51 项自动测试和 29 个前端文件语法检查全部通过。
+
+当前为架构级估算，不能代替后端物理实现签核。发布包的原始 Python 后端目前只保留字节码，尚不具备完整源码重建条件；此项已列为交接最高优先级缺口。
 
 使用说明：[架构输入与历史结果](INPUT-WORKFLOW.md)。
 

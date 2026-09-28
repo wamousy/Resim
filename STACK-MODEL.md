@@ -25,7 +25,7 @@ stack:
 
 `die_faces` 仅允许存在的 Die ID，值为 `up`、`down`、`unknown`。旧输入未指定时从 F2F/B2B 接口推断；无法推断时显示待定，不当作已知朝上。抽象 DRAM 封装不假设内部 die 朝向。
 
-当前发布包的计算引擎仍为 0.1，严格 schema 没有独立朝向字段。因此 Web 适配层把 `stack` 编码为 `architecture.description` 尾部的 `[resim-stack/1]` JSON 块，以保留在完整输入、历史结果和候选方案中；导出独立芯片文件时还原为 `stack` 并移除兼容块。原文字说明保留。后续升级引擎 schema 时应迁移为正式字段，不依赖说明字段长期承载结构数据。
+当前计算引擎版本为 0.11.0，运行时输入 schema 为 `resim/0.1`，没有独立朝向字段。Web 与双文件存储适配层把 `stack` 编码为 `architecture.description` 尾部的 `[resim-stack/1]` JSON 块，以保留在完整输入、历史结果和候选方案中；导出或保存独立芯片文件时还原为 `stack` 并移除兼容块。原文字说明保留。后续升级引擎 schema 时应迁移为正式字段，不依赖说明字段长期承载结构数据。
 
 ## 几何和资源口径
 
@@ -43,6 +43,8 @@ stack:
 HB 与 TSV 是不同的互联机制，不是物理上互斥的两种封装。背面 HB 等工艺还需背面金属与穿硅接入模型；本版不把这类结构当作已支持的直接 HB。背景参考：[imec 的正背面晶圆连接说明](https://www.imec-int.com/en/articles/path-high-density-front-and-backside-wafer-connectivity)。
 
 Web 在应用、校验、评估及寻优入口检查朝向冲突、直接 HB 接触面不匹配和非相邻接口；未指定朝向或接口计为待补数据。在「实现难点」与「约束检查」中展示 `STACK_GEOMETRY`。这些附加检查由 Web 从快照重新生成，独立运行旧版引擎及旧版导出 HTML 不包含它们；已有数值资源计算保持原引擎口径，未新增 RC、背面布线或签核级计算。
+
+主页面和多方案对比现在共用 `report-assessment.js` 生成附加检查，不重写原报告，对比 JSON 的 `assessment_scope` 标明包含 Web 堆叠检查。统一到后端与静态报告仍属于待完善工作。
 
 ## 验证
 
