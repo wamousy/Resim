@@ -1,21 +1,24 @@
-import {number as fmt} from './layout-model.js?v=13';
-const esc=s=>String(s??'未知').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-let activeGroup='area';
-const groups={area:['die_area','module_area','reserved','utilization','free'],wiring:['congestion','wire_area'],power:['power','tsv']};
-export function showCalculations(report,pending=false){
-  const select=document.getElementById('calculation-die'),target=document.getElementById('calculation-detail');
-  const before=select.value;select.innerHTML=report.dies.map(d=>`<option value="${esc(d.id)}">${esc(d.id)}</option>`).join('');
-  if(report.dies.some(d=>d.id===before))select.value=before;
-  const draw=()=>{
-    if(pending){target.innerHTML='<p>输入或布局有变化，计算完成后显示新的代入值。</p>';return;}
-    const entry=report.calculations?.dies.find(d=>d.die===select.value);
-    if(!entry){target.innerHTML='<p>历史结果未记录计算明细，请重新评估。</p>';return;}
-    target.innerHTML=entry.metrics.filter(m=>groups[activeGroup].includes(m.key)).map(m=>`<article class="formula-card"><h3>${esc(m.title)}</h3><code>${esc(m.formula)}</code><p class="substitution">${esc(m.substitution)}</p><p>${esc(m.note)}</p></article>`).join('')+
-    `<details data-source-group="area power"><summary>模块尺寸与面积需求明细</summary><div class="table-scroll"><table><tr><th>模块</th><th>宽 × 高 µm</th><th>矩形面积 µm²</th><th>最低需求 µm²</th><th>目标 / 实际单元利用率</th><th>设定依据</th><th>功耗 W</th></tr>${entry.module_terms.map(m=>`<tr><td>${esc(m.id)}</td><td>${fmt(m.width_um)} × ${fmt(m.height_um)}</td><td>${fmt(m.footprint_um2)}</td><td>${fmt(m.required_footprint_um2)}</td><td>${m.target_cell_utilization==null?'未知':fmt(m.target_cell_utilization*100)+'%'} / ${m.cell_utilization==null?'未知':fmt(m.cell_utilization*100)+'%'}</td><td>${esc(m.utilization_basis||'未提供；规划输入，需确认')}</td><td>${fmt(m.power_W)}</td></tr>`).join('')}</table></div><p>最低需求 = 标准单元面积 / 目标单元利用率 + 硬宏面积。</p></details>`+
-    `<details data-source-group="area"><summary>预留区域明细（并集计算前）</summary><div class="table-scroll"><table><tr><th>区域</th><th>类型</th><th>左下角 µm</th><th>宽 × 高 µm</th></tr>${entry.reserve_rectangles.map(r=>`<tr><td>${esc(r.id)}</td><td>${esc(r.kind)}</td><td>${fmt(r.x_um)}, ${fmt(r.y_um)}</td><td>${fmt(r.width_um)} × ${fmt(r.height_um)}</td></tr>`).join('')}</table></div></details>`+
-    `<details data-source-group="wiring"><summary>每个金属层对网格容量的贡献</summary><div class="table-scroll"><table><tr><th>层</th><th>方向</th><th>pitch µm</th><th>有效轨道容量 / 格</th></tr>${entry.congestion_capacity_terms.map(m=>`<tr><td>${esc(m.metal)}</td><td>${esc(m.direction)}</td><td>${fmt(m.pitch_um,5)}</td><td>${fmt(m.capacity_tracks,5)}</td></tr>`).join('')}</table></div></details>`;
-  };
-  const refresh=()=>{draw();target.querySelectorAll('[data-source-group]').forEach(d=>d.hidden=!d.dataset.sourceGroup.split(' ').includes(activeGroup));document.querySelectorAll('[data-calculation-group]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.calculationGroup===activeGroup)));};
-  document.querySelectorAll('[data-calculation-group]').forEach(button=>button.onclick=()=>{activeGroup=button.dataset.calculationGroup;refresh();});
-  select.onchange=refresh;refresh();
+import {number as fmt,area} from './layout-model.js?v=13';
+const esc=s=>String(s??'未提供').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const groups={area:['die_area','module_area','reserved','utilization','free'],wiring:['congestion','wire_area'],power:['power'],vertical:[]};
+const table=(heads,rows)=>`<div class="table-scroll"><table><thead><tr>${heads.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.join('')}</tbody></table></div>`;
+const fold=(title,body)=>`<details class="resource-disclosure"><summary>${title}</summary>${body}</details>`;
+export function showCalculations(report,pending=false,{die,group='area'}={}){
+  const target=document.getElementById('calculation-detail');
+  if(pending){target.innerHTML='<p class="resource-empty" role="status">输入已变化，等待重新计算。</p>';return;}
+  const d=report.dies.find(d=>d.id===die);if(!d){target.innerHTML='';return;}
+  const entry=report.calculations?.dies?.find(d=>d.die===die);
+  if(group==='vertical'){target.innerHTML='';return;}
+  if(d.display_platform&&group!=='wiring'){target.innerHTML='<p class="resource-empty">此层仅表示封装平台，不展示内部面积与功耗估算。跨层资源见 TSV / HB。</p>';return;}
+  const metrics={area:[['Die 面积',d.area_mm2,'mm²'],['模块占地',d.module_area_mm2,'mm²'],['预留面积',d.reserved_area_mm2,'mm²'],['剩余可布局',d.free_area_mm2,'mm²'],['有效区占用率',d.footprint_utilization==null?null:d.footprint_utilization*100,'%']],wiring:[['峰值拥塞比',d.peak_congestion,''],['互联金属面积',d.wire_area?.metal_area_um2,'µm²'],['互联轨道面积',d.wire_area?.track_area_um2,'µm²']],power:[['模块总功耗',d.power_W,'W'],['功耗预算',d.power_budget_W,'W'],['功耗余量',d.power_margin_W,'W']]};
+  let html=`<div class="resource-metric-grid">${metrics[group].map(([label,n,unit])=>`<div class="resource-metric"><span>${label}${unit?' / '+unit:''}</span><strong class="${n<0?'negative':''}">${n==null?'待补数据':fmt(n,3)}</strong></div>`).join('')}</div>`;
+  if(!entry){target.innerHTML=html+'<p class="resource-empty">本历史结果未记录计算过程。</p>';return;}
+  const terms=entry.module_terms||[];
+  if(group==='area'){
+    html+=fold(`模块面积明细 · ${terms.length} 个`,table(['模块','宽 × 高 / µm','占地 / mm²','最低需求 / mm²','目标 / 实际单元利用率'],terms.map(m=>`<tr><td>${esc(m.id)}</td><td>${fmt(m.width_um)} × ${fmt(m.height_um)}</td><td>${area(m.footprint_um2/1e6)}</td><td>${m.required_footprint_um2==null?'待补数据':area(m.required_footprint_um2/1e6)}</td><td>${m.target_cell_utilization==null?'未知':fmt(m.target_cell_utilization*100)+'%'} / ${m.cell_utilization==null?'未知':fmt(m.cell_utilization*100)+'%'}</td></tr>`))+'<p>最低需求 = 标准单元面积 ÷ 目标单元利用率 + 硬宏面积；目标利用率由项目输入设定。</p>');
+    html+=fold(`预留区域明细 · ${(entry.reserve_rectangles||[]).length} 个`,table(['区域','类型','左下角 / µm','宽 × 高 / µm'],(entry.reserve_rectangles||[]).map(r=>`<tr><td>${esc(r.id)}</td><td>${esc(r.kind)}</td><td>${fmt(r.x_um)}, ${fmt(r.y_um)}</td><td>${fmt(r.width_um)} × ${fmt(r.height_um)}</td></tr>`))+'<p>此处为原始矩形；预留总面积按并集去重计算。</p>');
+  }
+  if(group==='power')html+=fold(`模块功耗明细 · ${terms.length} 个`,table(['模块','功耗 / W'],terms.map(m=>`<tr><td>${esc(m.id)}</td><td>${m.power_W==null?'待补数据':fmt(m.power_W)}</td></tr>`)));
+  html+=fold('计算公式与代入值',(entry.metrics||[]).filter(m=>groups[group].includes(m.key)).map(m=>`<article class="resource-formula"><h3>${esc(m.title)}</h3><code>${esc(m.formula)}</code><p class="substitution">${esc(m.key==='congestion'&&d.peak_congestion==null?'布线需求待补，当前无法给出有效的拥塞代入结果。':m.substitution)}</p><p>${esc(m.note)}</p></article>`).join(''));
+  target.innerHTML=html;
 }

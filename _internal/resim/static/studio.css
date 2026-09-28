@@ -203,6 +203,20 @@ body[data-workspace=connections] .stats{grid-template-columns:repeat(2,minmax(0,
 body[data-workspace=connections] .stats>.chip-summary,body[data-workspace=connections] .stats>.difficulty-shortcut{display:none}
 body[data-workspace=connections] .stats>div:has(#s-congestion){border-right:0}
 .candidate-difference{color:#93cbc8!important;border-top:1px solid #35465d;padding-top:9px;margin-top:6px;line-height:1.7}
+.candidate-list{display:flex;overflow-x:auto;scrollbar-width:none;gap:12px;overscroll-behavior-x:contain;padding:2px 0 5px}
+.candidate-list::-webkit-scrollbar{display:none}.candidate-list:focus-visible{outline:2px solid #73acae;outline-offset:3px}
+.candidate-card{flex:0 0 260px;max-width:calc(100% - 4px);min-width:0}
+.candidate-scroll{display:flex;align-items:center;gap:12px;margin-top:13px}.candidate-scroll[hidden]{display:none}
+.candidate-scroll input{flex:1;min-width:40px;height:20px}.candidate-scroll button{padding:5px 11px}.candidate-scroll output{color:#96acc6;font-size:11px;min-width:60px;text-align:right}
+#candidate-origin{font-size:11px;color:#8fa6c2;line-height:1.6}.layout-actions .search-actions{margin-left:auto}#search-count{width:95px}
+.workspace-heading #workspace-kicker{display:none}
+.difficulty-totals>button{display:grid;grid-template-columns:1fr auto;align-items:center;text-align:left;border:1px solid var(--line);border-radius:9px;background:var(--panel);padding:18px 20px}
+.difficulty-totals>button:hover{background:#233248}.difficulty-totals>button[aria-expanded=true]{background:#24394e;border-color:#77abb4;box-shadow:inset 0 -2px #77abb4}
+.difficulty-totals>button:focus-visible{outline:2px solid #9fcaf0;outline-offset:2px}.difficulty-totals>button:nth-child(1) b{color:#f1b09d}.difficulty-totals>button:nth-child(2) b{color:#e3c38e}.difficulty-totals>button:nth-child(3) b{color:#99bde9}
+#difficulty-panel>.panel-head{padding:20px 0 0}#difficulty-panel>.panel-head h2{font-size:16px}#difficulty-summary .difficulty-category strong{overflow-wrap:anywhere}
+#difficulty-title{scroll-margin-top:75px}
+.difficulty-pages{display:flex;align-items:center;justify-content:center;gap:20px;padding:18px 0}.difficulty-pages[hidden]{display:none}.difficulty-empty{padding:25px 0}.difficulty-item .difficulty-category button{font-size:11px}
+@media(max-width:760px){.difficulty-totals>button{padding:14px 10px;display:block}.difficulty-totals>button b{display:block;margin-top:8px}.candidate-card{flex-basis:230px}.layout-actions{flex-wrap:wrap}}
 
 /* Multi-plan comparison is opt-in; no plan is a privileged baseline. */
 #history-comparison{padding:0;overflow:hidden}

@@ -2,6 +2,8 @@ import {OutputFolders} from './output-folders.js?v=1';
 import {InputEditor} from './input-editor.js?v=8';
 import {HistoryComparison} from './multi-comparison.js?v=2';
 import {distinctCandidates,layoutDifference} from './layout-variants.js';
+import {CandidateBrowser,candidateCount,searchCompletion} from './candidate-browser.js';
+import {SEVERITIES,difficultyPage} from './difficulty-view.js';
 import {updateStructure} from './structure-editor.js?v=4';
 import {stackModel,faceText,assertStack} from './stack-model.js?v=2';
 import {renderInterfaceInputs,interfaceInputValues,renderStackStrip,dieDetails,pairDetails} from './stack-panel.js?v=2';
@@ -9,22 +11,22 @@ import {readYaml} from './architecture-io.js?v=2';
 import {peerConnections} from './core-view.js?v=19';
 import {chipDimensions,coreDetails,corePeers} from './object-details.js?v=2';
 import {connectionScope,SCOPE_NAMES,transferBudget} from './connection-view.js?v=19';
-import {showRoutingResources} from './routing-resources.js?v=19';
+import {showResourceWorkspace} from './resource-workspace.js?v=resources-2';
 import {number as fmt,area,movePlacement,linkBudget} from './layout-model.js?v=19';
 import {Viewer} from './viewer.js?v=24';
 import {Connections} from './connections.js?v=20';
 import {assessment,candidateFolder,matchingSavedCandidate,runLabel} from './ui-state.js?v=19';
-import {showMethods} from './methods.js?v=21';
-import {showCalculations} from './calculations.js?v=19';
+import {showMethods} from './methods.js?v=resources-2';
 import {initWorkbench,openWorkspace} from './workbench.js?v=workflow-6';
 initWorkbench();
 const $=id=>document.getElementById(id),clone=x=>structuredClone(x);
+const candidateBrowser=new CandidateBrowser($('layout-candidates'));
+let difficultySelection=null,difficultyPageIndex=0;
 const esc=s=>String(s??'—').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let report,searchResult,baseline,activeStorage,currentProjectId=null,selectedId=null;
 let busy=false,dirty=false,draftChanged=false,rawEdited=false,revision=0,previewPending=false,previewFailed=false,previewTimer,editBase=null,undo=[],redo=[];
 let storageMode='evaluate',activeCandidate='current',savedCandidate='current',previewController,selectedIssue=null;
 let connectionPane;let structureDirty=false;let inputEditor,historyComparison;
-function meter(value,limit=1){return value==null||!Number.isFinite(value)?'':`<span class="resource-meter ${value>limit?'danger':value>limit*.85?'warn':''}" aria-hidden="true"><i style="width:${Math.max(0,Math.min(100,value*100))}%"></i></span>`;}
 function notice(message,error=false){$('notice').textContent=message;$('notice').classList.toggle('error',error);}
 function allIssues(){return report?[...report.issues,...stackModel(report.project).issues]:[];}
 function displaySummary(value=report){if(!value)return undefined;const s={...value.summary};for(const i of stackModel(value.project).issues){const key={error:'errors',unknown:'unknowns',warning:'warnings'}[i.severity];s[key]=(s[key]||0)+1;}return s;}
@@ -75,7 +77,7 @@ function download(name,text,type){const url=URL.createObjectURL(new Blob([text],
 function updateControls(){
   inputEditor?.busy(busy);
   $('search-count').disabled=busy;
-  for(const button of $('layout-candidates').querySelectorAll('button'))button.disabled=busy;
+  for(const button of $('layout-candidates').querySelectorAll('[data-plan]'))button.disabled=busy;
   const m=report?.project.architecture.modules.find(m=>m.id===selectedId);
   for(const id of ['web-new-project','apply-structure','add-die','reset-structure','output-dir','browse-output','new-output-folder','load','evaluate','optimize','validate','preview-input','candidate','new-project','load-run','project','history','editor-toggle','input-export','yaml'])$(id).disabled=busy;
   for(const id of ['apply-move','edit-die','edit-x','edit-y'])$(id).disabled=busy||rawEdited||!m||m.fixed;
@@ -90,10 +92,11 @@ function updateControls(){
 }
 function setBusy(value){busy=value;updateControls();}
 function clearResult(){
+  difficultySelection=null;difficultyPageIndex=0;$('difficulty-panel').hidden=true;candidateBrowser.clear();
   inputEditor?.reset();
   structureDirty=false;
   showPort(null);
-  showRoutingResources(null);
+  showResourceWorkspace(null);
   revision++;previewController?.abort();clearTimeout(previewTimer);previewPending=false;previewFailed=false;dirty=false;draftChanged=false;rawEdited=false;undo=[];redo=[];editBase=null;report=null;renderStackStrip(null);searchResult=null;baseline=null;activeStorage=null;selectedId=null;selectedIssue=null;activeCandidate=savedCandidate='current';
   $('result-files').hidden=true;$('nav-links').textContent='—';showMethods(null);for(const id of ['ledger','issues','live-metrics','difficulty-summary'])$(id).innerHTML='';
   for(const id of ['s-dies','s-modules','s-power','s-tsv','s-congestion','s-errors','s-status','plan-id','difficulty-errors','difficulty-warnings','difficulty-unknowns'])$(id).textContent='—';
@@ -110,25 +113,29 @@ function updateFiles(){
   $('result-location').textContent=saved?currentFolder():'尚未保存到工程';
   $('result-note').textContent=dirty||rawEdited?'路径指向上次结果。点击“保存评估结果”保存当前输入及新报告。':'implementation-difficulties.md 为实现难点清单，report.html 为完整报告，layout-plan.yml 为规划方案；output-manifest.json 说明文件及单位。';
   if(saved)$('storage-path').textContent=activeStorage.run_dir;
-  for(const id of ['result-json','result-yaml','export-json','export-yaml'])$(id).disabled=!report||!saved||dirty||rawEdited||previewPending||previewFailed;
+  for(const id of ['result-json','result-yaml'])$(id).disabled=!report||!saved||dirty||rawEdited||previewPending||previewFailed;
   $('open-results').disabled=!saved;$('copy-results').disabled=!saved;$('html-report').hidden=!report||!saved||dirty||rawEdited;
   if(report&&saved&&!dirty&&!rawEdited)$('html-report').href=resultUrl('report.html');
   $('active-context').textContent=`当前工程：${$('project-name').value||'新工程'} · ${rawEdited?'输入待应用':dirty?'未保存预览':report?'已保存方案':'等待评估'}`;
   showMethods(report,searchResult);renderCandidates();updateControls();updateAssessment();
 }
 function renderCandidates(){
+  $('candidate-origin').hidden=activeCandidate!=='base';
   const host=$('layout-candidates');host.hidden=!searchResult;
-  if(!searchResult){host.replaceChildren();return;}
+  if(!searchResult){candidateBrowser.clear();host.replaceChildren();return;}
   const candidates=distinctCandidates(searchResult),requested=searchResult.baseline?.project.search?.candidates||candidates[0]?.report.project.search?.candidates;
   const plans=candidates.map(c=>({...c,key:c.id,summary:displaySummary(c.report)}));
   const difference=(p,i)=>{if(plans.length<2)return '';const other=plans[i===0?1:0],d=layoutDifference(other.report,p.report);return `<small class="candidate-difference">与${other.name}相比：${d.changed} 个模块不同${d.migrated?' · '+d.migrated+' 个跨层迁移':''}${d.moved?' · '+d.moved+' 个位置变化':''}</small>`;};
-  host.innerHTML=`<div class="candidate-list-head"><b>布局方案</b><span>${candidates.length} 个不同候选${requested?' / 目标 '+requested+' 个':''} · 已保存</span></div><div class="candidate-list">${plans.map((p,i)=>`<button data-plan="${p.key}" aria-pressed="${activeCandidate===p.key}" class="candidate-card"><b>${p.name}</b><span>${fmt(p.summary.errors,0)} 项违例 · ${fmt(p.summary.unknowns,0)} 项缺失</span><small>加权线长 ${fmt(p.report.summary.weighted_wirelength_um,0)} wire·µm</small><small>峰值拥塞 ${fmt(p.report.summary.peak_congestion,3)}</small>${difference(p,i)}</button>`).join('')}</div><p class="compact-note">按模块归属、位置和尺寸检查差异。${candidates.length<(requested||0)?'当前约束或时限下未找到足够的不同方案，不以重复布局补足。':''}选择方案查看评估；搜索结果不代表全局最优。</p>`;
+  host.innerHTML=`<div class="candidate-list-head"><b>布局方案</b><span>${candidates.length} 个不同候选${requested?' / 请求 '+requested+' 个':''}</span></div><div class="candidate-list" tabindex="0" aria-label="候选布局，左右滚动浏览">${plans.map((p,i)=>`<button data-plan="${p.key}" aria-pressed="${activeCandidate===p.key}" class="candidate-card"><b>${p.name}</b><span>${fmt(p.summary.errors,0)} 项违例 · ${fmt(p.summary.unknowns,0)} 项缺失</span><small>加权线长 ${fmt(p.report.summary.weighted_wirelength_um,0)} wire·µm</small><small>峰值拥塞 ${fmt(p.report.summary.peak_congestion,3)}</small>${difference(p,i)}</button>`).join('')}</div><div class="candidate-scroll" hidden><button data-candidate-prev aria-label="向左浏览方案">←</button><input data-candidate-slider type="range" min="0" max="1000" value="0" aria-label="左右浏览候选方案"><button data-candidate-next aria-label="向右浏览方案">→</button><output></output></div><p class="compact-note">${esc(searchCompletion(searchResult,candidates.length,requested))}</p>`;
+  candidateBrowser.bind(activeStorage?.run_id||searchResult);
   for(const b of host.querySelectorAll('[data-plan]'))b.onclick=()=>selectCandidate(b.dataset.plan);
 }
 function renderResult(result,mode){
   activeStorage=result.storage||null;storageMode=mode;
+  const count=(mode==='optimize'?result.baseline||result.candidates[0]:result)?.project?.search?.candidates;
+  if(count)$('search-count').value=count;
   if(mode==='optimize'){
-    searchResult=result;baseline=result.baseline;$('candidate').innerHTML=(baseline?'<option value="base">原始布局</option>':'')+distinctCandidates(result).map(c=>`<option value="${c.id}">${c.name} · ${c.report.candidate.accepted?'通过当前模型约束':'需修改 / 数据不全'}</option>`).join('');
+    searchResult=result;baseline=result.baseline;$('candidate').innerHTML=(baseline?'<option value="base">寻优前布局</option>':'')+distinctCandidates(result).map(c=>`<option value="${c.id}">${c.name} · ${c.report.candidate.accepted?'通过当前模型约束':'需修改 / 数据不全'}</option>`).join('');
     if(result.candidates.length){activeCandidate=savedCandidate='0';$('candidate').value='0';show(result.candidates[0],true);}else if(baseline){activeCandidate=savedCandidate='base';$('candidate').value='base';show(baseline,true);}
   }else{searchResult=null;baseline=result;activeCandidate=savedCandidate='current';$('candidate').innerHTML='<option value="current">给定布局</option>';show(result,true);}updateFiles();
 }
@@ -155,7 +162,7 @@ function newProject(name=''){ openWorkspace('inputs');structureDirty=false;$('st
 async function syncYaml(){if(report&&!rawEdited){const token=revision,project=clone(report.project);project.name=$('project-name').value||project.name;const response=await fetch('/api/yaml',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({yaml:JSON.stringify(project)})});if(!response.ok)throw new Error('当前布局输入校验失败');const text=await response.text();if(token===revision&&!rawEdited)$('yaml').value=text;}}
 async function execute(mode){
   if(busy)return;if(inputEditor?.hasPending()){notice('输入区仍有未应用修改，请先应用预览或撤销。',true);openWorkspace('inputs');return;}if(structureDirty){notice('Die 表格有未应用修改，请先应用结构并预览。',true);return;}if(previewPending){notice('正在重算布局，请稍候；也可继续调整位置。');return;}if(previewFailed&&!rawEdited){notice('预览计算失败，请重试或撤销后再保存。',true);return;}setBusy(true);notice(mode==='optimize'?'正在搜索分区与布局，时间上限由输入配置决定…':mode==='validate'?'正在校验输入…':'正在计算并保存当前布局…');
-  try{await syncYaml();const project=readYaml($('yaml').value);assertStack(project);let yaml=$('yaml').value;if(mode==='optimize'){const count=Number($('search-count').value);if(!Number.isInteger(count)||count<2||count>10)throw new Error('候选数量须为 2–10 的整数');project.search={...project.search,candidates:count};yaml=JSON.stringify(project);}const result=await api(mode,{yaml,project_id:currentProjectId,project_name:$('project-name').value||null,output_dir:$('output-dir').value.trim()||null});
+  try{await syncYaml();const project=readYaml($('yaml').value);assertStack(project);let yaml=$('yaml').value;if(mode==='optimize'){const count=candidateCount($('search-count').value);project.search={...project.search,candidates:count};yaml=JSON.stringify(project);}const result=await api(mode,{yaml,project_id:currentProjectId,project_name:$('project-name').value||null,output_dir:$('output-dir').value.trim()||null});
     if(mode==='validate'){notice(`输入有效：${result.dies} 个 die，${result.modules} 个模块。`);return;}
     currentProjectId=result.storage.project_id;localStorage.setItem('resim-project',currentProjectId);localStorage.setItem('resim-output-'+currentProjectId,$('output-dir').value.trim());$('project-name').value=result.storage.project_name;$('project-name').disabled=true;clearResult();renderResult(result,mode);await refreshProjects();await refreshHistory(result.storage.run_id);
     notice(mode==='optimize'?`已保存 ${distinctCandidates(result).length} 个不同候选。${result.message||''}`:`评估已保存：${result.summary.errors} 项违例，${result.summary.unknowns} 项数据缺失。报告和结果目录见“结果管理”。`);
@@ -194,17 +201,14 @@ function show(value,fit=false){
   const oldCore=$('connection-core').value;$('connection-core').innerHTML='<option value="">全部 core</option>'+report.project.architecture.cores.map(c=>`<option value="${esc(c.id)}">${esc(c.id)}</option>`).join('');if(report.project.architecture.cores.some(c=>c.id===oldCore))$('connection-core').value=oldCore;
   const metal=$('metal-layer').value;$('metal-layer').innerHTML='<option value="all">所有金属层</option>'+report.project.resources.metals.map(m=>`<option value="${esc(m.name)}">${esc(m.name)} · ${m.direction==='HORIZONTAL'?'水平':'垂直'}</option>`).join('');if([...$('metal-layer').options].some(o=>o.value===metal))$('metal-layer').value=metal;
   renderIssues();$('focused-issue').hidden=true;
-  $('ledger').innerHTML=report.dies.map(d=>{const via=report.interfaces.find(v=>v.lower_die===d.id);return `<tr><td><b>${esc(d.id)}</b><small>${esc(d.kind)}</small><button class="calc-link" data-calc="${esc(d.id)}">怎么算的？</button></td><td>${area(d.area_mm2)}<small class="dimension">${fmt(d.width_um)} × ${fmt(d.height_um)} µm<br>${fmt(d.area_mm2*1e6)} µm²</small></td><td>${d.footprint_utilization==null?'未知':fmt(d.footprint_utilization*100,2)+'%'}${meter(d.footprint_utilization,d.max_utilization)}<small class="dimension">模块面积 ${area(d.module_area_mm2)} mm²</small></td><td>${area(d.reserved_area_mm2)}</td><td>${fmt(d.power_W)} / ${fmt(d.power_margin_W)}</td><td>${fmt(d.peak_congestion,4)}${meter(d.peak_congestion)}</td><td>${via?`${fmt(via.total_vias,0)} / ${fmt(via.capacity,0)}<small>信号 ${via.signal_vias} · 电源 ${fmt(via.power_vias,0)} · 地 ${fmt(via.ground_vias,0)}</small>`:'顶部'}</td><td>${fmt(d.wire_area?.metal_area_um2,5)} / ${fmt(d.wire_area?.track_area_um2,5)}</td></tr>`;}).join('');
-  $('ledger').querySelectorAll('[data-calc]').forEach(button=>button.onclick=()=>{$('calculation-die').value=button.dataset.calc;showCalculations(report,previewPending||previewFailed||rawEdited);openWorkspace('resources');$('calculation-panel').scrollIntoView({behavior:'smooth',block:'start'});});
-  $('supply-rows').innerHTML=report.supply.map(s=>`<tr><td>${esc(s.die)} / ${esc(s.domain)}</td><td>${fmt(s.local_current_A,4)}</td><td>${fmt(s.injection_current_A,4)}</td><td>${fmt(s.capacity_A,4)}</td><td class="${s.margin_A<0?'negative':''}">${fmt(s.margin_A,4)}</td></tr>`).join('');
   const previousPort=$('edit-supply-port').value;
   $('edit-supply-port').innerHTML=report.ports.map(p=>`<option value="${esc(p.id)}">${esc(p.die)} / ${esc(p.core||p.id)}</option>`).join('');
   if(report.ports.some(p=>p.id===previousPort))$('edit-supply-port').value=previousPort;
   fillSupplyEditor();
   const owned=report.supply_groups||[];
-  $('supply-port-details').innerHTML='<table><thead><tr><th>端口 / 核</th><th>Die / 电压域</th><th>位置 µm</th><th>接入方式</th><th>电压 V / 能力 A</th><th>本核需求 / 余量 A</th></tr></thead><tbody>'+report.ports.map(p=>{const g=owned.find(g=>g.ports.includes(p.id));return `<tr><td>${esc(p.id)}<small>${esc(p.core||'共享入口')}</small></td><td>${esc(p.die)} / ${esc(p.domain)}</td><td>${fmt(p.x_um)}, ${fmt(p.y_um)}</td><td>${p.feed==='stack_base'?'从底层经 TSV 接入':'外部供电入口'}</td><td>${fmt(p.voltage_V)} / ${fmt(p.max_current_A)}</td><td>${fmt(g?.demand_A)} / ${fmt(g?.margin_A)}<small>${esc(p.provenance||'未填写入口依据')}</small></td></tr>`;}).join('')+'</tbody></table>';
+  $('supply-port-details').innerHTML='<table><thead><tr><th>端口 / 核</th><th>Die / 电压域</th><th>位置 µm</th><th>接入方式</th><th>电压 V / 能力 A</th><th>本核需求 / 余量 A</th></tr></thead><tbody>'+report.ports.map(p=>{const g=owned.find(g=>g.ports.includes(p.id));return `<tr data-port-die="${esc(p.die)}"><td>${esc(p.id)}<small>${esc(p.core||'共享入口')}</small></td><td>${esc(p.die)} / ${esc(p.domain)}</td><td>${fmt(p.x_um)}, ${fmt(p.y_um)}</td><td>${p.feed==='stack_base'?'从底层经 TSV 接入':'外部供电入口'}</td><td>${fmt(p.voltage_V)} / ${fmt(p.max_current_A)}</td><td>${fmt(g?.demand_A)} / ${fmt(g?.margin_A)}<small>${esc(p.provenance||'未填写入口依据')}</small></td></tr>`;}).join('')+'</tbody></table>';
   const timing=report.timing;
-  $('timing-summary').innerHTML='<h2>数据通路延迟估算</h2>'+(timing?.model?`<p>${timing.model.calibrated?'输入标记为已校准':'未校准 · 仅用于方案比较'}：${esc(timing.model.provenance)}</p><p>平面 ${fmt(timing.model.planar_ps_per_um,5)} ps/µm + 跨层 ${fmt(timing.model.tier_ps)} ps/接口；加权总延迟 ${fmt(timing.weighted_delay_ps)} ps，最长单连接 ${fmt(timing.max_link_delay_ps)} ps。</p><p>${esc(timing.scope)} 加权总和不是模型执行时间。</p>`:'<p>未提供延迟系数，不把线长或带宽当作真实传输时间。</p>');
+  $('timing-summary').innerHTML=(timing?.model?`<p>${timing.model.calibrated?'输入标记为已校准':'未校准 · 仅用于方案比较'}：${esc(timing.model.provenance)}</p><p>平面 ${fmt(timing.model.planar_ps_per_um,5)} ps/µm + 跨层 ${fmt(timing.model.tier_ps)} ps/接口；加权总延迟 ${fmt(timing.weighted_delay_ps)} ps，最长单连接 ${fmt(timing.max_link_delay_ps)} ps。</p><p>${esc(timing.scope)} 加权总和不是模型执行时间。</p>`:'<p>未提供延迟系数，不把线长或带宽当作真实传输时间。</p>');
 
   connectionPane?.update(report,previewPending||previewFailed);inspect(report.modules.find(m=>m.id===selectedId)||null,false);updateLive();viewer?.draw(report,previewPending||previewFailed);if(fit)viewer?.reset();updateFiles();
 }
@@ -215,9 +219,9 @@ function updateLive(){
   $('draft-status').textContent=rawEdited?'输入待应用':previewFailed?'预览失败，可重试或撤销':previewPending?'移动后重算中':dirty?'未保存预览 · 保存评估结果为新版本':'已评估布局';updateControls();
   // Never present a stale evaluated metric as the value of a moving layout.
   const stale=previewPending||previewFailed||rawEdited;
-  showRoutingResources(report,stale,id=>{connectionPane.select(id);openWorkspace('connections');});
-  showCalculations(report,stale);connectionPane?.update(report,stale);
-  for(const id of ['ledger','issues','supply-rows'])$(id).classList.toggle('pending',stale);
+  showResourceWorkspace(report,stale,id=>{connectionPane.select(id);openWorkspace('connections');});
+  connectionPane?.update(report,stale);
+  for(const id of ['issues'])$(id).classList.toggle('pending',stale);
   if(previewPending||previewFailed){for(const id of ['s-congestion','s-tsv','s-errors'])$(id).textContent='—';$('s-status').textContent=previewFailed?'计算失败':'重算中';if(previewFailed)$('live-metrics').textContent='指标计算失败，重试成功前不显示旧数值。';}
   updateAssessment();
 }
@@ -298,7 +302,7 @@ $('redo-move').onclick=async()=>{if(busy||rawEdited||!redo.length)return;undo.pu
 $('retry-preview').onclick=preview;$('issue-filter').onchange=renderIssues;
 $('input-export').onclick=async()=>{try{await syncYaml();download('resim-input.yml',$('yaml').value,'application/yaml');}catch(e){notice(e.message,true);}};
 function exportResult(format){if(!report||!activeStorage||dirty||rawEdited||previewPending||previewFailed)return;const a=document.createElement('a');a.href=resultUrl(format);a.download='';a.click();}
-$('export-json').onclick=$('result-json').onclick=()=>exportResult('report.json');$('export-yaml').onclick=$('result-yaml').onclick=()=>exportResult('layout.yml');
+$('result-json').onclick=()=>exportResult('report.json');$('result-yaml').onclick=()=>exportResult('layout.yml');
 $('open-results').onclick=async()=>{try{await api(`projects/${activeStorage.project_id}/runs/${activeStorage.run_id}/open-folder?candidate=${encodeURIComponent(dirty?savedCandidate:activeCandidate)}`,{});}catch(e){notice(e.message,true);}};
 $('copy-results').onclick=async()=>{try{await navigator.clipboard.writeText(currentFolder());notice('当前方案的结果路径已复制。');}catch{notice('复制受浏览器限制，请选择并复制上方路径。');}};
 window.addEventListener('beforeunload',event=>{if(draftChanged||rawEdited||structureDirty||inputEditor?.hasPending()){event.preventDefault();event.returnValue='';}});
@@ -430,20 +434,29 @@ $('apply-structure').onclick=async()=>{
 };
 $('output-dir').onchange=()=>{localStorage.setItem('resim-output-'+(currentProjectId||'new'),$('output-dir').value.trim());notice('结果保存位置已设置，下次评估或寻优时生效；旧结果保持原位置。');};
 function renderDifficulties(){
-  const groups=new Map(),counts={error:0,warning:0,unknown:0};
-  for(const [index,i] of allIssues().entries()){
-    const key=i.severity+'|'+i.code;counts[i.severity]=(counts[i.severity]||0)+1;
-    if(!groups.has(key))groups.set(key,{...i,count:0,index,subjects:new Set()});
-    const group=groups.get(key);group.count++;group.subjects.add(i.subject);
-  }
+  const issues=allIssues(),counts={error:0,warning:0,unknown:0};
+  for(const issue of issues)counts[issue.severity]=(counts[issue.severity]||0)+1;
   $('difficulty-errors').textContent=fmt(counts.error,0);$('difficulty-warnings').textContent=fmt(counts.warning,0);$('difficulty-unknowns').textContent=fmt(counts.unknown,0);
-  $('difficulty-summary').innerHTML=[...groups.values()].sort((a,b)=>({error:0,warning:1,unknown:2}[a.severity]-{error:0,warning:1,unknown:2}[b.severity])).map(i=>`<article><div class="difficulty-category"><span class="severity-tag ${esc(i.severity)}">${esc({error:'实现性违例',warning:'风险与提示',unknown:'待补数据'}[i.severity])}</span><strong>${fmt(i.count,0)} 项 · ${i.subjects.size} 个对象</strong><code>${esc(i.code)}</code></div><div class="difficulty-content"><h3>${esc(i.reason)}</h3><p>建议：${esc(i.suggestion)}</p><small>涉及 ${[...i.subjects].slice(0,3).map(esc).join('、')}${i.subjects.size>3?' 等对象':''}</small><button data-difficulty-index="${i.index}" data-severity="${esc(i.severity)}">在布局中查看首项 →</button></div></article>`).join('')||'<p class="hint">在当前模型范围内未发现问题；不等于后端签核通过。</p>';
+  document.querySelectorAll('[data-difficulty]').forEach(b=>{b.disabled=!report;b.setAttribute('aria-expanded',String(b.dataset.difficulty===difficultySelection));});
+  $('difficulty-panel').hidden=!difficultySelection;
+  if(!difficultySelection)return;
+  const page=difficultyPage(issues,difficultySelection,difficultyPageIndex);difficultyPageIndex=page.page;
+  $('difficulty-title').textContent=SEVERITIES[difficultySelection]+' · '+page.total+' 项';
+  $('difficulty-summary').innerHTML=page.items.map(i=>`<article class="difficulty-item"><div class="difficulty-category"><strong>${esc(i.subject)}</strong><code>${esc(i.code)}</code><button data-difficulty-index="${i.index}">定位对象 →</button></div><div class="difficulty-content"><h3>${esc(i.reason)}</h3>${i.suggestion?'<p>建议：'+esc(i.suggestion)+'</p>':''}</div></article>`).join('')||'<p class="difficulty-empty">当前没有'+SEVERITIES[difficultySelection]+'。</p>';
+  $('difficulty-pages').hidden=page.pages===1;$('difficulty-page-number').textContent=(page.page+1)+' / '+page.pages;
+  $('difficulty-prev').disabled=page.page===0;$('difficulty-next').disabled=page.page===page.pages-1;
   $('difficulty-summary').querySelectorAll('[data-difficulty-index]').forEach(button=>button.onclick=()=>{
-    openWorkspace('layout');$('issue-filter').value=button.dataset.severity;renderIssues();
+    openWorkspace('layout');$('issue-filter').value=difficultySelection;renderIssues();
     $('issues').querySelector(`[data-issue="${button.dataset.difficultyIndex}"]`)?.click();
     $('focused-issue').scrollIntoView({block:'nearest'});
   });
 }
+document.querySelectorAll('[data-difficulty]').forEach(button=>button.onclick=()=>{
+  difficultySelection=difficultySelection===button.dataset.difficulty?null:button.dataset.difficulty;difficultyPageIndex=0;renderDifficulties();
+});
+$('close-difficulties').onclick=()=>{difficultySelection=null;renderDifficulties();};
+$('difficulty-prev').onclick=()=>{difficultyPageIndex--;renderDifficulties();$('difficulty-title').scrollIntoView({block:'start'});};
+$('difficulty-next').onclick=()=>{difficultyPageIndex++;renderDifficulties();$('difficulty-title').scrollIntoView({block:'start'});};
 
 $('web-new-project').onclick=async()=>{if(busy||!await canLeaveDraft())return;setBusy(true);try{const data=await api('starter');newProject('新架构工程');$('yaml').value=data.yaml;dirty=true;draftChanged=true;show(data.report,true);$('editor-panel').hidden=true;notice('新项目已准备好，请填写名称，再选择架构和工艺库的输入方式。');}catch(e){notice(e.message,true);}finally{setBusy(false);}};
 

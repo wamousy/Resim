@@ -1,6 +1,6 @@
 # Windows 本地程序入口
 
-`Resim.exe` 是轻量 Windows 入口，`Resim.Engine.exe` 保留原计算引擎。入口转发原 CLI 命令；`serve` 将计算引擎放在临时回环端口，对外继续提供原端口（默认 8770），增加同源目录浏览/创建接口。现有静态页面、评估、历史与结果导出由原引擎处理。
+`Resim.exe` 是轻量 Windows 入口，`Resim.Engine.exe` 是计算引擎。入口转发原 CLI 命令；`serve` 将计算引擎放在临时回环端口，对外继续提供原端口（默认 8770），增加同源目录浏览/创建接口。现有静态页面、评估、历史与结果导出由引擎处理。启动网页应使用 `Resim.exe serve`，直接启动 Engine 不含目录选择服务。
 
 - `GET /api/output-folders?path=...`：浏览已有目录，空路径为项目根目录。
 - `POST /api/output-folders/create`：`{parent, name}`，原子创建单个子目录并返回真实路径。
@@ -16,3 +16,17 @@ node --test tests/output-folders.test.mjs
 ```
 
 集成测试启动独立端口，使用临时项目和结果目录，验证真实创建、Unicode/空格路径、重名、越界名称、同源限制及实际评估落盘，最后清理测试目录。Windows 受限执行环境可能不支持 HttpListener，需在普通本地环境运行。测试通过后，停止当前 Resim 入口，将测试入口替换为 `Resim.exe`；保留 `Resim.Engine.exe` 与 `_internal` 的相对位置。更新引擎时替换 `Resim.Engine.exe`，前端依然位于 `_internal/resim/static/`。
+
+## 候选数量策略
+
+旧引擎的 `Search.candidates` 有人为设置的 `le=10`。`resim_search_policy.py` 通过启动钩子移除此字段上限，并重新构建 Search / Project 输入校验；正整数校验、网格、资源检查和原有时间预算保持不变。CLI、YAML、网页预览和寻优均使用同一策略。求解器仍通过排除已求得的坐标/Die 分配枚举不同方案；仅当排除之后返回 INFEASIBLE 才说明当前离散空间已穷尽，超时数量不是最大值。
+
+由于本地保留的是打包引擎及原模块字节码，`build_search_engine.py` 向现有 PyInstaller CArchive 插入上述有源码的启动钩子。构建会校验 Python 版本、档案边界和入口名称，逐项确认原始档案内容及 bootloader 未改；不替换求解器或评估代码。CArchive 格式依据 [PyInstaller 官方读取器](https://github.com/pyinstaller/pyinstaller/blob/develop/PyInstaller/archive/readers.py)。
+
+```powershell
+python source/build_search_engine.py
+node --test tests/planning-controls.test.mjs tests/search-capacity.test.mjs
+.\source\update-engine.ps1 -ExpectedProcessId <当前8770监听进程ID> -Port 8770
+```
+
+使用 Python 3.13 构建 `Resim.Engine.next.exe`；测试从独立临时目录启动新引擎，验证 12 个不同候选真实落盘、百万级请求数量输入校验、非法数量拒绝、固定布局搜索穷尽。更新脚本核对监听进程和路径，保留原项目目录，失败时恢复原引擎。成功后可删除 staging 文件；已安装引擎不依赖本机 Python。
