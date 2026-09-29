@@ -1,8 +1,11 @@
 # Generated developer outputs; original preserved bytecode remains tracked.
 .pytest_cache/
 **/__pycache__/
-!src/resim/__pycache__/
-!src/resim/__pycache__/*.cpython-313.pyc
+!src/tools/recovery/original-backend/__pycache__/
+!src/tools/recovery/original-backend/__pycache__/*.cpython-313.pyc
+src/tools/.venv/
+src/tools/.build/
+**/*.egg-info/
 app/Resim.Engine.next.exe
 app/Resim.Host.test.exe
 *.tmp

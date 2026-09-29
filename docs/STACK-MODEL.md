@@ -46,6 +46,6 @@ HB 与 TSV 是不同的互联机制，不是物理上互斥的两种封装。背
 
 ## 验证
 
-`node --test src/tests/*.test.mjs` 覆盖四种接触关系、旧输入推断、冲突拦截、朝向/接口原子更新、独立 YAML 往返、Die 改名引用同步。
+`node --test src/tests/frontend/stack-model.test.mjs src/tests/frontend/structure-editor.test.mjs` 覆盖四种接触关系、旧输入推断、冲突拦截、朝向/接口原子更新、独立 YAML 往返、Die 改名引用同步。完整验收使用 `node src/tools/verify.mjs`。
 
 真实 BLX 输入通过本地预览 API 往返后，536 个模块的放置数据不变；信号 TSV 1,182,400、HB 715,200 bit 不变。测试仅预览，不写入示例工程或历史运行。

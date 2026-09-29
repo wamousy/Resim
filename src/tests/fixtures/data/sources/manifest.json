@@ -1,0 +1,17 @@
+{
+  "origin": "OpenROAD-flow-scripts Nangate45, copied from existing Resim reference set; original source manifest attached",
+  "files": [
+    {
+      "path": "data/sources/nangate45/cells.lef",
+      "sha256": "840b01e500826096d1edcc752350834da647fdbf360798f243f8122b52b357c3"
+    },
+    {
+      "path": "data/sources/nangate45/LICENSE",
+      "sha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594"
+    },
+    {
+      "path": "data/sources/nangate45/tech.lef",
+      "sha256": "834a79295054cd4209178d1bade67c353863c47bb4b3c22ee38b862b7cec37f2"
+    }
+  ]
+}

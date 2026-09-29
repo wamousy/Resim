@@ -1,0 +1,743 @@
+schema_version: resim/0.1
+name: GCD16 · 单层逻辑芯片（Nangate45）
+architecture:
+  chip: gcd16_nangate45
+  description: '16-bit iterative GCD: one logic die, eight RTL-derived blocks; illustrative
+    area model.'
+  metrics:
+    compute_TOPS:
+    bandwidth_GBps:
+    capacity_KiB:
+    precision: unspecified
+    frequency_MHz:
+    bit_width:
+  dies:
+  - id: die0
+    display_platform: false
+    package_layers: 1
+    kind: logic
+    order: 0
+    width_um: 70.0
+    height_um: 60.0
+    thickness_um: 50.0
+    voltage_V: 1.1
+    power_budget_W:
+    max_utilization: 0.8
+    metrics:
+      compute_TOPS:
+      bandwidth_GBps:
+      capacity_KiB:
+      precision: unspecified
+      frequency_MHz:
+      bit_width:
+  cores:
+  - id: gcd_core
+    keep_on_same_die: true
+    metrics:
+      compute_TOPS:
+      bandwidth_GBps:
+      capacity_KiB:
+      precision: unspecified
+      frequency_MHz:
+      bit_width:
+  modules:
+  - shared_cores: []
+    id: ctrl
+    area_known: true
+    core: gcd_core
+    kind: control
+    allowed_dies:
+    - die0
+    stdcell_area_um2: 34.048
+    macro_area_um2: 0.0
+    power_W:
+    width_um: 10.0
+    height_um: 10.0
+    target_cell_utilization: 0.55
+    utilization_basis:
+    halo_um: 0.0
+    voltage_domain: VDD
+    fixed: false
+    placement_window:
+    ports:
+    - in
+    - out
+    port_locations: {}
+    metrics:
+      compute_TOPS:
+      bandwidth_GBps:
+      capacity_KiB:
+      precision: unspecified
+      frequency_MHz:
+      bit_width: 2
+    provenance: Illustrative cell-count estimate using real Nangate45 LEF areas;
+      NOT synthesis. See references/area-estimates.json.
+  - shared_cores: []
+    id: a_reg
+    area_known: true
+    core: gcd_core
+    kind: register
+    allowed_dies:
+    - die0
+    stdcell_area_um2: 102.144
+    macro_area_um2: 0.0
+    power_W:
+    width_um: 14.0
+    height_um: 14.0
+    target_cell_utilization: 0.55
+    utilization_basis:
+    halo_um: 0.0
+    voltage_domain: VDD
+    fixed: false
+    placement_window:
+    ports:
+    - in
+    - out
+    port_locations: {}
+    metrics:
+      compute_TOPS:
+      bandwidth_GBps:
+      capacity_KiB:
+      precision: unspecified
+      frequency_MHz:
+      bit_width: 16
+    provenance: Illustrative cell-count estimate using real Nangate45 LEF areas;
+      NOT synthesis. See references/area-estimates.json.
+  - shared_cores: []
+    id: b_reg
+    area_known: true
+    core: gcd_core
+    kind: register
+    allowed_dies:
+    - die0
+    stdcell_area_um2: 102.144
+    macro_area_um2: 0.0
+    power_W:
+    width_um: 14.0
+    height_um: 14.0
+    target_cell_utilization: 0.55
+    utilization_basis:
+    halo_um: 0.0
+    voltage_domain: VDD
+    fixed: false
+    placement_window:
+    ports:
+    - in
+    - out
+    port_locations: {}
+    metrics:
+      compute_TOPS:
+      bandwidth_GBps:
+      capacity_KiB:
+      precision: unspecified
+      frequency_MHz:
+      bit_width: 16
+    provenance: Illustrative cell-count estimate using real Nangate45 LEF areas;
+      NOT synthesis. See references/area-estimates.json.
+  - shared_cores: []
+    id: a_mux
+    area_known: true
+    core: gcd_core
+    kind: mux
+    allowed_dies:
+    - die0
+    stdcell_area_um2: 59.584
+    macro_area_um2: 0.0
+    power_W:
+    width_um: 12.0
+    height_um: 12.0
+    target_cell_utilization: 0.55
+    utilization_basis:
+    halo_um: 0.0
+    voltage_domain: VDD
+    fixed: false
+    placement_window:
+    ports:
+    - in
+    - out
+    port_locations: {}
+    metrics:
+      compute_TOPS:
+      bandwidth_GBps:
+      capacity_KiB:
+      precision: unspecified
+      frequency_MHz:
+      bit_width: 16
+    provenance: Illustrative cell-count estimate using real Nangate45 LEF areas;
+      NOT synthesis. See references/area-estimates.json.
+  - shared_cores: []
+    id: b_mux
+    area_known: true
+    core: gcd_core
+    kind: mux
+    allowed_dies:
+    - die0
+    stdcell_area_um2: 29.792
+    macro_area_um2: 0.0
+    power_W:
+    width_um: 10.0
+    height_um: 10.0
+    target_cell_utilization: 0.55
+    utilization_basis:
+    halo_um: 0.0
+    voltage_domain: VDD
+    fixed: false
+    placement_window:
+    ports:
+    - in
+    - out
+    port_locations: {}
+    metrics:
+      compute_TOPS:
+      bandwidth_GBps:
+      capacity_KiB:
+      precision: unspecified
+      frequency_MHz:
+      bit_width: 16
+    provenance: Illustrative cell-count estimate using real Nangate45 LEF areas;
+      NOT synthesis. See references/area-estimates.json.
+  - shared_cores: []
+    id: sub
+    area_known: true
+    core: gcd_core
+    kind: compute
+    allowed_dies:
+    - die0
+    stdcell_area_um2: 110.656
+    macro_area_um2: 0.0
+    power_W:
+    width_um: 18.0
+    height_um: 18.0
+    target_cell_utilization: 0.55
+    utilization_basis:
+    halo_um: 0.0
+    voltage_domain: VDD
+    fixed: false
+    placement_window:
+    ports:
+    - in
+    - out
+    port_locations: {}
+    metrics:
+      compute_TOPS:
+      bandwidth_GBps:
+      capacity_KiB:
+      precision: unspecified
+      frequency_MHz:
+      bit_width: 16
+    provenance: Illustrative cell-count estimate using real Nangate45 LEF areas;
+      NOT synthesis. See references/area-estimates.json.
+  - shared_cores: []
+    id: a_lt_b
+    area_known: true
+    core: gcd_core
+    kind: compare
+    allowed_dies:
+    - die0
+    stdcell_area_um2: 85.12
+    macro_area_um2: 0.0
+    power_W:
+    width_um: 16.0
+    height_um: 16.0
+    target_cell_utilization: 0.55
+    utilization_basis:
+    halo_um: 0.0
+    voltage_domain: VDD
+    fixed: false
+    placement_window:
+    ports:
+    - in
+    - out
+    port_locations: {}
+    metrics:
+      compute_TOPS:
+      bandwidth_GBps:
+      capacity_KiB:
+      precision: unspecified
+      frequency_MHz:
+      bit_width: 16
+    provenance: Illustrative cell-count estimate using real Nangate45 LEF areas;
+      NOT synthesis. See references/area-estimates.json.
+  - shared_cores: []
+    id: b_zero
+    area_known: true
+    core: gcd_core
+    kind: compare
+    allowed_dies:
+    - die0
+    stdcell_area_um2: 16.492
+    macro_area_um2: 0.0
+    power_W:
+    width_um: 8.0
+    height_um: 8.0
+    target_cell_utilization: 0.55
+    utilization_basis:
+    halo_um: 0.0
+    voltage_domain: VDD
+    fixed: false
+    placement_window:
+    ports:
+    - in
+    - out
+    port_locations: {}
+    metrics:
+      compute_TOPS:
+      bandwidth_GBps:
+      capacity_KiB:
+      precision: unspecified
+      frequency_MHz:
+      bit_width: 16
+    provenance: Illustrative cell-count estimate using real Nangate45 LEF areas;
+      NOT synthesis. See references/area-estimates.json.
+  links:
+  - id: a_mux_to_a_reg
+    source: a_mux
+    target: a_reg
+    source_port: out
+    target_port: in
+    bus_width_bits: 16
+    bandwidth_GBps: 0.0
+    lane_rate_Gbps: 1.0
+    data_wires: 16
+    control_wires: 0
+    spare_fraction: 0.0
+    max_planar_length_um:
+    max_tier_hops: 0
+    latency_weight: 1
+    area_reference:
+      horizontal:
+      vertical:
+    routing_layers: {}
+  - id: b_mux_to_b_reg
+    source: b_mux
+    target: b_reg
+    source_port: out
+    target_port: in
+    bus_width_bits: 16
+    bandwidth_GBps: 0.0
+    lane_rate_Gbps: 1.0
+    data_wires: 16
+    control_wires: 0
+    spare_fraction: 0.0
+    max_planar_length_um:
+    max_tier_hops: 0
+    latency_weight: 1
+    area_reference:
+      horizontal:
+      vertical:
+    routing_layers: {}
+  - id: a_reg_to_sub
+    source: a_reg
+    target: sub
+    source_port: out
+    target_port: in
+    bus_width_bits: 16
+    bandwidth_GBps: 0.0
+    lane_rate_Gbps: 1.0
+    data_wires: 16
+    control_wires: 0
+    spare_fraction: 0.0
+    max_planar_length_um:
+    max_tier_hops: 0
+    latency_weight: 1
+    area_reference:
+      horizontal:
+      vertical:
+    routing_layers: {}
+  - id: b_reg_to_sub
+    source: b_reg
+    target: sub
+    source_port: out
+    target_port: in
+    bus_width_bits: 16
+    bandwidth_GBps: 0.0
+    lane_rate_Gbps: 1.0
+    data_wires: 16
+    control_wires: 0
+    spare_fraction: 0.0
+    max_planar_length_um:
+    max_tier_hops: 0
+    latency_weight: 1
+    area_reference:
+      horizontal:
+      vertical:
+    routing_layers: {}
+  - id: sub_to_a_mux
+    source: sub
+    target: a_mux
+    source_port: out
+    target_port: in
+    bus_width_bits: 16
+    bandwidth_GBps: 0.0
+    lane_rate_Gbps: 1.0
+    data_wires: 16
+    control_wires: 0
+    spare_fraction: 0.0
+    max_planar_length_um:
+    max_tier_hops: 0
+    latency_weight: 1
+    area_reference:
+      horizontal:
+      vertical:
+    routing_layers: {}
+  - id: b_reg_to_a_mux
+    source: b_reg
+    target: a_mux
+    source_port: out
+    target_port: in
+    bus_width_bits: 16
+    bandwidth_GBps: 0.0
+    lane_rate_Gbps: 1.0
+    data_wires: 16
+    control_wires: 0
+    spare_fraction: 0.0
+    max_planar_length_um:
+    max_tier_hops: 0
+    latency_weight: 1
+    area_reference:
+      horizontal:
+      vertical:
+    routing_layers: {}
+  - id: a_reg_to_b_mux
+    source: a_reg
+    target: b_mux
+    source_port: out
+    target_port: in
+    bus_width_bits: 16
+    bandwidth_GBps: 0.0
+    lane_rate_Gbps: 1.0
+    data_wires: 16
+    control_wires: 0
+    spare_fraction: 0.0
+    max_planar_length_um:
+    max_tier_hops: 0
+    latency_weight: 1
+    area_reference:
+      horizontal:
+      vertical:
+    routing_layers: {}
+  - id: a_reg_to_a_lt_b
+    source: a_reg
+    target: a_lt_b
+    source_port: out
+    target_port: in
+    bus_width_bits: 16
+    bandwidth_GBps: 0.0
+    lane_rate_Gbps: 1.0
+    data_wires: 16
+    control_wires: 0
+    spare_fraction: 0.0
+    max_planar_length_um:
+    max_tier_hops: 0
+    latency_weight: 1
+    area_reference:
+      horizontal:
+      vertical:
+    routing_layers: {}
+  - id: b_reg_to_a_lt_b
+    source: b_reg
+    target: a_lt_b
+    source_port: out
+    target_port: in
+    bus_width_bits: 16
+    bandwidth_GBps: 0.0
+    lane_rate_Gbps: 1.0
+    data_wires: 16
+    control_wires: 0
+    spare_fraction: 0.0
+    max_planar_length_um:
+    max_tier_hops: 0
+    latency_weight: 1
+    area_reference:
+      horizontal:
+      vertical:
+    routing_layers: {}
+  - id: b_reg_to_b_zero
+    source: b_reg
+    target: b_zero
+    source_port: out
+    target_port: in
+    bus_width_bits: 16
+    bandwidth_GBps: 0.0
+    lane_rate_Gbps: 1.0
+    data_wires: 16
+    control_wires: 0
+    spare_fraction: 0.0
+    max_planar_length_um:
+    max_tier_hops: 0
+    latency_weight: 1
+    area_reference:
+      horizontal:
+      vertical:
+    routing_layers: {}
+  - id: a_lt_b_to_ctrl
+    source: a_lt_b
+    target: ctrl
+    source_port: out
+    target_port: in
+    bus_width_bits: 1
+    bandwidth_GBps: 0.0
+    lane_rate_Gbps: 1.0
+    data_wires: 1
+    control_wires: 0
+    spare_fraction: 0.0
+    max_planar_length_um:
+    max_tier_hops: 0
+    latency_weight: 1
+    area_reference:
+      horizontal:
+      vertical:
+    routing_layers: {}
+  - id: b_zero_to_ctrl
+    source: b_zero
+    target: ctrl
+    source_port: out
+    target_port: in
+    bus_width_bits: 1
+    bandwidth_GBps: 0.0
+    lane_rate_Gbps: 1.0
+    data_wires: 1
+    control_wires: 0
+    spare_fraction: 0.0
+    max_planar_length_um:
+    max_tier_hops: 0
+    latency_weight: 1
+    area_reference:
+      horizontal:
+      vertical:
+    routing_layers: {}
+  - id: ctrl_to_a_mux
+    source: ctrl
+    target: a_mux
+    source_port: out
+    target_port: in
+    bus_width_bits: 2
+    bandwidth_GBps: 0.0
+    lane_rate_Gbps: 1.0
+    data_wires: 2
+    control_wires: 0
+    spare_fraction: 0.0
+    max_planar_length_um:
+    max_tier_hops: 0
+    latency_weight: 1
+    area_reference:
+      horizontal:
+      vertical:
+    routing_layers: {}
+  - id: ctrl_to_b_mux
+    source: ctrl
+    target: b_mux
+    source_port: out
+    target_port: in
+    bus_width_bits: 1
+    bandwidth_GBps: 0.0
+    lane_rate_Gbps: 1.0
+    data_wires: 1
+    control_wires: 0
+    spare_fraction: 0.0
+    max_planar_length_um:
+    max_tier_hops: 0
+    latency_weight: 1
+    area_reference:
+      horizontal:
+      vertical:
+    routing_layers: {}
+  - id: ctrl_to_a_reg
+    source: ctrl
+    target: a_reg
+    source_port: out
+    target_port: in
+    bus_width_bits: 1
+    bandwidth_GBps: 0.0
+    lane_rate_Gbps: 1.0
+    data_wires: 1
+    control_wires: 0
+    spare_fraction: 0.0
+    max_planar_length_um:
+    max_tier_hops: 0
+    latency_weight: 1
+    area_reference:
+      horizontal:
+      vertical:
+    routing_layers: {}
+  - id: ctrl_to_b_reg
+    source: ctrl
+    target: b_reg
+    source_port: out
+    target_port: in
+    bus_width_bits: 1
+    bandwidth_GBps: 0.0
+    lane_rate_Gbps: 1.0
+    data_wires: 1
+    control_wires: 0
+    spare_fraction: 0.0
+    max_planar_length_um:
+    max_tier_hops: 0
+    latency_weight: 1
+    area_reference:
+      horizontal:
+      vertical:
+    routing_layers: {}
+resources:
+  technology: Nangate45
+  technology_provenance: Shared Nangate45 LEF; hashes in 
+    references/area-estimates.json
+  metals:
+  - name: metal1
+    direction: HORIZONTAL
+    pitch_um: 0.14
+    width_um: 0.07
+    availability:
+  - name: metal2
+    direction: VERTICAL
+    pitch_um: 0.19
+    width_um: 0.07
+    availability:
+  - name: metal3
+    direction: HORIZONTAL
+    pitch_um: 0.14
+    width_um: 0.07
+    availability:
+  - name: metal4
+    direction: VERTICAL
+    pitch_um: 0.28
+    width_um: 0.14
+    availability:
+  - name: metal5
+    direction: HORIZONTAL
+    pitch_um: 0.28
+    width_um: 0.14
+    availability:
+  - name: metal6
+    direction: VERTICAL
+    pitch_um: 0.28
+    width_um: 0.14
+    availability:
+  - name: metal7
+    direction: HORIZONTAL
+    pitch_um: 0.8
+    width_um: 0.4
+    availability:
+  - name: metal8
+    direction: VERTICAL
+    pitch_um: 0.8
+    width_um: 0.4
+    availability:
+  - name: metal9
+    direction: HORIZONTAL
+    pitch_um: 1.6
+    width_um: 0.8
+    availability:
+  - name: metal10
+    direction: VERTICAL
+    pitch_um: 1.6
+    width_um: 0.8
+    availability:
+  routing_availability: 0.3
+  tsv:
+  delay_model:
+  notes:
+  - A 2x2 um supply_access placement blockage near the external supply port is 
+    an exploratory reservation, not a PDK rule or IO macro.
+  - Area is an uncalibrated cell-count estimate, not synthesis or 
+    place-and-route output.
+  - Power is unknown (null); incomplete assessment is intentional.
+  - Single-die block-level model; no SRAM macros and no TSV.
+  - 70x60 um die, 50 um thickness, 1.1 V and 10 mA supply capacity are 
+    exploratory assumptions, not measured design values.
+  - routing_availability=0.3 and target utilization=0.55 are assumed budgets.
+  - Internal wires use explicit RTL widths. bandwidth_GBps=0 disables 
+    throughput-derived demand; lane_rate_Gbps=1 is a required placeholder, not a
+    timing claim.
+  - Shared fanout is represented as independent point-to-point links; 
+    clock/reset trees, package IO and external ready/valid links are excluded.
+  - No GCD execution latency, frequency, throughput or functional simulation is 
+    performed.
+constraints:
+  die_area_limit_mm2: 0.0042
+  max_congestion_ratio: 1.0
+  max_power_density_W_mm2:
+  same_die_groups: []
+  blockages:
+  - x_um: 0.0
+    y_um: 30.0
+    width_um: 2.0
+    height_um: 2.0
+    id: supply_access
+    die: die0
+  min_module_spacing_um: 0.0
+  routing_channels: []
+floorplan:
+  placements:
+  - x_um: 28.0
+    y_um: 24.0
+    width_um: 10.0
+    height_um: 10.0
+    module: ctrl
+    die: die0
+  - x_um: 26.0
+    y_um: 44.0
+    width_um: 14.0
+    height_um: 14.0
+    module: a_reg
+    die: die0
+  - x_um: 38.0
+    y_um: 30.0
+    width_um: 14.0
+    height_um: 14.0
+    module: b_reg
+    die: die0
+  - x_um: 40.0
+    y_um: 44.0
+    width_um: 12.0
+    height_um: 12.0
+    module: a_mux
+    die: die0
+  - x_um: 28.0
+    y_um: 34.0
+    width_um: 10.0
+    height_um: 10.0
+    module: b_mux
+    die: die0
+  - x_um: 52.0
+    y_um: 41.0
+    width_um: 18.0
+    height_um: 18.0
+    module: sub
+    die: die0
+  - x_um: 12.0
+    y_um: 28.0
+    width_um: 16.0
+    height_um: 16.0
+    module: a_lt_b
+    die: die0
+  - x_um: 41.0
+    y_um: 22.0
+    width_um: 8.0
+    height_um: 8.0
+    module: b_zero
+    die: die0
+  tsv_regions: []
+  supply_ports:
+  - id: vdd_external
+    die: die0
+    x_um: 0.0
+    y_um: 30.0
+    domain: VDD
+    voltage_V: 1.1
+    max_current_A: 0.01
+    core:
+    provenance:
+    feed: external
+search:
+  objective: wirelength
+  time_limit_s: 6.0
+  candidates: 2
+  grid_um: 1.0
+  seed: 7
+  wirelength_weight: 1
+  tier_crossing_weight: 0
+  congestion_grid: 8
+stack:
+  die_faces:
+    die0: up

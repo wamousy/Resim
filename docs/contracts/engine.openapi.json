@@ -51,6 +51,124 @@
         }
       }
     },
+    "/api/projects/open": {
+      "post": {
+        "summary": "Open Project",
+        "operationId": "open_project_api_projects_open_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OpenProjectRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/batches/save-plan": {
+      "post": {
+        "summary": "Save Batch Plan",
+        "operationId": "save_batch_plan_api_batches_save_plan_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BatchPlanRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/projects/{project_id}/batches/{batch_id}": {
+      "get": {
+        "summary": "Get Batch",
+        "operationId": "get_batch_api_projects__project_id__batches__batch_id__get",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Project Id"
+            }
+          },
+          {
+            "name": "batch_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Batch Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/": {
       "get": {
         "summary": "Index",
@@ -564,6 +682,43 @@
         }
       }
     },
+    "/api/optimize/preview": {
+      "post": {
+        "summary": "Search Preview",
+        "description": "Generate and evaluate candidate drafts; no project or run files are written.",
+        "operationId": "search_preview_api_optimize_preview_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Request"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/optimize": {
       "post": {
         "summary": "Search",
@@ -710,6 +865,139 @@
           "modules"
         ],
         "title": "Architecture"
+      },
+      "BatchPlanRequest": {
+        "properties": {
+          "project_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Project Id"
+          },
+          "project_name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Project Name"
+          },
+          "project_dir": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Project Dir"
+          },
+          "batch_id": {
+            "type": "string",
+            "pattern": "^batch-[a-f0-9-]{32,36}$",
+            "title": "Batch Id"
+          },
+          "batch_name": {
+            "type": "string",
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Batch Name"
+          },
+          "plan_name": {
+            "type": "string",
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Plan Name"
+          },
+          "base_yaml": {
+            "type": "string",
+            "maxLength": 4000000,
+            "title": "Base Yaml"
+          },
+          "yaml": {
+            "type": "string",
+            "maxLength": 4000000,
+            "title": "Yaml"
+          },
+          "preview_plan_id": {
+            "type": "string",
+            "title": "Preview Plan Id"
+          },
+          "source_key": {
+            "type": "string",
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Source Key"
+          },
+          "kind": {
+            "type": "string",
+            "pattern": "^(manual|optimize)$",
+            "title": "Kind",
+            "default": "manual"
+          },
+          "parent_record_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parent Record Id"
+          },
+          "parent_source_key": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 120
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parent Source Key"
+          },
+          "candidate_metadata": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Candidate Metadata"
+          },
+          "search_metadata": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Search Metadata"
+          }
+        },
+        "type": "object",
+        "required": [
+          "batch_id",
+          "batch_name",
+          "plan_name",
+          "base_yaml",
+          "yaml",
+          "preview_plan_id",
+          "source_key"
+        ],
+        "title": "BatchPlanRequest"
       },
       "Blockage": {
         "properties": {
@@ -1444,6 +1732,21 @@
         ],
         "title": "NativeProject"
       },
+      "OpenProjectRequest": {
+        "properties": {
+          "project_dir": {
+            "type": "string",
+            "maxLength": 2000,
+            "minLength": 1,
+            "title": "Project Dir"
+          }
+        },
+        "type": "object",
+        "required": [
+          "project_dir"
+        ],
+        "title": "OpenProjectRequest"
+      },
       "Placement": {
         "properties": {
           "x_um": {
@@ -1688,6 +1991,18 @@
             ],
             "title": "Project Name"
           },
+          "project_dir": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Project Dir"
+          },
           "output_dir": {
             "anyOf": [
               {
@@ -1699,6 +2014,30 @@
               }
             ],
             "title": "Output Dir"
+          },
+          "run_name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 120
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Run Name"
+          },
+          "result_folder_name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 120
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Result Folder Name"
           }
         },
         "type": "object",

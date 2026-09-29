@@ -1,0 +1,17 @@
+{
+  "registry_removed": true,
+  "project_files_unchanged": 39,
+  "history_read_verified": true,
+  "checked_at": "2026-09-29T09:21:38.3891816Z",
+  "browser_verified": false,
+  "browser_limitation": "Browser control runtime exited during initialization.",
+  "project_discovery_without_registry": true,
+  "deployment": {
+    "backup": "C:\\Users\\W\\Desktop\\arch\\Resim\\src\\tools\\.build\\previous-app-20260929-172013-d6db5593",
+    "pid": 11564,
+    "projects": "C:\\Users\\W\\Desktop\\arch\\ResimProjects",
+    "status": "ready",
+    "application": "C:\\Users\\W\\Desktop\\arch\\Resim\\app"
+  },
+  "actual_project": "C:\\Users\\W\\Desktop\\arch\\ResimProjects\\test"
+}

@@ -1,0 +1,350 @@
+[
+  {
+    "name": "absl-py",
+    "version": "2.5.0",
+    "license_files": [
+      "licenses/absl-py/absl_py-2.5.0.dist-info/licenses/LICENSE"
+    ]
+  },
+  {
+    "name": "altgraph",
+    "version": "0.17.5",
+    "license_files": [
+      "licenses/altgraph/altgraph-0.17.5.dist-info/LICENSE"
+    ]
+  },
+  {
+    "name": "annotated-doc",
+    "version": "0.0.5",
+    "license_files": [
+      "licenses/annotated-doc/annotated_doc-0.0.5.dist-info/licenses/LICENSE"
+    ]
+  },
+  {
+    "name": "annotated-types",
+    "version": "0.8.0",
+    "license_files": [
+      "licenses/annotated-types/annotated_types-0.8.0.dist-info/licenses/LICENSE"
+    ]
+  },
+  {
+    "name": "anyio",
+    "version": "4.15.1",
+    "license_files": [
+      "licenses/anyio/anyio-4.15.1.dist-info/licenses/LICENSE"
+    ]
+  },
+  {
+    "name": "certifi",
+    "version": "2026.7.22",
+    "license_files": [
+      "licenses/certifi/certifi-2026.7.22.dist-info/licenses/LICENSE"
+    ]
+  },
+  {
+    "name": "click",
+    "version": "8.5.0",
+    "license_files": [
+      "licenses/click/click-8.5.0.dist-info/licenses/LICENSE.txt"
+    ]
+  },
+  {
+    "name": "colorama",
+    "version": "0.4.6",
+    "license_files": [
+      "licenses/colorama/colorama-0.4.6.dist-info/licenses/LICENSE.txt"
+    ]
+  },
+  {
+    "name": "fastapi",
+    "version": "0.141.1",
+    "license_files": [
+      "licenses/fastapi/fastapi-0.141.1.dist-info/licenses/LICENSE"
+    ]
+  },
+  {
+    "name": "h11",
+    "version": "0.16.0",
+    "license_files": [
+      "licenses/h11/h11-0.16.0.dist-info/licenses/LICENSE.txt"
+    ]
+  },
+  {
+    "name": "httpcore",
+    "version": "1.0.9",
+    "license_files": [
+      "licenses/httpcore/httpcore-1.0.9.dist-info/licenses/LICENSE.md"
+    ]
+  },
+  {
+    "name": "httpx",
+    "version": "0.28.1",
+    "license_files": [
+      "licenses/httpx/httpx-0.28.1.dist-info/licenses/LICENSE.md"
+    ]
+  },
+  {
+    "name": "idna",
+    "version": "3.20",
+    "license_files": [
+      "licenses/idna/idna-3.20.dist-info/licenses/LICENSE.md"
+    ]
+  },
+  {
+    "name": "immutabledict",
+    "version": "4.3.1",
+    "license_files": [
+      "licenses/immutabledict/immutabledict-4.3.1.dist-info/licenses/LICENSE"
+    ]
+  },
+  {
+    "name": "iniconfig",
+    "version": "2.3.0",
+    "license_files": [
+      "licenses/iniconfig/iniconfig-2.3.0.dist-info/licenses/LICENSE"
+    ]
+  },
+  {
+    "name": "numpy",
+    "version": "2.5.3",
+    "license_files": [
+      "licenses/numpy/numpy-2.5.3.dist-info/licenses/LICENSE.txt",
+      "licenses/numpy/numpy-2.5.3.dist-info/licenses/numpy/_core/include/numpy/libdivide/LICENSE.txt",
+      "licenses/numpy/numpy-2.5.3.dist-info/licenses/numpy/_core/src/common/pythoncapi-compat/COPYING",
+      "licenses/numpy/numpy-2.5.3.dist-info/licenses/numpy/_core/src/highway/LICENSE",
+      "licenses/numpy/numpy-2.5.3.dist-info/licenses/numpy/_core/src/npysort/x86-simd-sort/LICENSE.md",
+      "licenses/numpy/numpy-2.5.3.dist-info/licenses/numpy/_core/src/umath/svml/LICENSE",
+      "licenses/numpy/numpy-2.5.3.dist-info/licenses/numpy/fft/pocketfft/LICENSE.md",
+      "licenses/numpy/numpy-2.5.3.dist-info/licenses/numpy/linalg/lapack_lite/LICENSE.txt",
+      "licenses/numpy/numpy-2.5.3.dist-info/licenses/numpy/ma/LICENSE",
+      "licenses/numpy/numpy-2.5.3.dist-info/licenses/numpy/random/LICENSE.md",
+      "licenses/numpy/numpy-2.5.3.dist-info/licenses/numpy/random/src/distributions/LICENSE.md",
+      "licenses/numpy/numpy-2.5.3.dist-info/licenses/numpy/random/src/mt19937/LICENSE.md",
+      "licenses/numpy/numpy-2.5.3.dist-info/licenses/numpy/random/src/pcg64/LICENSE.md",
+      "licenses/numpy/numpy-2.5.3.dist-info/licenses/numpy/random/src/philox/LICENSE.md",
+      "licenses/numpy/numpy-2.5.3.dist-info/licenses/numpy/random/src/sfc64/LICENSE.md",
+      "licenses/numpy/numpy-2.5.3.dist-info/licenses/numpy/random/src/splitmix64/LICENSE.md",
+      "licenses/numpy/numpy/_core/include/numpy/random/LICENSE.txt",
+      "licenses/numpy/numpy/ma/LICENSE",
+      "licenses/numpy/numpy/random/LICENSE.md"
+    ]
+  },
+  {
+    "name": "ortools",
+    "version": "9.15.6755",
+    "license_files": [
+      "licenses/ortools/ortools-9.15.6755.dist-info/LICENSE"
+    ]
+  },
+  {
+    "name": "packaging",
+    "version": "26.3",
+    "license_files": [
+      "licenses/packaging/packaging-26.3.dist-info/licenses/LICENSE",
+      "licenses/packaging/packaging-26.3.dist-info/licenses/LICENSE.APACHE",
+      "licenses/packaging/packaging-26.3.dist-info/licenses/LICENSE.BSD"
+    ]
+  },
+  {
+    "name": "pandas",
+    "version": "3.0.6",
+    "license_files": [
+      "licenses/pandas/pandas-3.0.6.dist-info/LICENSE"
+    ]
+  },
+  {
+    "name": "pefile",
+    "version": "2024.8.26",
+    "license_files": [
+      "licenses/pefile/pefile-2024.8.26.dist-info/LICENSE"
+    ]
+  },
+  {
+    "name": "pip",
+    "version": "25.2",
+    "license_files": [
+      "licenses/pip/pip-25.2.dist-info/licenses/LICENSE.txt",
+      "licenses/pip/pip-25.2.dist-info/licenses/src/pip/_vendor/cachecontrol/LICENSE.txt",
+      "licenses/pip/pip-25.2.dist-info/licenses/src/pip/_vendor/certifi/LICENSE",
+      "licenses/pip/pip-25.2.dist-info/licenses/src/pip/_vendor/dependency_groups/LICENSE.txt",
+      "licenses/pip/pip-25.2.dist-info/licenses/src/pip/_vendor/distlib/LICENSE.txt",
+      "licenses/pip/pip-25.2.dist-info/licenses/src/pip/_vendor/distro/LICENSE",
+      "licenses/pip/pip-25.2.dist-info/licenses/src/pip/_vendor/idna/LICENSE.md",
+      "licenses/pip/pip-25.2.dist-info/licenses/src/pip/_vendor/msgpack/COPYING",
+      "licenses/pip/pip-25.2.dist-info/licenses/src/pip/_vendor/packaging/LICENSE",
+      "licenses/pip/pip-25.2.dist-info/licenses/src/pip/_vendor/packaging/LICENSE.APACHE",
+      "licenses/pip/pip-25.2.dist-info/licenses/src/pip/_vendor/packaging/LICENSE.BSD",
+      "licenses/pip/pip-25.2.dist-info/licenses/src/pip/_vendor/pkg_resources/LICENSE",
+      "licenses/pip/pip-25.2.dist-info/licenses/src/pip/_vendor/platformdirs/LICENSE",
+      "licenses/pip/pip-25.2.dist-info/licenses/src/pip/_vendor/pygments/LICENSE",
+      "licenses/pip/pip-25.2.dist-info/licenses/src/pip/_vendor/pyproject_hooks/LICENSE",
+      "licenses/pip/pip-25.2.dist-info/licenses/src/pip/_vendor/requests/LICENSE",
+      "licenses/pip/pip-25.2.dist-info/licenses/src/pip/_vendor/resolvelib/LICENSE",
+      "licenses/pip/pip-25.2.dist-info/licenses/src/pip/_vendor/rich/LICENSE",
+      "licenses/pip/pip-25.2.dist-info/licenses/src/pip/_vendor/tomli/LICENSE",
+      "licenses/pip/pip-25.2.dist-info/licenses/src/pip/_vendor/tomli/LICENSE-HEADER",
+      "licenses/pip/pip-25.2.dist-info/licenses/src/pip/_vendor/tomli_w/LICENSE",
+      "licenses/pip/pip-25.2.dist-info/licenses/src/pip/_vendor/truststore/LICENSE",
+      "licenses/pip/pip-25.2.dist-info/licenses/src/pip/_vendor/urllib3/LICENSE.txt"
+    ]
+  },
+  {
+    "name": "pluggy",
+    "version": "1.6.0",
+    "license_files": [
+      "licenses/pluggy/pluggy-1.6.0.dist-info/licenses/LICENSE"
+    ]
+  },
+  {
+    "name": "protobuf",
+    "version": "6.33.6",
+    "license_files": [
+      "licenses/protobuf/protobuf-6.33.6.dist-info/LICENSE"
+    ]
+  },
+  {
+    "name": "pydantic",
+    "version": "2.13.5",
+    "license_files": [
+      "licenses/pydantic/pydantic-2.13.5.dist-info/licenses/LICENSE"
+    ]
+  },
+  {
+    "name": "pydantic_core",
+    "version": "2.46.5",
+    "license_files": [
+      "licenses/pydantic_core/pydantic_core-2.46.5.dist-info/licenses/LICENSE"
+    ]
+  },
+  {
+    "name": "Pygments",
+    "version": "2.21.0",
+    "license_files": [
+      "licenses/Pygments/pygments-2.21.0.dist-info/licenses/LICENSE"
+    ]
+  },
+  {
+    "name": "pyinstaller",
+    "version": "6.22.3",
+    "license_files": [
+      "licenses/pyinstaller/pyinstaller-6.22.3.dist-info/licenses/COPYING.txt"
+    ]
+  },
+  {
+    "name": "pyinstaller-hooks-contrib",
+    "version": "2026.7",
+    "license_files": [
+      "licenses/pyinstaller-hooks-contrib/pyinstaller_hooks_contrib-2026.7.dist-info/licenses/LICENSE"
+    ]
+  },
+  {
+    "name": "pytest",
+    "version": "9.1.1",
+    "license_files": [
+      "licenses/pytest/pytest-9.1.1.dist-info/licenses/LICENSE"
+    ]
+  },
+  {
+    "name": "python-dateutil",
+    "version": "2.9.0.post0",
+    "license_files": [
+      "licenses/python-dateutil/python_dateutil-2.9.0.post0.dist-info/LICENSE"
+    ]
+  },
+  {
+    "name": "pywin32-ctypes",
+    "version": "0.2.3",
+    "license_files": [
+      "licenses/pywin32-ctypes/pywin32_ctypes-0.2.3.dist-info/LICENSE.txt"
+    ]
+  },
+  {
+    "name": "ruamel.yaml",
+    "version": "0.19.1",
+    "license_files": [
+      "licenses/ruamel.yaml/ruamel_yaml-0.19.1.dist-info/licenses/LICENSE"
+    ]
+  },
+  {
+    "name": "setuptools",
+    "version": "84.0.0",
+    "license_files": [
+      "licenses/setuptools/setuptools-84.0.0.dist-info/licenses/LICENSE",
+      "licenses/setuptools/setuptools/_vendor/autocommand-2.2.2.dist-info/LICENSE",
+      "licenses/setuptools/setuptools/_vendor/backports.tarfile-1.2.0.dist-info/LICENSE",
+      "licenses/setuptools/setuptools/_vendor/importlib_metadata-8.7.1.dist-info/licenses/LICENSE",
+      "licenses/setuptools/setuptools/_vendor/jaraco.text-4.0.0.dist-info/LICENSE",
+      "licenses/setuptools/setuptools/_vendor/jaraco_context-6.1.0.dist-info/licenses/LICENSE",
+      "licenses/setuptools/setuptools/_vendor/jaraco_functools-4.4.0.dist-info/licenses/LICENSE",
+      "licenses/setuptools/setuptools/_vendor/more_itertools-10.8.0.dist-info/licenses/LICENSE",
+      "licenses/setuptools/setuptools/_vendor/packaging-26.0.dist-info/licenses/LICENSE",
+      "licenses/setuptools/setuptools/_vendor/packaging-26.0.dist-info/licenses/LICENSE.APACHE",
+      "licenses/setuptools/setuptools/_vendor/packaging-26.0.dist-info/licenses/LICENSE.BSD",
+      "licenses/setuptools/setuptools/_vendor/platformdirs-4.4.0.dist-info/licenses/LICENSE",
+      "licenses/setuptools/setuptools/_vendor/tomli-2.4.0.dist-info/licenses/LICENSE",
+      "licenses/setuptools/setuptools/_vendor/wheel-0.46.3.dist-info/licenses/LICENSE.txt",
+      "licenses/setuptools/setuptools/_vendor/zipp-3.23.0.dist-info/licenses/LICENSE",
+      "licenses/setuptools/setuptools/config/NOTICE",
+      "licenses/setuptools/setuptools/config/_validate_pyproject/NOTICE"
+    ]
+  },
+  {
+    "name": "shapely",
+    "version": "2.1.2",
+    "license_files": [
+      "licenses/shapely/shapely-2.1.2.dist-info/licenses/LICENSE.txt",
+      "licenses/shapely/shapely-2.1.2.dist-info/licenses/LICENSE_GEOS",
+      "licenses/shapely/shapely-2.1.2.dist-info/licenses/LICENSE_win32"
+    ]
+  },
+  {
+    "name": "six",
+    "version": "1.17.0",
+    "license_files": [
+      "licenses/six/six-1.17.0.dist-info/LICENSE"
+    ]
+  },
+  {
+    "name": "starlette",
+    "version": "1.6.0",
+    "license_files": [
+      "licenses/starlette/starlette-1.6.0.dist-info/licenses/LICENSE.md"
+    ]
+  },
+  {
+    "name": "typing_extensions",
+    "version": "4.16.0",
+    "license_files": [
+      "licenses/typing_extensions/typing_extensions-4.16.0.dist-info/licenses/LICENSE"
+    ]
+  },
+  {
+    "name": "typing-inspection",
+    "version": "0.4.4",
+    "license_files": [
+      "licenses/typing-inspection/typing_inspection-0.4.4.dist-info/licenses/LICENSE"
+    ]
+  },
+  {
+    "name": "tzdata",
+    "version": "2026.4",
+    "license_files": [
+      "licenses/tzdata/tzdata-2026.4.dist-info/licenses/LICENSE",
+      "licenses/tzdata/tzdata-2026.4.dist-info/licenses/licenses/LICENSE_APACHE"
+    ]
+  },
+  {
+    "name": "uvicorn",
+    "version": "0.53.0",
+    "license_files": [
+      "licenses/uvicorn/uvicorn-0.53.0.dist-info/licenses/LICENSE.md"
+    ]
+  },
+  {
+    "name": "wheel",
+    "version": "0.48.0",
+    "license_files": [
+      "licenses/wheel/wheel-0.48.0.dist-info/licenses/LICENSE.txt"
+    ]
+  }
+]

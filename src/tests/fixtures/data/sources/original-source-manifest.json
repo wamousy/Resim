@@ -1,0 +1,52 @@
+{
+  "files": [
+    {
+      "path": "_references/sources/nangate45/tech.lef",
+      "url": "https://raw.githubusercontent.com/The-OpenROAD-Project/OpenROAD-flow-scripts/3a964e13f11a4e435aac01ffa14db0a7d2853720/flow/platforms/nangate45/lef/NangateOpenCellLibrary.tech.lef",
+      "commit": "3a964e13f11a4e435aac01ffa14db0a7d2853720",
+      "sha256": "834a79295054cd4209178d1bade67c353863c47bb4b3c22ee38b862b7cec37f2",
+      "bytes": 19485
+    },
+    {
+      "path": "_references/sources/nangate45/cells.lef",
+      "url": "https://raw.githubusercontent.com/The-OpenROAD-Project/OpenROAD-flow-scripts/3a964e13f11a4e435aac01ffa14db0a7d2853720/flow/platforms/nangate45/lef/NangateOpenCellLibrary.macro.lef",
+      "commit": "3a964e13f11a4e435aac01ffa14db0a7d2853720",
+      "sha256": "840b01e500826096d1edcc752350834da647fdbf360798f243f8122b52b357c3",
+      "bytes": 349950
+    },
+    {
+      "path": "_references/sources/nangate45/LICENSE",
+      "url": "https://raw.githubusercontent.com/The-OpenROAD-Project/OpenROAD-flow-scripts/3a964e13f11a4e435aac01ffa14db0a7d2853720/flow/platforms/nangate45/LICENSE",
+      "commit": "3a964e13f11a4e435aac01ffa14db0a7d2853720",
+      "sha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594",
+      "bytes": 10174
+    },
+    {
+      "path": "_references/sources/gemmini/README.md",
+      "url": "https://raw.githubusercontent.com/ucb-bar/gemmini/8c3f9923a44a2fe2c7930587be297d6d4f8c09ca/README.md",
+      "commit": "8c3f9923a44a2fe2c7930587be297d6d4f8c09ca",
+      "sha256": "9c5977d88b6ffa0fb04e5a8f878eb984d2f4c8c329539b6c8b29b57f2d2c42b7",
+      "bytes": 40587
+    },
+    {
+      "path": "_references/sources/gemmini/Configs.scala",
+      "url": "https://raw.githubusercontent.com/ucb-bar/gemmini/8c3f9923a44a2fe2c7930587be297d6d4f8c09ca/src/main/scala/gemmini/Configs.scala",
+      "commit": "8c3f9923a44a2fe2c7930587be297d6d4f8c09ca",
+      "sha256": "178c21ac741c89c08158efa71fb34da35d27b75bd50bde5116a5e19178f8391b",
+      "bytes": 14307
+    },
+    {
+      "path": "_references/sources/gemmini/LICENSE",
+      "url": "https://raw.githubusercontent.com/ucb-bar/gemmini/8c3f9923a44a2fe2c7930587be297d6d4f8c09ca/LICENSE",
+      "commit": "8c3f9923a44a2fe2c7930587be297d6d4f8c09ca",
+      "sha256": "c41aaa8016faefb6d266f5cfbbaeefc32b5ae0ff3c67670be2b1b0cf291ef6e0",
+      "bytes": 1403
+    }
+  ],
+  "notes": [
+    "Nangate45 is an open research library, not a modern production PDK.",
+    "Gemmini supplies an architecture reference, not a published 10-die implementation.",
+    "TSV, DRAM area and power assumptions in Resim examples are explicitly synthetic."
+  ],
+  "path_base": "ResimProjects"
+}

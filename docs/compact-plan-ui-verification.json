@@ -1,0 +1,12 @@
+{
+  "reason": "Browser runtime unavailable in this session due to Windows sandbox setup errors.",
+  "browser_verified": false,
+  "layout_checks": [
+    "SVG parsed as XML; all expected modules present",
+    "Saved plan inputs reproduce the same layout ID and resource summary",
+    "Packaged application serves floorplan.svg and restores per-plan inputs"
+  ],
+  "note": "Program and SVG structure checks passed; browser visual verification not performed.",
+  "program_verification": "compact-plan-verification.json",
+  "checked_at": "2026-09-29T08:24:35.8921661Z"
+}

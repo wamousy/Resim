@@ -1,0 +1,37 @@
+{
+  "checked_at": "2026-09-29T12:57:53.1099021+08:00",
+  "url": "http://127.0.0.1:55396/",
+  "project_folder": "C:\\Users\\W\\AppData\\Local\\Temp\\resim-planning-ui-YBoMlQ\\芯片项目",
+  "checks": {
+    "copy_entry_removed": true,
+    "new_fields_initially_hidden": true,
+    "collapse_preserves_fields": true,
+    "custom_project_folder_saved": true,
+    "reload_and_second_save": true,
+    "history_reopened": true,
+    "console_errors": 0
+  },
+  "files": [
+    {
+      "file": "project.json",
+      "exists": true
+    },
+    {
+      "file": "inputs\\chip-architecture.yml",
+      "exists": true
+    },
+    {
+      "file": "inputs\\technology.yml",
+      "exists": true
+    },
+    {
+      "file": "方案A\\report.html",
+      "exists": true
+    },
+    {
+      "file": "方案B\\report.html",
+      "exists": true
+    }
+  ],
+  "passed": true
+}

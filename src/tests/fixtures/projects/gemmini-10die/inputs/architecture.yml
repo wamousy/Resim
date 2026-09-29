@@ -1,0 +1,1663 @@
+schema_version: resim/0.1
+name: Gemmini-inspired 2 logic + 8 DRAM exploration
+architecture:
+  chip: gemmini_3d_exploration
+  description: Gemmini default 16x16, 256 KiB scratchpad (4 banks), 64 KiB 
+    accumulator (2 banks); ten-die stack is a Resim exploration, not the 
+    original Gemmini design.
+  metrics:
+    compute_TOPS:
+    bandwidth_GBps:
+    capacity_KiB:
+    precision: unspecified
+    frequency_MHz:
+    bit_width:
+  dies:
+  - id: L0
+    display_platform: false
+    package_layers: 1
+    kind: logic
+    order: 0
+    width_um: 6000.0
+    height_um: 6000.0
+    thickness_um: 100.0
+    voltage_V: 1.0
+    power_budget_W: 4.5
+    max_utilization: 0.8
+    metrics:
+      compute_TOPS:
+      bandwidth_GBps:
+      capacity_KiB:
+      precision: unspecified
+      frequency_MHz:
+      bit_width:
+  - id: L1
+    display_platform: false
+    package_layers: 1
+    kind: logic
+    order: 1
+    width_um: 6000.0
+    height_um: 6000.0
+    thickness_um: 100.0
+    voltage_V: 1.0
+    power_budget_W: 4.5
+    max_utilization: 0.8
+    metrics:
+      compute_TOPS:
+      bandwidth_GBps:
+      capacity_KiB:
+      precision: unspecified
+      frequency_MHz:
+      bit_width:
+  - id: D0
+    display_platform: false
+    package_layers: 1
+    kind: dram
+    order: 2
+    width_um: 6000.0
+    height_um: 6000.0
+    thickness_um: 50.0
+    voltage_V: 1.0
+    power_budget_W: 1.0
+    max_utilization: 0.8
+    metrics:
+      compute_TOPS:
+      bandwidth_GBps:
+      capacity_KiB:
+      precision: unspecified
+      frequency_MHz:
+      bit_width:
+  - id: D1
+    display_platform: false
+    package_layers: 1
+    kind: dram
+    order: 3
+    width_um: 6000.0
+    height_um: 6000.0
+    thickness_um: 50.0
+    voltage_V: 1.0
+    power_budget_W: 1.0
+    max_utilization: 0.8
+    metrics:
+      compute_TOPS:
+      bandwidth_GBps:
+      capacity_KiB:
+      precision: unspecified
+      frequency_MHz:
+      bit_width:
+  - id: D2
+    display_platform: false
+    package_layers: 1
+    kind: dram
+    order: 4
+    width_um: 6000.0
+    height_um: 6000.0
+    thickness_um: 50.0
+    voltage_V: 1.0
+    power_budget_W: 1.0
+    max_utilization: 0.8
+    metrics:
+      compute_TOPS:
+      bandwidth_GBps:
+      capacity_KiB:
+      precision: unspecified
+      frequency_MHz:
+      bit_width:
+  - id: D3
+    display_platform: false
+    package_layers: 1
+    kind: dram
+    order: 5
+    width_um: 6000.0
+    height_um: 6000.0
+    thickness_um: 50.0
+    voltage_V: 1.0
+    power_budget_W: 1.0
+    max_utilization: 0.8
+    metrics:
+      compute_TOPS:
+      bandwidth_GBps:
+      capacity_KiB:
+      precision: unspecified
+      frequency_MHz:
+      bit_width:
+  - id: D4
+    display_platform: false
+    package_layers: 1
+    kind: dram
+    order: 6
+    width_um: 6000.0
+    height_um: 6000.0
+    thickness_um: 50.0
+    voltage_V: 1.0
+    power_budget_W: 1.0
+    max_utilization: 0.8
+    metrics:
+      compute_TOPS:
+      bandwidth_GBps:
+      capacity_KiB:
+      precision: unspecified
+      frequency_MHz:
+      bit_width:
+  - id: D5
+    display_platform: false
+    package_layers: 1
+    kind: dram
+    order: 7
+    width_um: 6000.0
+    height_um: 6000.0
+    thickness_um: 50.0
+    voltage_V: 1.0
+    power_budget_W: 1.0
+    max_utilization: 0.8
+    metrics:
+      compute_TOPS:
+      bandwidth_GBps:
+      capacity_KiB:
+      precision: unspecified
+      frequency_MHz:
+      bit_width:
+  - id: D6
+    display_platform: false
+    package_layers: 1
+    kind: dram
+    order: 8
+    width_um: 6000.0
+    height_um: 6000.0
+    thickness_um: 50.0
+    voltage_V: 1.0
+    power_budget_W: 1.0
+    max_utilization: 0.8
+    metrics:
+      compute_TOPS:
+      bandwidth_GBps:
+      capacity_KiB:
+      precision: unspecified
+      frequency_MHz:
+      bit_width:
+  - id: D7
+    display_platform: false
+    package_layers: 1
+    kind: dram
+    order: 9
+    width_um: 6000.0
+    height_um: 6000.0
+    thickness_um: 50.0
+    voltage_V: 1.0
+    power_budget_W: 1.0
+    max_utilization: 0.8
+    metrics:
+      compute_TOPS:
+      bandwidth_GBps:
+      capacity_KiB:
+      precision: unspecified
+      frequency_MHz:
+      bit_width:
+  cores:
+  - id: gemmini
+    keep_on_same_die: false
+    metrics:
+      compute_TOPS:
+      bandwidth_GBps:
+      capacity_KiB:
+      precision: unspecified
+      frequency_MHz:
+      bit_width:
+  - id: system
+    keep_on_same_die: false
+    metrics:
+      compute_TOPS:
+      bandwidth_GBps:
+      capacity_KiB:
+      precision: unspecified
+      frequency_MHz:
+      bit_width:
+  - id: memory0
+    keep_on_same_die: true
+    metrics:
+      compute_TOPS:
+      bandwidth_GBps:
+      capacity_KiB:
+      precision: unspecified
+      frequency_MHz:
+      bit_width:
+  - id: memory1
+    keep_on_same_die: true
+    metrics:
+      compute_TOPS:
+      bandwidth_GBps:
+      capacity_KiB:
+      precision: unspecified
+      frequency_MHz:
+      bit_width:
+  - id: memory2
+    keep_on_same_die: true
+    metrics:
+      compute_TOPS:
+      bandwidth_GBps:
+      capacity_KiB:
+      precision: unspecified
+      frequency_MHz:
+      bit_width:
+  - id: memory3
+    keep_on_same_die: true
+    metrics:
+      compute_TOPS:
+      bandwidth_GBps:
+      capacity_KiB:
+      precision: unspecified
+      frequency_MHz:
+      bit_width:
+  - id: memory4
+    keep_on_same_die: true
+    metrics:
+      compute_TOPS:
+      bandwidth_GBps:
+      capacity_KiB:
+      precision: unspecified
+      frequency_MHz:
+      bit_width:
+  - id: memory5
+    keep_on_same_die: true
+    metrics:
+      compute_TOPS:
+      bandwidth_GBps:
+      capacity_KiB:
+      precision: unspecified
+      frequency_MHz:
+      bit_width:
+  - id: memory6
+    keep_on_same_die: true
+    metrics:
+      compute_TOPS:
+      bandwidth_GBps:
+      capacity_KiB:
+      precision: unspecified
+      frequency_MHz:
+      bit_width:
+  - id: memory7
+    keep_on_same_die: true
+    metrics:
+      compute_TOPS:
+      bandwidth_GBps:
+      capacity_KiB:
+      precision: unspecified
+      frequency_MHz:
+      bit_width:
+  modules:
+  - shared_cores: []
+    id: tensor
+    area_known: true
+    core: gemmini
+    kind: compute
+    allowed_dies:
+    - L0
+    - L1
+    stdcell_area_um2: 408576.0
+    macro_area_um2: 0.0
+    power_W: 2.0
+    width_um: 1200.0
+    height_um: 1000.0
+    target_cell_utilization: 0.65
+    utilization_basis:
+    halo_um: 0
+    voltage_domain: VDD
+    fixed: false
+    placement_window:
+    ports:
+    - in
+    - out
+    port_locations: {}
+    metrics:
+      compute_TOPS: 0.256
+      bandwidth_GBps:
+      capacity_KiB:
+      precision: int8 / int32 accumulate
+      frequency_MHz: 500.0
+      bit_width: 8
+    provenance: NAND2_X1 area 0.7979999999999999 um2 imported from Nangate45 
+      LEF; gate-equivalent count 512000, macro area and power are uncalibrated 
+      example assumptions.
+  - shared_cores: []
+    id: sp0
+    area_known: true
+    core: gemmini
+    kind: sram
+    allowed_dies:
+    - L0
+    - L1
+    stdcell_area_um2: 1596.0
+    macro_area_um2: 400000.0
+    power_W: 0.25
+    width_um: 800.0
+    height_um: 700.0
+    target_cell_utilization: 0.65
+    utilization_basis:
+    halo_um: 0
+    voltage_domain: VDD
+    fixed: false
+    placement_window:
+    ports:
+    - in
+    - out
+    port_locations: {}
+    metrics:
+      compute_TOPS:
+      bandwidth_GBps: 32.0
+      capacity_KiB: 64.0
+      precision: unspecified
+      frequency_MHz:
+      bit_width:
+    provenance: NAND2_X1 area 0.7979999999999999 um2 imported from Nangate45 
+      LEF; gate-equivalent count 2000, macro area and power are uncalibrated 
+      example assumptions.
+  - shared_cores: []
+    id: sp1
+    area_known: true
+    core: gemmini
+    kind: sram
+    allowed_dies:
+    - L0
+    - L1
+    stdcell_area_um2: 1596.0
+    macro_area_um2: 400000.0
+    power_W: 0.25
+    width_um: 800.0
+    height_um: 700.0
+    target_cell_utilization: 0.65
+    utilization_basis:
+    halo_um: 0
+    voltage_domain: VDD
+    fixed: false
+    placement_window:
+    ports:
+    - in
+    - out
+    port_locations: {}
+    metrics:
+      compute_TOPS:
+      bandwidth_GBps: 32.0
+      capacity_KiB: 64.0
+      precision: unspecified
+      frequency_MHz:
+      bit_width:
+    provenance: NAND2_X1 area 0.7979999999999999 um2 imported from Nangate45 
+      LEF; gate-equivalent count 2000, macro area and power are uncalibrated 
+      example assumptions.
+  - shared_cores: []
+    id: sp2
+    area_known: true
+    core: gemmini
+    kind: sram
+    allowed_dies:
+    - L0
+    - L1
+    stdcell_area_um2: 1596.0
+    macro_area_um2: 400000.0
+    power_W: 0.25
+    width_um: 800.0
+    height_um: 700.0
+    target_cell_utilization: 0.65
+    utilization_basis:
+    halo_um: 0
+    voltage_domain: VDD
+    fixed: false
+    placement_window:
+    ports:
+    - in
+    - out
+    port_locations: {}
+    metrics:
+      compute_TOPS:
+      bandwidth_GBps: 32.0
+      capacity_KiB: 64.0
+      precision: unspecified
+      frequency_MHz:
+      bit_width:
+    provenance: NAND2_X1 area 0.7979999999999999 um2 imported from Nangate45 
+      LEF; gate-equivalent count 2000, macro area and power are uncalibrated 
+      example assumptions.
+  - shared_cores: []
+    id: sp3
+    area_known: true
+    core: gemmini
+    kind: sram
+    allowed_dies:
+    - L0
+    - L1
+    stdcell_area_um2: 1596.0
+    macro_area_um2: 400000.0
+    power_W: 0.25
+    width_um: 800.0
+    height_um: 700.0
+    target_cell_utilization: 0.65
+    utilization_basis:
+    halo_um: 0
+    voltage_domain: VDD
+    fixed: false
+    placement_window:
+    ports:
+    - in
+    - out
+    port_locations: {}
+    metrics:
+      compute_TOPS:
+      bandwidth_GBps: 32.0
+      capacity_KiB: 64.0
+      precision: unspecified
+      frequency_MHz:
+      bit_width:
+    provenance: NAND2_X1 area 0.7979999999999999 um2 imported from Nangate45 
+      LEF; gate-equivalent count 2000, macro area and power are uncalibrated 
+      example assumptions.
+  - shared_cores: []
+    id: acc0
+    area_known: true
+    core: gemmini
+    kind: sram
+    allowed_dies:
+    - L0
+    - L1
+    stdcell_area_um2: 9576.0
+    macro_area_um2: 250000.0
+    power_W: 0.3
+    width_um: 800.0
+    height_um: 600.0
+    target_cell_utilization: 0.65
+    utilization_basis:
+    halo_um: 0
+    voltage_domain: VDD
+    fixed: false
+    placement_window:
+    ports:
+    - in
+    - out
+    port_locations: {}
+    metrics:
+      compute_TOPS:
+      bandwidth_GBps:
+      capacity_KiB: 32.0
+      precision: unspecified
+      frequency_MHz:
+      bit_width: 32
+    provenance: NAND2_X1 area 0.7979999999999999 um2 imported from Nangate45 
+      LEF; gate-equivalent count 12000, macro area and power are uncalibrated 
+      example assumptions.
+  - shared_cores: []
+    id: acc1
+    area_known: true
+    core: gemmini
+    kind: sram
+    allowed_dies:
+    - L0
+    - L1
+    stdcell_area_um2: 9576.0
+    macro_area_um2: 250000.0
+    power_W: 0.3
+    width_um: 800.0
+    height_um: 600.0
+    target_cell_utilization: 0.65
+    utilization_basis:
+    halo_um: 0
+    voltage_domain: VDD
+    fixed: false
+    placement_window:
+    ports:
+    - in
+    - out
+    port_locations: {}
+    metrics:
+      compute_TOPS:
+      bandwidth_GBps:
+      capacity_KiB: 32.0
+      precision: unspecified
+      frequency_MHz:
+      bit_width: 32
+    provenance: NAND2_X1 area 0.7979999999999999 um2 imported from Nangate45 
+      LEF; gate-equivalent count 12000, macro area and power are uncalibrated 
+      example assumptions.
+  - shared_cores: []
+    id: dma
+    area_known: true
+    core: system
+    kind: dma
+    allowed_dies:
+    - L0
+    - L1
+    stdcell_area_um2: 47880.0
+    macro_area_um2: 0.0
+    power_W: 0.6
+    width_um: 600.0
+    height_um: 500.0
+    target_cell_utilization: 0.65
+    utilization_basis:
+    halo_um: 0
+    voltage_domain: VDD
+    fixed: false
+    placement_window:
+    ports:
+    - in
+    - out
+    port_locations: {}
+    metrics:
+      compute_TOPS:
+      bandwidth_GBps: 64.0
+      capacity_KiB:
+      precision: unspecified
+      frequency_MHz:
+      bit_width: 128
+    provenance: NAND2_X1 area 0.7979999999999999 um2 imported from Nangate45 
+      LEF; gate-equivalent count 60000, macro area and power are uncalibrated 
+      example assumptions.
+  - shared_cores: []
+    id: controller
+    area_known: true
+    core: system
+    kind: control
+    allowed_dies:
+    - L0
+    - L1
+    stdcell_area_um2: 23940.0
+    macro_area_um2: 0.0
+    power_W: 0.2
+    width_um: 500.0
+    height_um: 400.0
+    target_cell_utilization: 0.65
+    utilization_basis:
+    halo_um: 0
+    voltage_domain: VDD
+    fixed: false
+    placement_window:
+    ports:
+    - in
+    - out
+    port_locations: {}
+    metrics:
+      compute_TOPS:
+      bandwidth_GBps:
+      capacity_KiB:
+      precision: unspecified
+      frequency_MHz:
+      bit_width:
+    provenance: NAND2_X1 area 0.7979999999999999 um2 imported from Nangate45 
+      LEF; gate-equivalent count 30000, macro area and power are uncalibrated 
+      example assumptions.
+  - shared_cores: []
+    id: transpose_scale
+    area_known: true
+    core: gemmini
+    kind: logic
+    allowed_dies:
+    - L0
+    - L1
+    stdcell_area_um2: 47880.0
+    macro_area_um2: 0.0
+    power_W: 0.4
+    width_um: 600.0
+    height_um: 500.0
+    target_cell_utilization: 0.65
+    utilization_basis:
+    halo_um: 0
+    voltage_domain: VDD
+    fixed: false
+    placement_window:
+    ports:
+    - in
+    - out
+    port_locations: {}
+    metrics:
+      compute_TOPS:
+      bandwidth_GBps:
+      capacity_KiB:
+      precision: unspecified
+      frequency_MHz:
+      bit_width:
+    provenance: NAND2_X1 area 0.7979999999999999 um2 imported from Nangate45 
+      LEF; gate-equivalent count 60000, macro area and power are uncalibrated 
+      example assumptions.
+  - shared_cores: []
+    id: dram0
+    area_known: true
+    core: memory0
+    kind: dram
+    allowed_dies:
+    - D0
+    stdcell_area_um2: 0.0
+    macro_area_um2: 16000000.0
+    power_W: 0.5
+    width_um: 4000.0
+    height_um: 4000.0
+    target_cell_utilization: 0.65
+    utilization_basis:
+    halo_um: 0
+    voltage_domain: VDD
+    fixed: true
+    placement_window:
+    ports:
+    - in
+    - out
+    port_locations: {}
+    metrics:
+      compute_TOPS:
+      bandwidth_GBps: 64.0
+      capacity_KiB: 131072.0
+      precision: unspecified
+      frequency_MHz:
+      bit_width:
+    provenance: NAND2_X1 area 0.7979999999999999 um2 imported from Nangate45 
+      LEF; gate-equivalent count 0, macro area and power are uncalibrated 
+      example assumptions.
+  - shared_cores: []
+    id: dram1
+    area_known: true
+    core: memory1
+    kind: dram
+    allowed_dies:
+    - D1
+    stdcell_area_um2: 0.0
+    macro_area_um2: 16000000.0
+    power_W: 0.5
+    width_um: 4000.0
+    height_um: 4000.0
+    target_cell_utilization: 0.65
+    utilization_basis:
+    halo_um: 0
+    voltage_domain: VDD
+    fixed: true
+    placement_window:
+    ports:
+    - in
+    - out
+    port_locations: {}
+    metrics:
+      compute_TOPS:
+      bandwidth_GBps: 64.0
+      capacity_KiB: 131072.0
+      precision: unspecified
+      frequency_MHz:
+      bit_width:
+    provenance: NAND2_X1 area 0.7979999999999999 um2 imported from Nangate45 
+      LEF; gate-equivalent count 0, macro area and power are uncalibrated 
+      example assumptions.
+  - shared_cores: []
+    id: dram2
+    area_known: true
+    core: memory2
+    kind: dram
+    allowed_dies:
+    - D2
+    stdcell_area_um2: 0.0
+    macro_area_um2: 16000000.0
+    power_W: 0.5
+    width_um: 4000.0
+    height_um: 4000.0
+    target_cell_utilization: 0.65
+    utilization_basis:
+    halo_um: 0
+    voltage_domain: VDD
+    fixed: true
+    placement_window:
+    ports:
+    - in
+    - out
+    port_locations: {}
+    metrics:
+      compute_TOPS:
+      bandwidth_GBps: 64.0
+      capacity_KiB: 131072.0
+      precision: unspecified
+      frequency_MHz:
+      bit_width:
+    provenance: NAND2_X1 area 0.7979999999999999 um2 imported from Nangate45 
+      LEF; gate-equivalent count 0, macro area and power are uncalibrated 
+      example assumptions.
+  - shared_cores: []
+    id: dram3
+    area_known: true
+    core: memory3
+    kind: dram
+    allowed_dies:
+    - D3
+    stdcell_area_um2: 0.0
+    macro_area_um2: 16000000.0
+    power_W: 0.5
+    width_um: 4000.0
+    height_um: 4000.0
+    target_cell_utilization: 0.65
+    utilization_basis:
+    halo_um: 0
+    voltage_domain: VDD
+    fixed: true
+    placement_window:
+    ports:
+    - in
+    - out
+    port_locations: {}
+    metrics:
+      compute_TOPS:
+      bandwidth_GBps: 64.0
+      capacity_KiB: 131072.0
+      precision: unspecified
+      frequency_MHz:
+      bit_width:
+    provenance: NAND2_X1 area 0.7979999999999999 um2 imported from Nangate45 
+      LEF; gate-equivalent count 0, macro area and power are uncalibrated 
+      example assumptions.
+  - shared_cores: []
+    id: dram4
+    area_known: true
+    core: memory4
+    kind: dram
+    allowed_dies:
+    - D4
+    stdcell_area_um2: 0.0
+    macro_area_um2: 16000000.0
+    power_W: 0.5
+    width_um: 4000.0
+    height_um: 4000.0
+    target_cell_utilization: 0.65
+    utilization_basis:
+    halo_um: 0
+    voltage_domain: VDD
+    fixed: true
+    placement_window:
+    ports:
+    - in
+    - out
+    port_locations: {}
+    metrics:
+      compute_TOPS:
+      bandwidth_GBps: 64.0
+      capacity_KiB: 131072.0
+      precision: unspecified
+      frequency_MHz:
+      bit_width:
+    provenance: NAND2_X1 area 0.7979999999999999 um2 imported from Nangate45 
+      LEF; gate-equivalent count 0, macro area and power are uncalibrated 
+      example assumptions.
+  - shared_cores: []
+    id: dram5
+    area_known: true
+    core: memory5
+    kind: dram
+    allowed_dies:
+    - D5
+    stdcell_area_um2: 0.0
+    macro_area_um2: 16000000.0
+    power_W: 0.5
+    width_um: 4000.0
+    height_um: 4000.0
+    target_cell_utilization: 0.65
+    utilization_basis:
+    halo_um: 0
+    voltage_domain: VDD
+    fixed: true
+    placement_window:
+    ports:
+    - in
+    - out
+    port_locations: {}
+    metrics:
+      compute_TOPS:
+      bandwidth_GBps: 64.0
+      capacity_KiB: 131072.0
+      precision: unspecified
+      frequency_MHz:
+      bit_width:
+    provenance: NAND2_X1 area 0.7979999999999999 um2 imported from Nangate45 
+      LEF; gate-equivalent count 0, macro area and power are uncalibrated 
+      example assumptions.
+  - shared_cores: []
+    id: dram6
+    area_known: true
+    core: memory6
+    kind: dram
+    allowed_dies:
+    - D6
+    stdcell_area_um2: 0.0
+    macro_area_um2: 16000000.0
+    power_W: 0.5
+    width_um: 4000.0
+    height_um: 4000.0
+    target_cell_utilization: 0.65
+    utilization_basis:
+    halo_um: 0
+    voltage_domain: VDD
+    fixed: true
+    placement_window:
+    ports:
+    - in
+    - out
+    port_locations: {}
+    metrics:
+      compute_TOPS:
+      bandwidth_GBps: 64.0
+      capacity_KiB: 131072.0
+      precision: unspecified
+      frequency_MHz:
+      bit_width:
+    provenance: NAND2_X1 area 0.7979999999999999 um2 imported from Nangate45 
+      LEF; gate-equivalent count 0, macro area and power are uncalibrated 
+      example assumptions.
+  - shared_cores: []
+    id: dram7
+    area_known: true
+    core: memory7
+    kind: dram
+    allowed_dies:
+    - D7
+    stdcell_area_um2: 0.0
+    macro_area_um2: 16000000.0
+    power_W: 0.5
+    width_um: 4000.0
+    height_um: 4000.0
+    target_cell_utilization: 0.65
+    utilization_basis:
+    halo_um: 0
+    voltage_domain: VDD
+    fixed: true
+    placement_window:
+    ports:
+    - in
+    - out
+    port_locations: {}
+    metrics:
+      compute_TOPS:
+      bandwidth_GBps: 64.0
+      capacity_KiB: 131072.0
+      precision: unspecified
+      frequency_MHz:
+      bit_width:
+    provenance: NAND2_X1 area 0.7979999999999999 um2 imported from Nangate45 
+      LEF; gate-equivalent count 0, macro area and power are uncalibrated 
+      example assumptions.
+  links:
+  - id: sp0_tensor
+    source: sp0
+    target: tensor
+    source_port: out
+    target_port: in
+    bus_width_bits:
+    bandwidth_GBps: 32.0
+    lane_rate_Gbps: 8.0
+    data_wires:
+    control_wires: 8
+    spare_fraction: 0.1
+    max_planar_length_um:
+    max_tier_hops:
+    latency_weight: 1
+    area_reference:
+      horizontal:
+      vertical:
+    routing_layers: {}
+  - id: sp1_tensor
+    source: sp1
+    target: tensor
+    source_port: out
+    target_port: in
+    bus_width_bits:
+    bandwidth_GBps: 32.0
+    lane_rate_Gbps: 8.0
+    data_wires:
+    control_wires: 8
+    spare_fraction: 0.1
+    max_planar_length_um:
+    max_tier_hops:
+    latency_weight: 1
+    area_reference:
+      horizontal:
+      vertical:
+    routing_layers: {}
+  - id: sp2_tensor
+    source: sp2
+    target: tensor
+    source_port: out
+    target_port: in
+    bus_width_bits:
+    bandwidth_GBps: 32.0
+    lane_rate_Gbps: 8.0
+    data_wires:
+    control_wires: 8
+    spare_fraction: 0.1
+    max_planar_length_um:
+    max_tier_hops:
+    latency_weight: 1
+    area_reference:
+      horizontal:
+      vertical:
+    routing_layers: {}
+  - id: sp3_tensor
+    source: sp3
+    target: tensor
+    source_port: out
+    target_port: in
+    bus_width_bits:
+    bandwidth_GBps: 32.0
+    lane_rate_Gbps: 8.0
+    data_wires:
+    control_wires: 8
+    spare_fraction: 0.1
+    max_planar_length_um:
+    max_tier_hops:
+    latency_weight: 1
+    area_reference:
+      horizontal:
+      vertical:
+    routing_layers: {}
+  - id: tensor_acc0
+    source: tensor
+    target: acc0
+    source_port: out
+    target_port: in
+    bus_width_bits:
+    bandwidth_GBps: 32.0
+    lane_rate_Gbps: 8.0
+    data_wires:
+    control_wires: 8
+    spare_fraction: 0.1
+    max_planar_length_um:
+    max_tier_hops:
+    latency_weight: 1
+    area_reference:
+      horizontal:
+      vertical:
+    routing_layers: {}
+  - id: tensor_acc1
+    source: tensor
+    target: acc1
+    source_port: out
+    target_port: in
+    bus_width_bits:
+    bandwidth_GBps: 32.0
+    lane_rate_Gbps: 8.0
+    data_wires:
+    control_wires: 8
+    spare_fraction: 0.1
+    max_planar_length_um:
+    max_tier_hops:
+    latency_weight: 1
+    area_reference:
+      horizontal:
+      vertical:
+    routing_layers: {}
+  - id: ctrl_tensor
+    source: controller
+    target: tensor
+    source_port: out
+    target_port: in
+    bus_width_bits:
+    bandwidth_GBps: 4.0
+    lane_rate_Gbps: 8.0
+    data_wires:
+    control_wires: 8
+    spare_fraction: 0.1
+    max_planar_length_um:
+    max_tier_hops:
+    latency_weight: 1
+    area_reference:
+      horizontal:
+      vertical:
+    routing_layers: {}
+  - id: tensor_transform
+    source: tensor
+    target: transpose_scale
+    source_port: out
+    target_port: in
+    bus_width_bits:
+    bandwidth_GBps: 32.0
+    lane_rate_Gbps: 8.0
+    data_wires:
+    control_wires: 8
+    spare_fraction: 0.1
+    max_planar_length_um:
+    max_tier_hops:
+    latency_weight: 1
+    area_reference:
+      horizontal:
+      vertical:
+    routing_layers: {}
+  - id: dma_sp0
+    source: dma
+    target: sp0
+    source_port: out
+    target_port: in
+    bus_width_bits:
+    bandwidth_GBps: 16.0
+    lane_rate_Gbps: 8.0
+    data_wires:
+    control_wires: 8
+    spare_fraction: 0.1
+    max_planar_length_um:
+    max_tier_hops:
+    latency_weight: 1
+    area_reference:
+      horizontal:
+      vertical:
+    routing_layers: {}
+  - id: dma_sp1
+    source: dma
+    target: sp1
+    source_port: out
+    target_port: in
+    bus_width_bits:
+    bandwidth_GBps: 16.0
+    lane_rate_Gbps: 8.0
+    data_wires:
+    control_wires: 8
+    spare_fraction: 0.1
+    max_planar_length_um:
+    max_tier_hops:
+    latency_weight: 1
+    area_reference:
+      horizontal:
+      vertical:
+    routing_layers: {}
+  - id: dma_sp2
+    source: dma
+    target: sp2
+    source_port: out
+    target_port: in
+    bus_width_bits:
+    bandwidth_GBps: 16.0
+    lane_rate_Gbps: 8.0
+    data_wires:
+    control_wires: 8
+    spare_fraction: 0.1
+    max_planar_length_um:
+    max_tier_hops:
+    latency_weight: 1
+    area_reference:
+      horizontal:
+      vertical:
+    routing_layers: {}
+  - id: dma_sp3
+    source: dma
+    target: sp3
+    source_port: out
+    target_port: in
+    bus_width_bits:
+    bandwidth_GBps: 16.0
+    lane_rate_Gbps: 8.0
+    data_wires:
+    control_wires: 8
+    spare_fraction: 0.1
+    max_planar_length_um:
+    max_tier_hops:
+    latency_weight: 1
+    area_reference:
+      horizontal:
+      vertical:
+    routing_layers: {}
+  - id: memory0_dma
+    source: dram0
+    target: dma
+    source_port: out
+    target_port: in
+    bus_width_bits:
+    bandwidth_GBps: 16.0
+    lane_rate_Gbps: 8.0
+    data_wires:
+    control_wires: 8
+    spare_fraction: 0.1
+    max_planar_length_um:
+    max_tier_hops:
+    latency_weight: 1
+    area_reference:
+      horizontal:
+      vertical:
+    routing_layers: {}
+  - id: memory1_dma
+    source: dram1
+    target: dma
+    source_port: out
+    target_port: in
+    bus_width_bits:
+    bandwidth_GBps: 16.0
+    lane_rate_Gbps: 8.0
+    data_wires:
+    control_wires: 8
+    spare_fraction: 0.1
+    max_planar_length_um:
+    max_tier_hops:
+    latency_weight: 1
+    area_reference:
+      horizontal:
+      vertical:
+    routing_layers: {}
+  - id: memory2_dma
+    source: dram2
+    target: dma
+    source_port: out
+    target_port: in
+    bus_width_bits:
+    bandwidth_GBps: 16.0
+    lane_rate_Gbps: 8.0
+    data_wires:
+    control_wires: 8
+    spare_fraction: 0.1
+    max_planar_length_um:
+    max_tier_hops:
+    latency_weight: 1
+    area_reference:
+      horizontal:
+      vertical:
+    routing_layers: {}
+  - id: memory3_dma
+    source: dram3
+    target: dma
+    source_port: out
+    target_port: in
+    bus_width_bits:
+    bandwidth_GBps: 16.0
+    lane_rate_Gbps: 8.0
+    data_wires:
+    control_wires: 8
+    spare_fraction: 0.1
+    max_planar_length_um:
+    max_tier_hops:
+    latency_weight: 1
+    area_reference:
+      horizontal:
+      vertical:
+    routing_layers: {}
+  - id: memory4_dma
+    source: dram4
+    target: dma
+    source_port: out
+    target_port: in
+    bus_width_bits:
+    bandwidth_GBps: 16.0
+    lane_rate_Gbps: 8.0
+    data_wires:
+    control_wires: 8
+    spare_fraction: 0.1
+    max_planar_length_um:
+    max_tier_hops:
+    latency_weight: 1
+    area_reference:
+      horizontal:
+      vertical:
+    routing_layers: {}
+  - id: memory5_dma
+    source: dram5
+    target: dma
+    source_port: out
+    target_port: in
+    bus_width_bits:
+    bandwidth_GBps: 16.0
+    lane_rate_Gbps: 8.0
+    data_wires:
+    control_wires: 8
+    spare_fraction: 0.1
+    max_planar_length_um:
+    max_tier_hops:
+    latency_weight: 1
+    area_reference:
+      horizontal:
+      vertical:
+    routing_layers: {}
+  - id: memory6_dma
+    source: dram6
+    target: dma
+    source_port: out
+    target_port: in
+    bus_width_bits:
+    bandwidth_GBps: 16.0
+    lane_rate_Gbps: 8.0
+    data_wires:
+    control_wires: 8
+    spare_fraction: 0.1
+    max_planar_length_um:
+    max_tier_hops:
+    latency_weight: 1
+    area_reference:
+      horizontal:
+      vertical:
+    routing_layers: {}
+  - id: memory7_dma
+    source: dram7
+    target: dma
+    source_port: out
+    target_port: in
+    bus_width_bits:
+    bandwidth_GBps: 16.0
+    lane_rate_Gbps: 8.0
+    data_wires:
+    control_wires: 8
+    spare_fraction: 0.1
+    max_planar_length_um:
+    max_tier_hops:
+    latency_weight: 1
+    area_reference:
+      horizontal:
+      vertical:
+    routing_layers: {}
+resources:
+  technology: Nangate45 geometry reference
+  technology_provenance: data/sources/manifest.json; 
+    OpenROAD-flow-scripts/flow/platforms/nangate45
+  metals:
+  - name: metal1
+    direction: HORIZONTAL
+    pitch_um: 0.14
+    width_um: 0.07
+    availability:
+  - name: metal2
+    direction: VERTICAL
+    pitch_um: 0.19
+    width_um: 0.07
+    availability:
+  - name: metal3
+    direction: HORIZONTAL
+    pitch_um: 0.14
+    width_um: 0.07
+    availability:
+  - name: metal4
+    direction: VERTICAL
+    pitch_um: 0.28
+    width_um: 0.14
+    availability:
+  - name: metal5
+    direction: HORIZONTAL
+    pitch_um: 0.28
+    width_um: 0.14
+    availability:
+  - name: metal6
+    direction: VERTICAL
+    pitch_um: 0.28
+    width_um: 0.14
+    availability:
+  - name: metal7
+    direction: HORIZONTAL
+    pitch_um: 0.8
+    width_um: 0.4
+    availability:
+  - name: metal8
+    direction: VERTICAL
+    pitch_um: 0.8
+    width_um: 0.4
+    availability:
+  - name: metal9
+    direction: HORIZONTAL
+    pitch_um: 1.6
+    width_um: 0.8
+    availability:
+  - name: metal10
+    direction: VERTICAL
+    pitch_um: 1.6
+    width_um: 0.8
+    availability:
+  routing_availability: 0.08
+  tsv:
+    diameter_um: 4.0
+    pitch_um: 10.0
+    keepout_um: 2.0
+    bond_pitch_um: 10.0
+    max_current_mA: 10.0
+    provenance: Exploratory assumptions, NOT Nangate45 TSV/DRAM process data
+  delay_model:
+  notes:
+  - Gemmini Configs.scala defaults are extracted by scripts/build_example.py; 
+    see reference.json.
+  - Module gate counts, SRAM/DRAM macro dimensions, all power, TSV and supply 
+    budgets are illustrative and need calibration.
+  - All dies use the same Nangate routing reference for this example; this does 
+    not characterize DRAM manufacturing.
+constraints:
+  die_area_limit_mm2: 800.0
+  max_congestion_ratio: 1.0
+  max_power_density_W_mm2: 5.0
+  same_die_groups: []
+  blockages: []
+  min_module_spacing_um: 0
+  routing_channels: []
+floorplan:
+  placements:
+  - x_um: 200.0
+    y_um: 200.0
+    width_um: 1200.0
+    height_um: 1000.0
+    module: tensor
+    die: L0
+  - x_um: 200.0
+    y_um: 200.0
+    width_um: 800.0
+    height_um: 700.0
+    module: sp0
+    die: L1
+  - x_um: 1300.0
+    y_um: 200.0
+    width_um: 800.0
+    height_um: 700.0
+    module: sp1
+    die: L1
+  - x_um: 2400.0
+    y_um: 200.0
+    width_um: 800.0
+    height_um: 700.0
+    module: sp2
+    die: L1
+  - x_um: 3500.0
+    y_um: 200.0
+    width_um: 800.0
+    height_um: 700.0
+    module: sp3
+    die: L1
+  - x_um: 200.0
+    y_um: 1700.0
+    width_um: 800.0
+    height_um: 600.0
+    module: acc0
+    die: L1
+  - x_um: 1300.0
+    y_um: 1700.0
+    width_um: 800.0
+    height_um: 600.0
+    module: acc1
+    die: L1
+  - x_um: 3800.0
+    y_um: 3300.0
+    width_um: 600.0
+    height_um: 500.0
+    module: dma
+    die: L1
+  - x_um: 4000.0
+    y_um: 4000.0
+    width_um: 500.0
+    height_um: 400.0
+    module: controller
+    die: L0
+  - x_um: 2400.0
+    y_um: 3400.0
+    width_um: 600.0
+    height_um: 500.0
+    module: transpose_scale
+    die: L0
+  - x_um: 400.0
+    y_um: 400.0
+    width_um: 4000.0
+    height_um: 4000.0
+    module: dram0
+    die: D0
+  - x_um: 400.0
+    y_um: 400.0
+    width_um: 4000.0
+    height_um: 4000.0
+    module: dram1
+    die: D1
+  - x_um: 400.0
+    y_um: 400.0
+    width_um: 4000.0
+    height_um: 4000.0
+    module: dram2
+    die: D2
+  - x_um: 400.0
+    y_um: 400.0
+    width_um: 4000.0
+    height_um: 4000.0
+    module: dram3
+    die: D3
+  - x_um: 400.0
+    y_um: 400.0
+    width_um: 4000.0
+    height_um: 4000.0
+    module: dram4
+    die: D4
+  - x_um: 400.0
+    y_um: 400.0
+    width_um: 4000.0
+    height_um: 4000.0
+    module: dram5
+    die: D5
+  - x_um: 400.0
+    y_um: 400.0
+    width_um: 4000.0
+    height_um: 4000.0
+    module: dram6
+    die: D6
+  - x_um: 400.0
+    y_um: 400.0
+    width_um: 4000.0
+    height_um: 4000.0
+    module: dram7
+    die: D7
+  tsv_regions:
+  - x_um: 4800.0
+    y_um: 4800.0
+    width_um: 800.0
+    height_um: 800.0
+    id: via_0
+    interconnect: TSV
+    orientation: unspecified
+    signal_budget_bits:
+    budget_paths: []
+    interface_pitch_um:
+    lower_die: L0
+    upper_die: L1
+    core:
+  - x_um: 4800.0
+    y_um: 4800.0
+    width_um: 800.0
+    height_um: 800.0
+    id: via_1
+    interconnect: TSV
+    orientation: unspecified
+    signal_budget_bits:
+    budget_paths: []
+    interface_pitch_um:
+    lower_die: L1
+    upper_die: D0
+    core:
+  - x_um: 4800.0
+    y_um: 4800.0
+    width_um: 800.0
+    height_um: 800.0
+    id: via_2
+    interconnect: TSV
+    orientation: unspecified
+    signal_budget_bits:
+    budget_paths: []
+    interface_pitch_um:
+    lower_die: D0
+    upper_die: D1
+    core:
+  - x_um: 4800.0
+    y_um: 4800.0
+    width_um: 800.0
+    height_um: 800.0
+    id: via_3
+    interconnect: TSV
+    orientation: unspecified
+    signal_budget_bits:
+    budget_paths: []
+    interface_pitch_um:
+    lower_die: D1
+    upper_die: D2
+    core:
+  - x_um: 4800.0
+    y_um: 4800.0
+    width_um: 800.0
+    height_um: 800.0
+    id: via_4
+    interconnect: TSV
+    orientation: unspecified
+    signal_budget_bits:
+    budget_paths: []
+    interface_pitch_um:
+    lower_die: D2
+    upper_die: D3
+    core:
+  - x_um: 4800.0
+    y_um: 4800.0
+    width_um: 800.0
+    height_um: 800.0
+    id: via_5
+    interconnect: TSV
+    orientation: unspecified
+    signal_budget_bits:
+    budget_paths: []
+    interface_pitch_um:
+    lower_die: D3
+    upper_die: D4
+    core:
+  - x_um: 4800.0
+    y_um: 4800.0
+    width_um: 800.0
+    height_um: 800.0
+    id: via_6
+    interconnect: TSV
+    orientation: unspecified
+    signal_budget_bits:
+    budget_paths: []
+    interface_pitch_um:
+    lower_die: D4
+    upper_die: D5
+    core:
+  - x_um: 4800.0
+    y_um: 4800.0
+    width_um: 800.0
+    height_um: 800.0
+    id: via_7
+    interconnect: TSV
+    orientation: unspecified
+    signal_budget_bits:
+    budget_paths: []
+    interface_pitch_um:
+    lower_die: D5
+    upper_die: D6
+    core:
+  - x_um: 4800.0
+    y_um: 4800.0
+    width_um: 800.0
+    height_um: 800.0
+    id: via_8
+    interconnect: TSV
+    orientation: unspecified
+    signal_budget_bits:
+    budget_paths: []
+    interface_pitch_um:
+    lower_die: D6
+    upper_die: D7
+    core:
+  supply_ports:
+  - id: vdd_L0
+    die: L0
+    x_um: 5700.0
+    y_um: 5200.0
+    domain: VDD
+    voltage_V: 1.0
+    max_current_A: 12.0
+    core:
+    provenance:
+    feed: external
+  - id: vdd_L1
+    die: L1
+    x_um: 5700.0
+    y_um: 5200.0
+    domain: VDD
+    voltage_V: 1.0
+    max_current_A: 5.0
+    core:
+    provenance:
+    feed: stack_base
+  - id: vdd_D0
+    die: D0
+    x_um: 5700.0
+    y_um: 5200.0
+    domain: VDD
+    voltage_V: 1.0
+    max_current_A: 5.0
+    core:
+    provenance:
+    feed: stack_base
+  - id: vdd_D1
+    die: D1
+    x_um: 5700.0
+    y_um: 5200.0
+    domain: VDD
+    voltage_V: 1.0
+    max_current_A: 5.0
+    core:
+    provenance:
+    feed: stack_base
+  - id: vdd_D2
+    die: D2
+    x_um: 5700.0
+    y_um: 5200.0
+    domain: VDD
+    voltage_V: 1.0
+    max_current_A: 5.0
+    core:
+    provenance:
+    feed: stack_base
+  - id: vdd_D3
+    die: D3
+    x_um: 5700.0
+    y_um: 5200.0
+    domain: VDD
+    voltage_V: 1.0
+    max_current_A: 5.0
+    core:
+    provenance:
+    feed: stack_base
+  - id: vdd_D4
+    die: D4
+    x_um: 5700.0
+    y_um: 5200.0
+    domain: VDD
+    voltage_V: 1.0
+    max_current_A: 5.0
+    core:
+    provenance:
+    feed: stack_base
+  - id: vdd_D5
+    die: D5
+    x_um: 5700.0
+    y_um: 5200.0
+    domain: VDD
+    voltage_V: 1.0
+    max_current_A: 5.0
+    core:
+    provenance:
+    feed: stack_base
+  - id: vdd_D6
+    die: D6
+    x_um: 5700.0
+    y_um: 5200.0
+    domain: VDD
+    voltage_V: 1.0
+    max_current_A: 5.0
+    core:
+    provenance:
+    feed: stack_base
+  - id: vdd_D7
+    die: D7
+    x_um: 5700.0
+    y_um: 5200.0
+    domain: VDD
+    voltage_V: 1.0
+    max_current_A: 5.0
+    core:
+    provenance:
+    feed: stack_base
+search:
+  objective: wirelength
+  time_limit_s: 18.0
+  candidates: 3
+  grid_um: 100.0
+  seed: 7
+  wirelength_weight: 1
+  tier_crossing_weight: 500
+  congestion_grid: 16
+stack:
+  die_faces:
+    L0: up
+    L1: up
+    D0: up
+    D1: up
+    D2: up
+    D3: up
+    D4: up
+    D5: up
+    D6: up
+    D7: up

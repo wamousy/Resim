@@ -5,14 +5,14 @@
 | 目录 | 内容 |
 | --- | --- |
 | [app](../app/) | 可执行程序、启动文件和运行依赖；使用人员只需此文件夹 |
-| [src](../src/) | 可维护源代码；包含 `web/` 前端、`tools/` 开发工具和 `tests/` 测试 |
+| [src](../src/) | 完整源代码：`frontend/` 前端、`backend/` 后端、`tests/` 测试、`tools/` 开发工具 |
 | [docs](./) | 使用说明、工作交接、格式契约与验证记录 |
 
 用户工程与示例继续单独放在 `Resim` 旁的 `ResimProjects/`；结果保存位置在网页中配置。`.git` 和 `.gitignore` 是版本管理元数据。
 
 双击 [app/启动Resim.cmd](../app/启动Resim.cmd) 或 [app/Resim.exe](../app/Resim.exe) 即可打开页面。程序已经运行时会复用已有服务。分发时必须复制整个 `app`，不能只复制 exe；运行不需要单独安装 Node 或 Python。
 
-**源码边界：** 前端以 `src/web/` 为唯一编辑入口，`app/_internal/resim/static/` 是随程序分发的副本。原后端目前只有打包引擎与字节码，尚不能从完整源码重建；缺口与待办见交接文档。C# 入口和新增 Python 扩展均有源码。
+后端缺失的 18 个模块和 12 份原测试源码已恢复；现在从 src 独立构建整个 app，不读取旧引擎，也不加载归档字节码。恢复依据见 [source-recovery.json](source-recovery.json)。前端以 `src/frontend/` 为唯一编辑入口，app 内的网页是构建副本。
 
 在仓库目录也可运行：
 
@@ -26,13 +26,13 @@
 .\app\Resim.exe serve --port 8770 --projects-dir "..\ResimProjects" --open-browser
 ```
 
-修改前端后，从 `Resim` 目录执行同步和验收：
+开始源码开发，在 `Resim` 目录执行：
 
 ```powershell
-node src/tools/sync-web.mjs
-node src/tools/verify.mjs
+.\src\tools\setup-dev.ps1
+.\src\tools\dev.ps1
 ```
 
-`sync-web.mjs` 将前端源文件发布到 app，并移除 app 静态目录中源码已删除的文件；`--check` 只核对，不修改。验收检查源码与运行副本一致、语法及自动测试，需要 Node 和 Python 3.13，结果见 [verification.json](verification.json)。
+源码服务默认使用 8771 端口，安装版默认 8770；建议开发时通过 `-ProjectsDir` 指定独立工程目录。完整构建、回归和整包发布见开发指南，当前验收证据见 [verification.json](verification.json)。
 
-文档入口：[工作交接](HANDOVER.md) · [本次实施与剩余任务](RELEASE-0.12.md) · [输入与接口](API-CONTRACT.md) · [启动与构建](HOST.md)。
+文档入口：[开发与构建指南](DEVELOPMENT.md) · [工作交接](HANDOVER.md) · [实施状态与剩余任务](RELEASE-0.12.md) · [输入与接口](API-CONTRACT.md) · [Windows 入口](HOST.md)。

@@ -1,0 +1,30 @@
+{
+  "checked_at": "2026-09-29T12:35:36.3403018+08:00",
+  "tested_application": "C:\\Users\\W\\Desktop\\arch\\Resim\\src\\tools\\.build\\named-result-folders\\app",
+  "application": "C:\\Users\\W\\Desktop\\arch\\Resim\\app",
+  "pid": 257064,
+  "backup": "src/tools/.build/previous-app-20260929-123454-8d823d80",
+  "checks": [
+    {
+      "file": "Resim.exe",
+      "match": true,
+      "sha256": "B470DAB0C641E630548FC99ED164CD784BE43938E5F513D62095DEF96781291B"
+    },
+    {
+      "file": "Resim.Engine.exe",
+      "match": true,
+      "sha256": "D59839E5B5E7B7A97B56EC32F83E0D967FCA5323749997DAE94B0C19D2CC06C2"
+    },
+    {
+      "file": "build-manifest.json",
+      "match": true,
+      "sha256": "33532184E8FFB66C72B83460C6774DBB74F1064BDDCB4BBF90E4C11793F465D1"
+    }
+  ],
+  "health": {
+    "application": "Resim",
+    "version": "0.12.0",
+    "projects_dir": "C:\\Users\\W\\Desktop\\arch\\ResimProjects"
+  },
+  "passed": true
+}

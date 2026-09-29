@@ -1,0 +1,14 @@
+{
+  "deployment": {
+    "projects": "C:\\Users\\W\\Desktop\\arch\\ResimProjects",
+    "pid": 17616,
+    "backup": "C:\\Users\\W\\Desktop\\arch\\Resim\\src\\tools\\.build\\previous-app-20260929-175632-a1dd4eaa",
+    "application": "C:\\Users\\W\\Desktop\\arch\\Resim\\app",
+    "status": "ready"
+  },
+  "remaining_actions_verified": true,
+  "browser_click_verified": false,
+  "source_runtime_match": true,
+  "removed_buttons_verified": true,
+  "checked_at": "2026-09-29T09:56:51.9944899Z"
+}

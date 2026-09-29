@@ -1,10 +1,10 @@
 # 0.12.0 实施状态与迁移说明
 
-日期：2026-09-28。对应 HANDOVER.md 第 12 节。本次保留原面积、路由和 CP-SAT 数值求解器，新增功能都有独立源码和回归测试。
+更新：2026-09-29。对应 HANDOVER.md 第 12 节。本次保留原面积、路由和 CP-SAT 数值求解器，新增功能都有独立源码和回归测试。
 
 ## 1. 目录与交付
 
-Resim 分为三个业务目录：`app/` 存放完整运行程序；`src/` 存放可维护源码，测试和工具归入 `src/tests/`、`src/tools/`；`docs/` 存放说明、交接和验证记录。用户工程 `ResimProjects` 保持原位置。前端源码唯一编辑入口为 `src/web/`，通过 `node src/tools/sync-web.mjs` 发布到 `app/_internal/resim/static/`，完整验收会检查两者一致。
+Resim 分为三个业务目录：`app/` 存放完整运行程序；`src/` 存放可维护源码，测试和工具归入 `src/tests/`、`src/tools/`；`docs/` 存放说明、交接和验证记录。用户工程 `ResimProjects` 保持原位置。前端源码唯一编辑入口为 `src/frontend/`，通过 `node src/tools/sync-web.mjs` 发布到 `app/_internal/resim/static/`，完整验收会检查两者一致。
 
 使用人员只需要 app 全部内容，包括 `_internal`，双击其中的 `启动Resim.cmd` 或 `Resim.exe`；不要加入 `.next.exe` 或测试入口。维护人员另接收 src 和 docs。`src/tools/start.ps1` 与仓库内 exe 均默认使用 Resim 旁的原工程目录；独立复制 app 后默认使用 app 旁的 ResimProjects，也可显式指定 `--projects-dir`。
 
@@ -12,7 +12,7 @@ Resim 分为三个业务目录：`app/` 存放完整运行程序；`src/` 存放
 
 | 编号 | 状态 | 本次交付及剩余边界 |
 | --- | --- | --- |
-| P0-01 完整后端源码 | 待资料 | 保留字节码，新增扩展都有源码；仍缺原始 Python 工程、依赖锁及从零打包方案。 |
+| P0-01 完整后端源码 | 本机完成 | 从开发记录恢复 18 个后端模块、12 份原测试，补齐锁文件和独立整包构建；另一台 Windows 机器仍需复建验收。 |
 | P0-02 schema / 堆叠统一 | 本版完成 | 正式 stack 字段、旧格式迁移；Web、API、CLI、新 JSON/HTML 共用引擎规则。旧文件不改写。 |
 | P1-01 真实工程与工艺参数 | 待资料 | 未补造真实功耗、面积、TSV/HB 和校准数据。 |
 | P1-02 事务与恢复 | 部分完成 | 双输入与 manifest 恢复日志、写入锁、中断运行标记。完整 run 目录跨文件/跨磁盘原子提交和断点续算仍未实现。 |
@@ -85,4 +85,4 @@ Resim 分为三个业务目录：`app/` 存放完整运行程序；`src/` 存放
 
 2026-09-28 浏览器实测：已载入 BLX 536 模块工程，B/L/X 仍各 800 mm²；B Die 的 15,400 条间距只绘制 50 行，搜索 core00__rssram 得到 175 条并可翻到第 2 页；点击模块切换到 core00 / bdie 并显示对象详情。浏览器错误日志为空。升级后的预览未覆盖用户历史记录。
 
-下一步优先找回原后端源码，再将运行保存和求解任务管理移入正式后端。新增扩展 `src/resim_policy_*.py` 已由构建工具嵌入引擎，不依赖外置源码运行。
+源码现已分为 `src/frontend`、`src/backend`、`src/tests` 和 `src/tools`；从源码重建不依赖旧引擎或恢复字节码。下一步重点是完整运行事务、任务管理和兼容层重构。完整开发/打包/发布步骤见 [DEVELOPMENT.md](DEVELOPMENT.md)，恢复证据见 [source-recovery.json](source-recovery.json)。

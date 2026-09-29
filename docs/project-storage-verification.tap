@@ -1,0 +1,478 @@
+TAP version 13
+# Subtest: layout variants share input family but technology, architecture and constraints do not
+ok 1 - layout variants share input family but technology, architecture and constraints do not
+  ---
+  duration_ms: 7.2371
+  type: 'test'
+  ...
+# Subtest: saving cannot bypass unapplied editor or form input and failed previews
+ok 2 - saving cannot bypass unapplied editor or form input and failed previews
+  ---
+  duration_ms: 0.1618
+  type: 'test'
+  ...
+# Subtest: separate YAML files round-trip, preserve all architecture fields, keep resources exclusive
+ok 3 - separate YAML files round-trip, preserve all architecture fields, keep resources exclusive
+  ---
+  duration_ms: 9.9282
+  type: 'test'
+  ...
+# Subtest: legacy complete YAML imports and explicit technology overrides legacy resources
+ok 4 - legacy complete YAML imports and explicit technology overrides legacy resources
+  ---
+  duration_ms: 4.5501
+  type: 'test'
+  ...
+# Subtest: wrong document kinds, missing tech, duplicate keys, cycles and multiple documents are rejected
+ok 5 - wrong document kinds, missing tech, duplicate keys, cycles and multiple documents are rejected
+  ---
+  duration_ms: 1.9201
+  type: 'test'
+  ...
+# Subtest: module dimensions and placement change together; unknown resources stay unknown
+ok 6 - module dimensions and placement change together; unknown resources stay unknown
+  ---
+  duration_ms: 0.8305
+  type: 'test'
+  ...
+# Subtest: explicit zero resources remain known, new core is created only once
+ok 7 - explicit zero resources remain known, new core is created only once
+  ---
+  duration_ms: 0.3268
+  type: 'test'
+  ...
+# Subtest: module mutation rejects duplicate IDs, invalid sizes and migration outside allowed dies
+ok 8 - module mutation rejects duplicate IDs, invalid sizes and migration outside allowed dies
+  ---
+  duration_ms: 0.598
+  type: 'test'
+  ...
+# Subtest: link input preserves implementation metadata; connected modules cannot be removed
+ok 9 - link input preserves implementation metadata; connected modules cannot be removed
+  ---
+  duration_ms: 0.5484
+  type: 'test'
+  ...
+# Subtest: comparison uses B minus A and never turns missing data into zero
+ok 10 - comparison uses B minus A and never turns missing data into zero
+  ---
+  duration_ms: 0.5569
+  type: 'test'
+  ...
+# Subtest: comparison finds migration, resizing, new modules and resolved/new issue identities
+ok 11 - comparison finds migration, resizing, new modules and resolved/new issue identities
+  ---
+  duration_ms: 0.3544
+  type: 'test'
+  ...
+# Subtest: duplicate issue identities are grouped; engine/library changes are disclosed
+ok 12 - duplicate issue identities are grouped; engine/library changes are disclosed
+  ---
+  duration_ms: 0.3184
+  type: 'test'
+  ...
+# Subtest: history lists unique candidate layouts, preserving stored IDs and excluding baseline
+ok 13 - history lists unique candidate layouts, preserving stored IDs and excluding baseline
+  ---
+  duration_ms: 0.355
+  type: 'test'
+  ...
+# Subtest: comparison exports the stored name, not the decorated dropdown label
+ok 14 - comparison exports the stored name, not the decorated dropdown label
+  ---
+  duration_ms: 0.8504
+  type: 'test'
+  ...
+# Subtest: geometry identity ignores score, plan ID and placement order, not actual location
+ok 15 - geometry identity ignores score, plan ID and placement order, not actual location
+  ---
+  duration_ms: 9.4959
+  type: 'test'
+  ...
+# Subtest: migration, resizing and moved coordinates distinguish plans and explain differences
+ok 16 - migration, resizing and moved coordinates distinguish plans and explain differences
+  ---
+  duration_ms: 1.2104
+  type: 'test'
+  ...
+# Subtest: comparison supports any number of peer selections and preserves unknowns and explicit zero
+ok 17 - comparison supports any number of peer selections and preserves unknowns and explicit zero
+  ---
+  duration_ms: 2.0862
+  type: 'test'
+  ...
+# Subtest: same persisted selection cannot be compared with itself; fewer than two is invalid
+ok 18 - same persisted selection cannot be compared with itself; fewer than two is invalid
+  ---
+  duration_ms: 0.4909
+  type: 'test'
+  ...
+# Subtest: all selected columns participate in layout and constraint differences
+ok 19 - all selected columns participate in layout and constraint differences
+  ---
+  duration_ms: 0.38
+  type: 'test'
+  ...
+# Subtest: all selected versions and technologies checked; key order is not a technology change
+ok 20 - all selected versions and technologies checked; key order is not a technology change
+  ---
+  duration_ms: 3.4496
+  type: 'test'
+  ...
+# Subtest: candidate requests have no fixed 10-item ceiling, retaining positive integer validation
+ok 21 - candidate requests have no fixed 10-item ceiling, retaining positive integer validation
+  ---
+  duration_ms: 0.9331
+  type: 'test'
+  ...
+# Subtest: only solver exhaustion is described as the total, never timeout or requested count
+ok 22 - only solver exhaustion is described as the total, never timeout or requested count
+  ---
+  duration_ms: 0.2039
+  type: 'test'
+  ...
+# Subtest: difficulty categories preserve each reason and global index across pages
+ok 23 - difficulty categories preserve each reason and global index across pages
+  ---
+  duration_ms: 1.4181
+  type: 'test'
+  ...
+# Subtest: existing project picker contains only projects and keeps valid selection
+ok 24 - existing project picker contains only projects and keeps valid selection
+  ---
+  duration_ms: 2.2276
+  type: 'test'
+  ...
+# Subtest: empty project picker has no selectable fake project
+ok 25 - empty project picker has no selectable fake project
+  ---
+  duration_ms: 0.8532
+  type: 'test'
+  ...
+# Subtest: display and history comparison include the same additional stack findings
+ok 26 - display and history comparison include the same additional stack findings
+  ---
+  duration_ms: 13.6998
+  type: 'test'
+  ...
+# Subtest: interfaces include all dedicated cores and MC regions without mixing HB with TSV
+ok 27 - interfaces include all dedicated cores and MC regions without mixing HB with TSV
+  ---
+  duration_ms: 1.7454
+  type: 'test'
+  ...
+# Subtest: partial unknown values remain unknown; zero and negative margins are preserved
+ok 28 - partial unknown values remain unknown; zero and negative margins are preserved
+  ---
+  duration_ms: 0.2733
+  type: 'test'
+  ...
+# Subtest: large spacing ledger is capped per page without discarding rows
+ok 29 - large spacing ledger is capped per page without discarding rows
+  ---
+  duration_ms: 4.1214
+  type: 'test'
+  ...
+# Subtest: spacing query and violation filter compose; page is clamped after filtering
+ok 30 - spacing query and violation filter compose; page is clamped after filtering
+  ---
+  duration_ms: 8.5325
+  type: 'test'
+  ...
+# Subtest: current save persists only the report being viewed, preserving the other candidates
+ok 31 - current save persists only the report being viewed, preserving the other candidates
+  ---
+  duration_ms: 7.5836
+  type: 'test'
+  ...
+# Subtest: selected save shares a batch and does not replace the unselected viewed layout
+ok 32 - selected save shares a batch and does not replace the unselected viewed layout
+  ---
+  duration_ms: 1.8159
+  type: 'test'
+  ...
+# Subtest: all save resumes after a partial failure without resaving committed plans
+ok 33 - all save resumes after a partial failure without resaving committed plans
+  ---
+  duration_ms: 2.018
+  type: 'test'
+  ...
+# Subtest: unapplied raw YAML blocks all three save entry points
+ok 34 - unapplied raw YAML blocks all three save entry points
+  ---
+  duration_ms: 2.2427
+  type: 'test'
+  ...
+# Subtest: an unchanged candidate is not its own parent; manual edits retain the source
+ok 35 - an unchanged candidate is not its own parent; manual edits retain the source
+  ---
+  duration_ms: 2.013
+  type: 'test'
+  ...
+# Subtest: face-down module and metal planes sit below silicon, while standalone views normalize the face
+ok 36 - face-down module and metal planes sit below silicon, while standalone views normalize the face
+  ---
+  duration_ms: 0.8539
+  type: 'test'
+  ...
+# Subtest: contact orientation uses lower top and upper bottom for all four combinations
+ok 37 - contact orientation uses lower top and upper bottom for all four combinations
+  ---
+  duration_ms: 0.1735
+  type: 'test'
+  ...
+# Subtest: legacy BLX infers B/L/X faces but does not invent the abstract DRAM package orientation
+ok 38 - legacy BLX infers B/L/X faces but does not invent the abstract DRAM package orientation
+  ---
+  duration_ms: 1.3498
+  type: 'test'
+  ...
+# Subtest: conflicting legacy face constraints and HB on opposite-facing surfaces cannot pass
+ok 39 - conflicting legacy face constraints and HB on opposite-facing surfaces cannot pass
+  ---
+  duration_ms: 0.9523
+  type: 'test'
+  ...
+# Subtest: changing both faces and interface kind is atomic and keeps position, ownership and demand intact
+ok 40 - changing both faces and interface kind is atomic and keeps position, ownership and demand intact
+  ---
+  duration_ms: 0.3201
+  type: 'test'
+  ...
+# Subtest: chip YAML has explicit stack mapping; old-engine snapshots round-trip without losing description
+ok 41 - chip YAML has explicit stack mapping; old-engine snapshots round-trip without losing description
+  ---
+  duration_ms: 7.0702
+  type: 'test'
+  ...
+# Subtest: rename Die IDs remaps explicit face keys in the same transaction
+ok 42 - rename Die IDs remaps explicit face keys in the same transaction
+  ---
+  duration_ms: 0.9578
+  type: 'test'
+  ...
+# Subtest: unknown faces and undefined interfaces are missing-data issues; non-adjacent/reversed interfaces are errors
+ok 43 - unknown faces and undefined interfaces are missing-data issues; non-adjacent/reversed interfaces are errors
+  ---
+  duration_ms: 0.5118
+  type: 'test'
+  ...
+# Subtest: malformed metadata, misspelled face values and references to missing layers fail explicitly
+ok 44 - malformed metadata, misspelled face values and references to missing layers fail explicitly
+  ---
+  duration_ms: 0.4704
+  type: 'test'
+  ...
+# Subtest: rename updates every Die reference and preserves physical parameters, source project and module coordinates
+ok 45 - rename updates every Die reference and preserves physical parameters, source project and module coordinates
+  ---
+  duration_ms: 2.9679
+  type: 'test'
+  ...
+# Subtest: swap two IDs simultaneously without merging references or physical properties
+ok 46 - swap two IDs simultaneously without merging references or physical properties
+  ---
+  duration_ms: 0.3361
+  type: 'test'
+  ...
+# Subtest: IDs are trimmed and empty or duplicate names rejected before mutation
+ok 47 - IDs are trimmed and empty or duplicate names rejected before mutation
+  ---
+  duration_ms: 0.7134
+  type: 'test'
+  ...
+# Subtest: height sets real dimensions; invalid or inconsistent geometry cannot be applied
+ok 48 - height sets real dimensions; invalid or inconsistent geometry cannot be applied
+  ---
+  duration_ms: 0.4857
+  type: 'test'
+  ...
+# Subtest: referenced layers cannot be deleted or replaced with an unrelated new layer
+ok 49 - referenced layers cannot be deleted or replaced with an unrelated new layer
+  ---
+  duration_ms: 0.4103
+  type: 'test'
+  ...
+# Subtest: renamed BLX layers retain visual roles from the bonding topology
+ok 50 - renamed BLX layers retain visual roles from the bonding topology
+  ---
+  duration_ms: 0.4525
+  type: 'test'
+  ...
+# Subtest: waiting stays explicit beyond the search budget, then stops its timer on completion
+ok 51 - waiting stays explicit beyond the search budget, then stops its timer on completion
+  ---
+  duration_ms: 1.2912
+  type: 'test'
+  ...
+# Subtest: failure is visible, leaves no animation timer and allows the next attempt
+ok 52 - failure is visible, leaves no animation timer and allows the next attempt
+  ---
+  duration_ms: 1.7674
+  type: 'test'
+  ...
+# Subtest: result names are validated and historical unnamed runs retain a useful label
+ok 53 - result names are validated and historical unnamed runs retain a useful label
+  ---
+  duration_ms: 19.1755
+  type: 'test'
+  ...
+# Subtest: only repeated history names receive an option hint, without changing persisted names
+ok 54 - only repeated history names receive an option hint, without changing persisted names
+  ---
+  duration_ms: 0.2514
+  type: 'test'
+  ...
+# Subtest: physical folder names allow Chinese and spaces, rejecting path and Windows name hazards
+ok 55 - physical folder names allow Chinese and spaces, rejecting path and Windows name hazards
+  ---
+  duration_ms: 0.6584
+  type: 'test'
+  ...
+# Subtest: technology form preserves unedited calibration and notes; distinguishes inheritance, zero capacity and disabled TSV
+ok 56 - technology form preserves unedited calibration and notes; distinguishes inheritance, zero capacity and disabled TSV
+  ---
+  duration_ms: 1.6326
+  type: 'test'
+  ...
+# Subtest: reject ambiguous metal IDs, invalid capacities and impossible wire/TSV pitch
+ok 57 - reject ambiguous metal IDs, invalid capacities and impossible wire/TSV pitch
+  ---
+  duration_ms: 0.719
+  type: 'test'
+  ...
+# Subtest: directory listing starts in the configured project root and excludes files
+ok 58 - directory listing starts in the configured project root and excludes files
+  ---
+  duration_ms: 10888.1518
+  type: 'test'
+  ...
+# Subtest: repeated launch reuses the same desktop service and preserves its project root
+ok 59 - repeated launch reuses the same desktop service and preserves its project root
+  ---
+  duration_ms: 205.1065
+  type: 'test'
+  ...
+# Subtest: a launch for a different project root cannot silently reuse the current service
+ok 60 - a launch for a different project root cannot silently reuse the current service
+  ---
+  duration_ms: 210.4099
+  type: 'test'
+  ...
+# Subtest: only local, same-origin UI requests can browse or create directories
+ok 61 - only local, same-origin UI requests can browse or create directories
+  ---
+  duration_ms: 22.986
+  type: 'test'
+  ...
+# Subtest: Unicode/spaced folder is created immediately; duplicate name cannot overwrite it
+ok 62 - Unicode/spaced folder is created immediately; duplicate name cannot overwrite it
+  ---
+  duration_ms: 33.9592
+  type: 'test'
+  ...
+# Subtest: traversal, reserved names, missing parent and application-directory writes are rejected
+ok 63 - traversal, reserved names, missing parent and application-directory writes are rejected
+  ---
+  duration_ms: 87.6307
+  type: 'test'
+  ...
+# Subtest: actual evaluation writes results into the folder selected through the new API
+ok 64 - actual evaluation writes results into the folder selected through the new API
+  ---
+  duration_ms: 228.0845
+  type: 'test'
+  ...
+# Subtest: existing web assets, validation errors and report APIs pass through unchanged
+ok 65 - existing web assets, validation errors and report APIs pass through unchanged
+  ---
+  duration_ms: 77.7499
+  type: 'test'
+  ...
+# Subtest: optimizer persists physically different candidates and never pads a fixed layout
+ok 66 - optimizer persists physically different candidates and never pads a fixed layout
+  ---
+  duration_ms: 513.2319
+  type: 'test'
+  ...
+# Subtest: packaged preview does not create history and explicit saves persist custom names
+ok 67 - packaged preview does not create history and explicit saves persist custom names
+  ---
+  duration_ms: 10966.4551
+  type: 'test'
+  ...
+# Subtest: packaged app writes named output folders and reopens reports through stable history IDs
+ok 68 - packaged app writes named output folders and reopens reports through stable history IDs
+  ---
+  duration_ms: 452.6845
+  type: 'test'
+  ...
+# Subtest: selected directory contains the whole project and named result children
+ok 69 - selected directory contains the whole project and named result children
+  ---
+  duration_ms: 344.1086
+  type: 'test'
+  ...
+# Subtest: explicit batch saves only the requested preview and appends siblings without overwriting
+ok 70 - explicit batch saves only the requested preview and appends siblings without overwriting
+  ---
+  duration_ms: 419.7771
+  type: 'test'
+  ...
+# Subtest: all input endpoints accept count >10 and still reject invalid requests
+ok 71 - all input endpoints accept count >10 and still reject invalid requests
+  ---
+  duration_ms: 131.9518
+  type: 'test'
+  ...
+# Subtest: requesting 12 yields 12 distinct persisted layouts; fixed model exhausts at one
+ok 72 - requesting 12 yields 12 distinct persisted layouts; fixed model exhausts at one
+  ---
+  duration_ms: 666.0125
+  type: 'test'
+  ...
+# Subtest: stored split inputs expose stack, reload edited faces, and retain run snapshots
+ok 73 - stored split inputs expose stack, reload edited faces, and retain run snapshots
+  ---
+  duration_ms: 237.9438
+  type: 'test'
+  ...
+# Subtest: resource evaluation conserves geometry and power, flags overlap, and propagates unknown power
+ok 74 - resource evaluation conserves geometry and power, flags overlap, and propagates unknown power
+  ---
+  duration_ms: 96.4696
+  type: 'test'
+  ...
+# Subtest: native stack rules agree in API, saved JSON/HTML, CLI, and Web for invalid HB geometry
+ok 75 - native stack rules agree in API, saved JSON/HTML, CLI, and Web for invalid HB geometry
+  ---
+  duration_ms: 1089.605
+  type: 'test'
+  ...
+# Subtest: legacy stack migrates and offline split validation reports field paths
+ok 76 - legacy stack migrates and offline split validation reports field paths
+  ---
+  duration_ms: 1411.5176
+  type: 'test'
+  ...
+# Subtest: portable bundle restores real external reports, snapshots and reusable split inputs
+ok 77 - portable bundle restores real external reports, snapshots and reusable split inputs
+  ---
+  duration_ms: 2401.8644
+  type: 'test'
+  ...
+# Subtest: stale running records are recovered as interrupted rather than completed
+ok 78 - stale running records are recovered as interrupted rather than completed
+  ---
+  duration_ms: 190.4559
+  type: 'test'
+  ...
+1..78
+# tests 78
+# suites 0
+# pass 78
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 19210.4767

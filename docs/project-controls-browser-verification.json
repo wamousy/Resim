@@ -1,0 +1,18 @@
+{
+  "checked_at": "2026-09-29T03:43:20.9122463Z",
+  "isolated_projects": true,
+  "application": "src/tools/.build/project-controls-collapse/app",
+  "checks": {
+    "collapse_retains_name_and_output_dir": true,
+    "load_and_copy_disabled_when_unavailable": true,
+    "save_and_load_end_creation_mode": true,
+    "empty_start_hides_fields": true,
+    "save_while_collapsed_works": true,
+    "navigation_preserves_collapsed_state": true,
+    "dropdown_has_no_new_project_action": true,
+    "new_opens_fields": true,
+    "console_errors": 0,
+    "copy_opens_and_toggles_without_reset": true,
+    "same_button_toggles_without_reset": true
+  }
+}

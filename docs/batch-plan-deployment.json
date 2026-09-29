@@ -1,0 +1,32 @@
+{
+  "pid": 27372,
+  "files": [
+    {
+      "matches": true,
+      "sha256": "C10968C3BD65484286A1D76EE04C447C229D1CE4B2C0FEADB146A0D23C40C88B",
+      "name": "Resim.exe"
+    },
+    {
+      "matches": true,
+      "sha256": "0511D3BEF62A8BE9B54152088678E48412DB7197B66138CE338EA4981AD0C9B6",
+      "name": "Resim.Engine.exe"
+    },
+    {
+      "matches": true,
+      "sha256": "FA6CFD3CF36924543038E909CD7D966931AAACEA805D2A6897B5C26F97EC84CC",
+      "name": "build-manifest.json"
+    }
+  ],
+  "backup": "C:\\Users\\W\\Desktop\\arch\\Resim\\src\\tools\\.build\\previous-app-20260929-144937-b5eb10c8",
+  "health": {
+    "application": "Resim",
+    "version": "0.12.0",
+    "projects_dir": "C:\\Users\\W\\Desktop\\arch\\ResimProjects"
+  },
+  "verification": "batch-plan-verification.json",
+  "ui_verification": "batch-plan-ui-verification.json",
+  "checked_at": "2026-09-29T06:52:36.1050157Z",
+  "batch_api_available": true,
+  "application": "C:\\Users\\W\\Desktop\\arch\\Resim\\app",
+  "status": "ready"
+}

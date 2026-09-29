@@ -1,4 +1,4 @@
-# HTTP.sys reports PID 4 at the TCP layer; resolve the application in its queue.
+﻿# HTTP.sys reports PID 4 at the TCP layer; resolve the application in its queue.
 function Test-ResimHttpQueueOwner([string]$State, [int]$ProcessId, [int]$Port) {
     $queuePattern = '(?m)^Request queue name:'
     $processPattern = '(?m)^\s+ID:\s*' + $ProcessId + ',\s*image:'
