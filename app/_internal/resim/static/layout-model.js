@@ -8,7 +8,7 @@ export function number(value, digits=2) {
 }
 export const area=value=>value==null?'未知':Number(value).toLocaleString('zh-CN',{maximumSignificantDigits:7});
 export function linkBudget(link) {
-  const required=Math.ceil(link.bandwidth_GBps*8/link.lane_rate_Gbps);
+  const required=link.bandwidth_GBps==null||link.lane_rate_Gbps==null?null:Math.ceil(link.bandwidth_GBps*8/link.lane_rate_Gbps);
   const data=link.data_wires??required,control=link.control_wires??8;
   const total=Math.ceil((data+control)*(1+(link.spare_fraction??.1)));
   return {bus_width_bits:link.bus_width_bits??null,data_wires:data,control_wires:control,spare_wires:total-data-control,wires:total,
@@ -79,7 +79,8 @@ export function routeDraft(project) {
       const sourceCore=modules[link.source]?.core,targetCore=modules[link.target]?.core;
       const owned=candidates.filter(r=>r.core&&(r.core===sourceCore||r.core===targetCore)),pool=owned.length?owned:candidates,mid=center(p).map((v,n)=>(v+center(q)[n])/2);
       const region=[...pool].sort((a,b)=>center(a).reduce((s,v,n)=>s+Math.abs(v-mid[n]),0)-center(b).reduce((s,v,n)=>s+Math.abs(v-mid[n]),0))[0];
-      const point=region?center(region):center(p).map((v,n)=>(v+center(q)[n])/2);
+      const distributedHB=region?.interconnect==='HB'&&!region.core&&region.signal_budget_bits!=null&&region.interface_pitch_um==null;
+      const point=region&&!distributedHB?center(region):mid;
       const via={link:link.id,lower_die,upper_die,region_id:region?.id,point};viaPoints.push(via);vertical.push(via);
     }
     const source=edgeAnchor(p,viaPoints.length?viaPoints[0].point:center(q),modules[link.source]?.port_locations?.[link.source_port||'out'],'east');

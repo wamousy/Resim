@@ -7,7 +7,7 @@ function fixture(){
   const nodes=Object.fromEntries(['title','detail','bar','close','results','elapsed'].map(k=>[k,{}]));
   const host={hidden:true,dataset:{},attributes:{},querySelector:s=>nodes[s.match(/data-task-(\w+)/)[1]],setAttribute(k,v){this.attributes[k]=v;}};
   let clock=0,callback=null;
-  const task=new TaskProgress(host,{clock:()=>clock,repeat:fn=>(callback=fn,1),cancel:()=>{callback=null;}});
+  const task=new TaskProgress(host,{clock:()=>clock,repeat:fn=>(callback=fn,1),cancel:()=>{callback=null;},paint:async()=>{}});
   return {task,host,nodes,advance(ms){clock+=ms;callback?.();},active:()=>Boolean(callback)};
 }
 test('waiting stays explicit beyond the search budget, then stops its timer on completion',()=>{
@@ -25,6 +25,33 @@ test('failure is visible, leaves no animation timer and allows the next attempt'
   assert.equal(host.dataset.state,'error');assert.equal(nodes.detail.textContent,'输入错误');assert.equal(active(),false);
   task.start('再次生成');assert.equal(host.dataset.state,'running');assert.equal(nodes.results.hidden,true);
   task.finish('结束','未生成候选');nodes.close.onclick();assert.equal(host.hidden,true);
+});
+
+test('loading displays and paints its phase before data work and rendering',async()=>{
+ const {task,host,nodes,active}=fixture(),events=[];
+ task.paint=async()=>events.push('paint:'+nodes.detail.textContent);
+ const result=await task.run('正在载入项目',async phase=>{
+  assert.equal(host.hidden,false);assert.equal(host.dataset.kind,'load');assert.equal(active(),true);
+  events.push('read');await phase('构建布局…');events.push('draw');task.reset();assert.equal(host.hidden,false);return 42;
+ },{complete:'项目载入完成',detail:'读取项目…'});
+ assert.deepEqual(events,['paint:读取项目…','read','paint:构建布局…','draw']);
+ assert.equal(result,42);assert.equal(nodes.title.textContent,'项目载入完成');assert.equal(active(),false);
+ assert.equal(host.dataset.state,'complete');assert.equal(host.attributes['aria-busy'],'false');
+});
+
+test('failed loads stop their timer, propagate errors and allow retry',async()=>{
+ const {task,host,nodes,active}=fixture();
+ await assert.rejects(task.run('载入中',async()=>{throw new Error('文件缺失');}),/文件缺失/);
+ assert.equal(host.dataset.state,'error');assert.equal(nodes.detail.textContent,'文件缺失');assert.equal(active(),false);
+ await task.run('重试',async()=>true);assert.equal(host.dataset.state,'complete');assert.equal(task.running,false);
+});
+
+test('loading refuses overlapping operations without replacing the first status',async()=>{
+ const {task,nodes}=fixture();let release;
+ const pending=task.run('第一项',()=>new Promise(resolve=>{release=resolve;}));
+ await Promise.resolve();await Promise.resolve();
+ await assert.rejects(task.run('第二项',async()=>{}),/已有任务/);assert.equal(nodes.title.textContent,'第一项');
+ release();await pending;
 });
 test('result names are validated and historical unnamed runs retain a useful label',()=>{
   assert.equal(resultName('  芯片 A / 低拥塞  '),'芯片 A / 低拥塞');

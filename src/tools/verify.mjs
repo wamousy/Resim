@@ -1,14 +1,18 @@
 // Reproducible handover check: syntax, isolated tests, and file identity evidence.
 import {spawnSync} from 'node:child_process';
 import {readFileSync,readdirSync,existsSync,mkdirSync,mkdtempSync,writeFileSync} from 'node:fs';
-import {resolve,dirname,join,relative} from 'node:path';
+import {resolve,dirname,join,relative,isAbsolute} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {createHash} from 'node:crypto';
 import {tmpdir} from 'node:os';
 import {checkWeb} from './sync-web.mjs';
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'../..');
 const app=resolve(process.env.RESIM_APP_DIR||join(root,'app'));
-const reportPath=resolve(root,process.argv[2]||'docs/verification.json');
+const reportPath=resolve(root,process.argv[2]||'src/tools/.artifacts/verification.json');
+const docsRelative=relative(join(root,'docs'),reportPath);
+if(docsRelative===''||(!docsRelative.startsWith('..')&&!isAbsolute(docsRelative))){
+  throw new Error('Verification reports must not be written to docs/. Use src/tools/.artifacts/ or another build-artifact directory.');
+}
 mkdirSync(dirname(reportPath),{recursive:true});
 const run=(args)=>spawnSync(process.execPath,args,{cwd:root,encoding:'utf8',windowsHide:true,maxBuffer:8*1024*1024});
 const web=checkWeb(join(app,'_internal/resim/static'));

@@ -1,6 +1,7 @@
 import {number as fmt,area} from './layout-model.js?v=13';
-import {showCalculations} from './calculations.js?v=resources-2';
-import {showRoutingResources} from './routing-resources.js?v=paging-3';
+import {showCalculations} from './calculations.js?v=clarity-1';
+import {showRoutingResources} from './routing-resources.js?v=clarity-1';
+import {areaBudget,wiringState,resourceData} from './resource-model.js?v=clarity-1';
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const value=(v,digits=2)=>v==null?'待补数据':fmt(v,digits);
@@ -29,18 +30,19 @@ function draw(){
   document.querySelectorAll('[data-resource-die]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.resourceDie===die)));
   document.querySelectorAll('[data-resource-row]').forEach(row=>row.classList.toggle('selected',row.dataset.resourceRow===die));
   document.querySelectorAll('[data-calculation-group]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.calculationGroup===activeGroup)));
-  $('resource-die-meta').textContent=report.dies.find(d=>d.id===die)?.display_platform?'封装抽象层':'当前层结果';
+  const platform=report.dies.find(d=>d.id===die)?.display_platform;
+  $('resource-die-meta').textContent=platform?'封装抽象层':currentPending?'等待重算':'当前方案 · 已应用输入';
   showCalculations(report,currentPending,{die,group:activeGroup});
-  $('routing-resources').hidden=activeGroup!=='wiring'||currentPending;
-  if(activeGroup==='wiring')showRoutingResources(report,currentPending,currentLink,die,currentModule);
+  $('routing-resources').hidden=activeGroup!=='wiring'||currentPending||platform;
+  if(activeGroup==='wiring'&&!platform)showRoutingResources(report,currentPending,currentLink,die,currentModule);
   $('resource-interfaces').hidden=activeGroup!=='vertical'||currentPending;
   $('resource-interfaces').innerHTML=activeGroup==='vertical'&&!currentPending?renderInterfaces(report,die):'';
-  $('resource-supply').hidden=activeGroup!=='power'||currentPending;
+  $('resource-supply').hidden=activeGroup!=='power'||currentPending||platform;
   const supply=(report.supply||[]).filter(s=>s.die===die);
   $('supply-rows').innerHTML=supply.length?supply.map(s=>`<tr><td>${esc(s.domain)}</td><td>${value(s.local_current_A,4)}</td><td>${value(s.injection_current_A,4)}</td><td>${value(s.capacity_A,4)}</td><td class="${s.margin_A<0?'negative':''}">${value(s.margin_A,4)}</td></tr>`).join(''):'<tr><td colspan="5">本层未配置供电电压域。</td></tr>';
   document.querySelectorAll('#supply-port-details [data-port-die]').forEach(row=>row.hidden=row.dataset.portDie!==die);
   const ports=$('edit-supply-port');
-  for(const option of ports.options){const p=report.ports.find(p=>p.id===option.value);option.hidden=option.disabled=p?.die!==die;}
+  for(const option of ports.options){const p=(report.ports||[]).find(p=>p.id===option.value);option.hidden=option.disabled=p?.die!==die;}
   const valid=[...ports.options].filter(o=>!o.disabled);
   if(!valid.some(o=>o.value===ports.value)){ports.value=valid[0]?.value||'';ports.dispatchEvent(new Event('change'));}
   $('supply-port-editor').hidden=!valid.length;
@@ -53,7 +55,12 @@ export function showResourceWorkspace(report,pending=false,onLink=()=>{},onModul
   const dies=[...report.dies].sort((a,b)=>b.order-a.order),select=$('calculation-die'),previous=select.value;
   select.innerHTML=dies.map(d=>`<option value="${esc(d.id)}">${esc(d.id)}</option>`).join('');
   select.value=dies.some(d=>d.id===previous)?previous:(dies.find(d=>!d.display_platform)||dies[0])?.id||'';
-  $('ledger').innerHTML=dies.map(d=>{const number=(v,format=fmt)=>pending?'待重算':v==null?'待补数据':format(v);return `<tr data-resource-row="${esc(d.id)}"><td><button data-resource-die="${esc(d.id)}" aria-pressed="false" aria-label="查看 ${esc(d.id)} 资源明细">${esc(d.id)} <span>→</span></button>${d.display_platform?'<small>封装抽象层</small>':''}</td><td>${d.display_platform?'—':number(d.area_mm2,area)}</td><td>${d.display_platform?'—':number(d.footprint_utilization,v=>fmt(v*100,2)+'%')}</td><td>${d.display_platform?'—':number(d.free_area_mm2,v=>fmt(v,3))}</td><td>${d.display_platform?'—':number(d.power_W)}</td><td>${number(d.peak_congestion)}</td></tr>`;}).join('');
+  $('ledger').innerHTML=dies.map(d=>{
+    const number=(v,format=fmt)=>pending?'待重算':Number.isFinite(v)?format(v):'待补数据';
+    const budget=areaBudget(d),routing=wiringState(report,d.id),data=resourceData(report,d.id),platform=d.display_platform;
+    const peak=pending?'待重算':!routing.known?'未评估':routing.zeroCapacity?'零容量有需求':number(d.peak_congestion)+(routing.partial?'（部分）':'');
+    return `<tr data-resource-row="${esc(d.id)}"><td><button data-resource-die="${esc(d.id)}" aria-pressed="false" aria-label="查看 ${esc(d.id)} 资源明细">${esc(d.id)} <span>→</span></button>${platform?'<small>封装抽象层</small>':''}</td><td>${platform?'—':number(d.area_mm2,area)}</td><td>${platform?'—':number(d.footprint_utilization,v=>fmt(v*100,2)+'%')}${!platform&&!pending?'<small>上限 '+number(d.max_utilization,v=>fmt(v*100)+'%')+'</small>':''}</td><td>${platform?'—':number(d.free_area_mm2,v=>fmt(v,3))}</td><td class="${!pending&&budget.headroom<0?'negative':''}">${platform?'—':number(budget.headroom,v=>fmt(v,3))}</td><td>${platform?'—':number(d.power_W)}${!platform&&!pending&&data.powerMissing.length?'<small>'+data.powerMissing.length+' 个模块待补</small>':''}</td><td class="${!pending&&routing.known&&(routing.zeroCapacity||d.peak_congestion>1)?'negative':''}">${platform?'—':peak}</td></tr>`;
+  }).join('');
   $('ledger').querySelectorAll('[data-resource-die]').forEach(button=>button.onclick=()=>{select.value=button.dataset.resourceDie;draw();});
   select.onchange=draw;
   document.querySelectorAll('[data-calculation-group]').forEach(button=>button.onclick=()=>{activeGroup=button.dataset.calculationGroup;draw();});

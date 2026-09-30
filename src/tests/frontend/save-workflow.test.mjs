@@ -27,7 +27,7 @@ function setup(){
      return {batch:{name:body.batch_name},report:{plan_id:body.preview_plan_id,project:JSON.parse(body.yaml),storage:{project_id:'chip',project_name:'项目',project_dir:'D:/chip',run_id:'record-'+body.preview_plan_id,run_name:body.plan_name,batch_id:body.batch_id,source_key:body.source_key}}};
    }};
  const save=vm.runInNewContext(handler+'\nsavePlans;',c);
- return {c,calls,notices,save,reports};
+ return {c,calls,notices,save,reports,fields,candidates};
 }
 test('current save persists only the report being viewed, preserving the other candidates',async()=>{
  const h=setup();await h.save('current');
@@ -55,4 +55,42 @@ test('an unchanged candidate is not its own parent; manual edits retain the sour
  assert.equal(h.calls[0].parent_source_key,null);
  const edited=setup();edited.c.planParent={record:'record-1',key:'layout-1'};await edited.save('current');
  assert.equal(edited.calls[0].parent_record_id,'record-1');assert.equal(edited.calls[0].parent_source_key,'layout-1');
+});
+
+test('consecutive single saves reuse the first batch without removing candidates',async()=>{
+ const h=setup();h.fields['result-name'].value='';await h.save('current');
+ h.c.report=h.reports[2];h.c.activeCandidate='2';h.c.dirty=true;
+ h.fields['plan-name'].value='第二个已选方案';h.fields['result-name'].value='不应另建批次';
+ await h.save('current');
+ assert.deepEqual(h.calls.map(c=>c.preview_plan_id),['2','3']);
+ assert.deepEqual(h.calls.map(c=>c.batch_name),['布局批次','布局批次']);
+ assert.equal(h.calls[0].batch_id,h.calls[1].batch_id);
+ assert.equal(h.calls[1].project_id,'chip');assert.equal(h.calls[1].plan_name,'第二个已选方案');
+ assert.equal(h.c.batchContext.saved.size,2);assert.equal(h.c.searchResult.candidates.length,3);
+ await h.save('current');assert.equal(h.calls.length,2);
+});
+
+test('single then batch saves only the remaining selected plans and preserves current view',async()=>{
+ const h=setup();await h.save('current');const viewed=h.c.report;
+ await h.save('selected');
+ assert.deepEqual(h.calls.map(c=>c.preview_plan_id),['2','1','3']);
+ assert.equal(new Set(h.calls.map(c=>c.batch_id)).size,1);assert.equal(h.c.batchContext.saved.size,3);
+ assert.equal(h.c.report,viewed);assert.equal(h.c.activeCandidate,'1');assert.equal(h.c.candidateSaves.size,3);
+ await h.save('selected');assert.equal(h.calls.length,3);
+});
+
+test('batch save can be followed by saving an unselected candidate individually',async()=>{
+ const h=setup();await h.save('selected');await h.save('current');
+ assert.deepEqual(h.calls.map(c=>c.preview_plan_id),['1','3','2']);
+ assert.equal(new Set(h.calls.map(c=>c.batch_id)).size,1);assert.equal(h.c.dirty,false);
+ assert.equal(h.c.report.storage.run_name,'自定义方案');
+});
+
+test('cancelling a candidate switch restores the result picker and keeps draft state',async()=>{
+ const h=setup();h.fields.candidate.value='2';let renders=0;
+ h.c.renderSavePanel=()=>{renders++;};h.c.canLeaveDraft=async()=>false;
+ const source=app.slice(app.indexOf('async function selectCandidate(next){'),app.indexOf("$('candidate').onchange="));
+ await vm.runInNewContext(source+'\nselectCandidate;',h.c)('2');
+ assert.equal(h.fields.candidate.value,'1');assert.equal(h.c.activeCandidate,'1');
+ assert.equal(h.c.report,h.reports[1]);assert.equal(h.c.dirty,true);assert.equal(renders,1);
 });

@@ -89,8 +89,9 @@ class Link(Strict):
     source_port: str = "out"
     target_port: str = "in"
     bus_width_bits: int | None = Field(default=None, ge=1, description="Logical payload width; independent of serialized physical data lanes")
-    bandwidth_GBps: float = Field(ge=0)
-    lane_rate_Gbps: float = Field(gt=0)
+    bandwidth_GBps: float | None = Field(default=None, ge=0)
+    lane_rate_Gbps: float | None = Field(default=None, gt=0)
+    provenance: str | None = None
     data_wires: int | None = Field(default=None, ge=1)
     control_wires: int = Field(default=8, ge=0)
     spare_fraction: float = Field(default=0.1, ge=0, le=1)
@@ -102,7 +103,15 @@ class Link(Strict):
 
     @property
     def required_lanes(self):
+        if self.bandwidth_GBps is None or self.lane_rate_Gbps is None:
+            return None
         return math.ceil(self.bandwidth_GBps * 8 / self.lane_rate_Gbps)
+
+    @model_validator(mode="after")
+    def lane_budget(self):
+        if self.data_wires is None and self.required_lanes is None:
+            raise ValueError('provide data_wires, or both bandwidth_GBps and lane_rate_Gbps')
+        return self
 
     @property
     def wires(self):
@@ -117,6 +126,21 @@ class Link(Strict):
         return self.wires - self.allocated_data_wires - self.control_wires
 
 
+class ReferenceGroup(Strict):
+    """Source estimates for a component or subsystem, never additive child costs."""
+    id: str
+    modules: list[str] = Field(min_length=1)
+    source: str
+    label: str
+    width_um: float | None = Field(default=None, gt=0)
+    height_um: float | None = Field(default=None, gt=0)
+    area_estimate_um2: float | None = Field(default=None, ge=0)
+    area_basis: str = ''
+    cell_count: int | None = Field(default=None, ge=0)
+    pin_counts: dict[str, int] = Field(default_factory=dict)
+    notes: list[str] = Field(default_factory=list)
+
+
 class Architecture(Strict):
     chip: str
     description: str
@@ -125,6 +149,7 @@ class Architecture(Strict):
     cores: list[Core] = Field(min_length=1)
     modules: list[Module] = Field(min_length=1)
     links: list[Link] = Field(default_factory=list)
+    reference_groups: list[ReferenceGroup] = Field(default_factory=list)
 
 
 class Metal(Strict):
@@ -271,6 +296,13 @@ class Project(Strict):
         unique([m.name for m in self.resources.metals], "metal layer")
         unique([c.id for c in self.constraints.routing_channels], 'routing channel')
         ds, cs, ms = {d.id: d for d in a.dies}, {c.id for c in a.cores}, {m.id: m for m in a.modules}
+        unique([g.id for g in a.reference_groups], 'reference group')
+        for g in a.reference_groups:
+            unique(g.modules, 'reference group member')
+            if not set(g.modules) <= ms.keys():
+                raise ValueError(f'unknown reference group module: {g.id}')
+            if any(v < 0 for v in g.pin_counts.values()):
+                raise ValueError(f'negative reference pin count: {g.id}')
         if sorted(d.order for d in a.dies) != list(range(len(a.dies))):
             raise ValueError("die order must be consecutive from zero")
         for m in a.modules:

@@ -10,6 +10,7 @@ import json
 import os
 import threading
 import time
+import tempfile
 import uuid
 
 _mutex = threading.RLock()
@@ -19,43 +20,81 @@ ALLOWED = {'inputs/chip-architecture.yml', 'inputs/technology.yml', 'project.jso
 
 
 @contextmanager
+def _windows_store_lock(key, timeout):
+    """A kernel mutex leaves no lock file and is released after process failure."""
+    import ctypes
+    from ctypes import wintypes
+    kernel = ctypes.WinDLL('kernel32', use_last_error=True)
+    kernel.CreateMutexW.argtypes = [ctypes.c_void_p, wintypes.BOOL, wintypes.LPCWSTR]
+    kernel.CreateMutexW.restype = wintypes.HANDLE
+    kernel.WaitForSingleObject.argtypes = [wintypes.HANDLE, wintypes.DWORD]
+    kernel.WaitForSingleObject.restype = wintypes.DWORD
+    kernel.ReleaseMutex.argtypes = [wintypes.HANDLE]
+    kernel.ReleaseMutex.restype = wintypes.BOOL
+    kernel.CloseHandle.argtypes = [wintypes.HANDLE]
+    kernel.CloseHandle.restype = wintypes.BOOL
+    name = 'Global\\Resim.Store.' + hashlib.sha256(key.encode('utf-8')).hexdigest()
+    handle = kernel.CreateMutexW(None, False, name)
+    if not handle:
+        raise ctypes.WinError(ctypes.get_last_error())
+    acquired = False
+    try:
+        status = kernel.WaitForSingleObject(handle, min(0xfffffffe, max(0, int(timeout * 1000))))
+        if status == 0x102:
+            raise TimeoutError('Project store is busy; retry after the current save')
+        if status not in (0, 0x80):  # WAIT_OBJECT_0 / WAIT_ABANDONED: both grant ownership.
+            raise ctypes.WinError(ctypes.get_last_error())
+        acquired = True
+        # Callers recover committed input journals before accessing project data.
+        yield
+    finally:
+        try:
+            if acquired and not kernel.ReleaseMutex(handle):
+                raise ctypes.WinError(ctypes.get_last_error())
+        finally:
+            kernel.CloseHandle(handle)
+
+
+@contextmanager
+def _posix_store_lock(key, timeout):
+    """Portable development fallback; its stable lock lives outside project data."""
+    import fcntl
+    cache = Path(tempfile.gettempdir()) / ('resim-locks-' + str(os.getuid()))
+    cache.mkdir(mode=0o700, parents=True, exist_ok=True)
+    path = cache / (hashlib.sha256(key.encode('utf-8')).hexdigest() + '.lock')
+    with open(path, 'a+b') as stream:
+        deadline = time.monotonic() + timeout
+        while True:
+            try:
+                fcntl.flock(stream.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+                break
+            except BlockingIOError:
+                if time.monotonic() >= deadline:
+                    raise TimeoutError('Project store is busy; retry after the current save')
+                time.sleep(.05)
+        try:
+            yield
+        finally:
+            fcntl.flock(stream.fileno(), fcntl.LOCK_UN)
+
+
+@contextmanager
 def store_lock(root, timeout=30):
     root = Path(root).resolve()
     root.mkdir(parents=True, exist_ok=True)
     with _mutex:
-        key = str(root)
+        key = os.path.normcase(str(root))
         active = getattr(_held, 'roots', set())
         if key in active:
             yield
             return
-        path = root / '.resim-store.lock'
-        with open(path, 'a+b') as stream:
-            stream.seek(0, 2)
-            if stream.tell() == 0:
-                stream.write(b'0'); stream.flush()
-            deadline = time.monotonic() + timeout
-            while True:
-                try:
-                    stream.seek(0)
-                    if os.name == 'nt':
-                        import msvcrt
-                        msvcrt.locking(stream.fileno(), msvcrt.LK_NBLCK, 1)
-                    else:
-                        import fcntl
-                        fcntl.flock(stream.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
-                    break
-                except OSError:
-                    if time.monotonic() >= deadline:
-                        raise TimeoutError('Project store is busy; retry after the current save')
-                    time.sleep(.05)
+        process_lock = _windows_store_lock if os.name == 'nt' else _posix_store_lock
+        with process_lock(key, timeout):
             _held.roots = active | {key}
             try:
                 yield
             finally:
                 _held.roots = active
-                stream.seek(0)
-                if os.name == 'nt': msvcrt.locking(stream.fileno(), msvcrt.LK_UNLCK, 1)
-                else: fcntl.flock(stream.fileno(), fcntl.LOCK_UN)
 
 
 def atomic_text(path, text):

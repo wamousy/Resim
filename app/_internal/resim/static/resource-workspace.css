@@ -29,6 +29,11 @@ body[data-workspace=resources] .stats{display:none}
 .resource-metric>span{display:block;color:#91a6c2;font-size:11px;margin-bottom:7px}
 .resource-metric strong{display:block;color:#d4e2f2;font-size:20px;line-height:1.5;font-weight:500;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
 .resource-metric strong.negative{color:#f2ac98}
+.resource-overview .negative{color:#f2ac98}
+.resource-metric small{display:block;margin-top:6px;font-size:11px;color:#95a9c2;line-height:1.6}
+.resource-notice{padding:11px 14px;margin:0 0 16px;border-left:3px solid #d4ac77;background:#302d2b;border-radius:0 6px 6px 0;color:#e0c59e;font-size:12px;line-height:1.8}
+#calculation-detail .resource-metric-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media(max-width:850px){#calculation-detail .resource-metric-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .resource-workbench .resource-disclosure,#calculation-detail>.resource-disclosure{display:block;margin:0;padding:0;border:0;border-bottom:1px solid #303e51;background:none;border-radius:0}
 .resource-disclosure>summary{display:flex;align-items:center;gap:10px;padding:13px 2px;list-style:none;cursor:pointer;font-size:12px;color:#bccde4}
 .resource-disclosure>summary:before{content:'+';font-size:16px;line-height:1;color:#829cba;width:14px;text-align:center;flex:none}
@@ -46,9 +51,9 @@ body[data-workspace=resources] .stats{display:none}
 .resource-formula code{font-size:12px;line-height:1.8;color:#aed5cf;white-space:normal;overflow-wrap:anywhere}
 .resource-formula .substitution{max-height:180px;overflow:auto;color:#d4c6ab;background:#243140;padding:10px;border-radius:4px;scrollbar-width:thin}
 .resource-empty{color:#8ea4be;font-size:12px;padding:15px 0;line-height:1.8}
-.resource-methods,.resource-timing{padding:0!important}
-.resource-methods>summary,.resource-timing>summary{cursor:pointer;font-size:12px;color:#9eb4d0;padding:15px 22px}
-.resource-methods[open]>summary,.resource-timing[open]>summary{border-bottom:1px solid #303e51}
+.resource-methods{padding:0!important}
+.resource-methods>summary{cursor:pointer;font-size:12px;color:#9eb4d0;padding:15px 22px}
+.resource-methods[open]>summary{border-bottom:1px solid #303e51}
 .resource-methods .model-methods{padding:18px 22px}
 .resource-methods h2{font-size:13px;font-weight:500;overflow-wrap:anywhere}
 .resource-methods .panel-head>span{font-size:11px}
@@ -62,7 +67,6 @@ body[data-workspace=resources] .stats{display:none}
 #resource-supply>h3 small{font-size:10px;color:#8299b7;margin-left:8px}
 #supply-port-editor .edit-fields{padding-bottom:15px}
 #supply-port-editor .edit-fields input,#supply-port-editor .edit-fields select{max-width:180px}
-#timing-summary p{font-size:12px;line-height:1.8}
 @media(max-width:850px){.resource-overview,.resource-workbench{padding:16px}.resource-overview .panel-head>span{display:none}.resource-metric-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.resource-metric strong{font-size:18px}.resource-workbench .calculation-tabs{gap:16px}.resource-workbench>.panel-head>div{display:block}#resource-die-meta{display:none}.resource-disclosure>summary{flex-wrap:wrap}.resource-disclosure>summary>span{margin-left:24px}.resource-subhead{flex-wrap:wrap}}
 .resource-table-tools{display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:12px 0}
 .resource-table-tools label{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted,#64748b)}

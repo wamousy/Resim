@@ -1,7 +1,7 @@
-import {OutputFolders} from './output-folders.js?v=direct-projects-1';
-import {BatchSavePanel,newBatch,family,planKey,saveBlockedReason} from './batch-save.js?v=1';
-import {TaskProgress,resultFolderName} from './task-progress.js?v=named-folders-1';
-import {InputEditor} from './input-editor.js?v=8';
+import {OutputFolders} from './output-folders.js?v=folder-files-1';
+import {BatchSavePanel,newBatch,family,planKey,saveBlockedReason} from './batch-save.js?v=workflow-2';
+import {TaskProgress,resultFolderName} from './task-progress.js?v=loading-1';
+import {InputEditor} from './input-editor.js?v=clarity-1';
 import {HistoryComparison} from './multi-comparison.js?v=batch-plans-1';
 import {assessedReport} from './report-assessment.js';
 import {distinctCandidates,layoutDifference} from './layout-variants.js';
@@ -12,21 +12,24 @@ import {stackModel,faceText,assertStack} from './stack-model.js?v=native-3';
 import {renderInterfaceInputs,interfaceInputValues,renderStackStrip,dieDetails,pairDetails} from './stack-panel.js?v=2';
 import {readYaml} from './architecture-io.js?v=2';
 import {peerConnections} from './core-view.js?v=19';
-import {chipDimensions,coreDetails,corePeers} from './object-details.js?v=2';
+import {chipDimensions,coreDetails,corePeers,referenceDetails} from './object-details.js?v=chips-detail-1';
 import {connectionScope,SCOPE_NAMES,transferBudget} from './connection-view.js?v=19';
-import {showResourceWorkspace} from './resource-workspace.js?v=paging-3';
+import {showResourceWorkspace} from './resource-workspace.js?v=clarity-1';
+import {wiringState} from './resource-model.js?v=clarity-1';
 import {number as fmt,area,movePlacement,linkBudget} from './layout-model.js?v=19';
 import {Viewer} from './viewer.js?v=24';
-import {Connections} from './connections.js?v=20';
-import {assessment,candidateFolder,matchingSavedCandidate,runDetails,runOptionLabel} from './ui-state.js?v=batch-plans-1';
+import {Connections} from './connections.js?v=trim-panels-1';
+import {assessment,candidateFolder,matchingSavedCandidate,runOptionLabel} from './ui-state.js?v=batch-plans-1';
 import {showMethods} from './methods.js?v=resources-2';
-import {initWorkbench,openWorkspace} from './workbench.js?v=task-save-1';
+import {initWorkbench,openWorkspace} from './workbench.js?v=workflow-2';
 initWorkbench();
 const $=id=>document.getElementById(id),clone=x=>structuredClone(x);
 const candidateBrowser=new CandidateBrowser($('layout-candidates'));
 const taskProgress=new TaskProgress($('task-progress'));
 let candidateSaves=new Map();
 let batchContext=null,planParent=null;
+let historyRows=[];
+let inputYaml='';
 const batchPanel=new BatchSavePanel();
 function unsavedSearch(){return searchResult&&!searchResult.storage&&distinctCandidates(searchResult).some(c=>!candidateSaves.has(c.id));}
 let difficultySelection=null,difficultyPageIndex=0;
@@ -85,18 +88,23 @@ async function canLeaveDraft(includeSearch=true){
 async function api(path,body,signal){const response=await fetch('/api/'+path,{...(body?{method:'POST',headers:{'Content-Type':'application/json','X-Resim-Local':'1'},body:JSON.stringify(body)}:{}),signal});if(!response.ok){let message=`请求失败（${response.status}）`;try{const error=await response.json();message=typeof error.detail==='string'?error.detail:JSON.stringify(error.detail);}catch{}throw new Error(message);}return response.json();}
 function download(name,text,type){const url=URL.createObjectURL(new Blob([text],{type})),a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
 function updateControls(){
-  inputEditor?.busy(busy);
+  inputEditor?.busy(busy||!report);
   const creationVisible=!currentProjectId&&creationMode!==null&&creationFieldsOpen;
   $('project-create-fields').hidden=!creationVisible;
   $('web-new-project').setAttribute('aria-expanded',String(creationVisible));
-  if(!creationVisible){$('project-options-panel').hidden=true;$('project-options').setAttribute('aria-expanded','false');}
+  $('current-project-info').hidden=!currentProjectId;
+  $('current-project-name').textContent=currentProjectId?$('project-name').value:'';
+  $('current-project-location').textContent=currentProjectId?$('output-dir').value:'';
   $('result-name').disabled=busy;
   $('search-count').disabled=busy;
   for(const button of $('layout-candidates').querySelectorAll('[data-plan]'))button.disabled=busy;
   const m=report?.project.architecture.modules.find(m=>m.id===selectedId);
-  for(const id of ['web-new-project','open-project','hide-project-create','project-options','apply-structure','add-die','reset-structure','output-dir','browse-output','new-output-folder','load','evaluate','optimize','validate','preview-input','candidate','load-run','project','history','editor-toggle','input-export','yaml'])$(id).disabled=busy;
+  for(const id of ['web-new-project','open-project','hide-project-create','apply-structure','add-die','reset-structure','output-dir','browse-output','new-output-folder','load','evaluate','optimize','candidate','load-run','project','history','history-batch'])$(id).disabled=busy;
+  $('optimize').disabled=busy||!report;
+  for(const id of ['load','load-run','web-new-project'])$(id).setAttribute('aria-busy',String(busy));
   if(!$('project').value&&$('project').options.length)$('project').selectedIndex=0;
   $('load').disabled=busy||!$('project').value;
+  $('load-run').disabled=busy||!$('history').value||$('history').selectedOptions[0]?.disabled;
   for(const id of ['apply-move','edit-die','edit-x','edit-y'])$(id).disabled=busy||rawEdited||!m||m.fixed;
   $('apply-spacing').disabled=busy||rawEdited||!report;$('edit-spacing').disabled=busy||rawEdited||!report;$('edit-halo').disabled=busy||rawEdited||!m;
   if($('apply-routing'))$('apply-routing').disabled=busy||rawEdited||previewPending;
@@ -109,6 +117,7 @@ function updateControls(){
   renderSavePanel();
 }
 function setBusy(value){busy=value;updateControls();}
+async function withLoading(title,operation,options){setBusy(true);try{return await taskProgress.run(title,operation,options);}finally{setBusy(false);}}
 function clearResult(){
   batchContext=null;planParent=null;
   candidateSaves=new Map();taskProgress.reset();$('result-name').value='';
@@ -129,16 +138,25 @@ async function refreshProjects(id=currentProjectId){
   $('project').value=items.some(p=>p.id===id)?id:items[0]?.id||'';
   historyComparison?.refresh(items,id).catch(e=>notice(e.message,true));updateControls();return items;
 }
-function updateHistoryDetails(){
+function updateHistorySelection(){
   const option=$('history').selectedOptions[0];
-  $('history-record-details').hidden=!option?.value;
-  $('history-record-meta').textContent=option?.value?`${option.title}\n记录编号：${option.value}`:'';
+  $('load-run').disabled=busy||!option?.value||option.disabled;
+}
+function renderHistoryList(runId){
+  const groups=new Map();
+  for(const row of historyRows){const key=row.batch_id||'legacy';if(!groups.has(key))groups.set(key,{name:row.batch_name||'历史独立记录',rows:[]});groups.get(key).rows.push(row);}
+  const selected=historyRows.find(row=>row.run_id===runId),previous=$('history-batch').value;
+  $('history-batch').innerHTML=[...groups].map(([key,g])=>`<option value="${esc(key)}">${esc(g.name)}（${g.rows.length}）</option>`).join('')||'<option value="">暂无批次</option>';
+  $('history-batch').value=selected?(selected.batch_id||'legacy'):groups.has(previous)?previous:groups.keys().next().value||'';
+  const rows=groups.get($('history-batch').value)?.rows||[];
+  $('history').innerHTML=rows.map(row=>`<option value="${esc(row.run_id)}" ${row.status!=='completed'?'disabled':''}>${esc(runOptionLabel(row,rows))}</option>`).join('')||'<option value="">暂无方案</option>';
+  $('history').value=selected?.run_id||rows.find(row=>row.status==='completed')?.run_id||'';
+  $('history-count').textContent=historyRows.length?`${groups.size} 个批次 · ${historyRows.length} 个方案`:'暂无保存记录';
+  updateHistorySelection();
 }
 async function refreshHistory(runId){
-  const runs=currentProjectId?await api(`projects/${currentProjectId}/runs`):[];
-  const groups=new Map();for(const r of runs){const key=r.batch_id||'legacy';if(!groups.has(key))groups.set(key,{name:r.batch_name||'历史独立记录',rows:[]});groups.get(key).rows.push(r);}
-  $('history').innerHTML='<option value="">选择历史方案</option>'+[...groups.values()].map(g=>`<optgroup label="${esc(g.name)}">${g.rows.map(r=>`<option value="${esc(r.run_id)}" title="${esc(runDetails(r))}">${esc(runOptionLabel(r,g.rows))}</option>`).join('')}</optgroup>`).join('');
-  if(runId)$('history').value=runId;updateHistoryDetails();return runs;
+  historyRows=currentProjectId?await api(`projects/${currentProjectId}/runs`):[];
+  renderHistoryList(runId);return historyRows;
 }
 function currentFolder(){return candidateFolder(activeStorage,storageMode,dirty?savedCandidate:activeCandidate);}
 function resultUrl(format){return `/api/projects/${activeStorage.project_id}/runs/${activeStorage.run_id}/export/${format}?candidate=${encodeURIComponent($('candidate').value)}`;}
@@ -147,10 +165,9 @@ function updateFiles(){
     if(batchContext){searchResult=null;candidateSaves=new Map();activeCandidate='draft';$('candidate').innerHTML='<option value="draft">新输入 · 未保存</option>';}
     batchContext=newBatch(report.project);planParent=null;
   }
-  const saved=Boolean(activeStorage);$('result-files').hidden=!saved&&!dirty&&!rawEdited;$('reports-empty').hidden=saved||dirty||rawEdited;$('unsaved-dot').hidden=!dirty&&!rawEdited&&!unsavedSearch();
+  const saved=Boolean(activeStorage);$('result-files').hidden=!saved||dirty||rawEdited;$('reports-empty').hidden=Boolean(report);$('unsaved-dot').hidden=!dirty&&!rawEdited&&!unsavedSearch();
   $('result-state').textContent=rawEdited?'输入已修改 · 图中仍是上次布局':dirty?'未保存预览':report?activeStorage?.run_name||'评估结果':'已保存搜索记录 · 没有可展示的布局';
-  const plan=$('candidate').selectedOptions[0]?.textContent?.split(' · ')[0]||'当前布局';
-  $('save-result-context').textContent=report?`当前方案：${plan} · 保存到 项目 / 批次 / 方案。`:'尚未载入方案';
+  $('save-result-context').textContent=report?'两种操作保存到同一批次，已保存的方案不会重复写入。':'';
   $('result-location').textContent=saved?currentFolder():'尚未保存到工程';
   $('result-note').textContent=dirty||rawEdited?(saved?'路径指向上次结果。保存后会生成新的独立记录。':'当前方案尚未写入文件，请在上方填写名称并保存。'):report?.storage_format==='resim-report/2'?'本方案的 inputs 保存架构与工艺；floorplan.svg 为布局图，implementation-difficulties.md 为实现难点，report.html / resource-report.json 为资源报告。':'历史格式：保留原方案的输入、布局和报告。';
   if(saved)$('storage-path').textContent=activeStorage.run_dir;
@@ -158,11 +175,11 @@ function updateFiles(){
   if(report&&saved&&!dirty&&!rawEdited)$('html-report').href=resultUrl('report.html');
   $('floorplan-report').hidden=!report||!saved||dirty||rawEdited||previewPending||previewFailed;
   if(report&&saved&&!dirty&&!rawEdited)$('floorplan-report').href=resultUrl('floorplan.svg');
-  $('active-context').textContent=`当前工程：${$('project-name').value||'新工程'} · ${rawEdited?'输入待应用':dirty?'未保存预览':report?'已保存方案':'等待评估'}`;
+  $('active-context').textContent=!report&&!currentProjectId&&!creationMode?'尚未载入项目':`当前工程：${$('project-name').value||'新工程'} · ${rawEdited?'输入待应用':dirty?'未保存预览':report?'已保存方案':'等待评估'}`;
   showMethods(report,searchResult);renderCandidates();updateControls();updateAssessment();
   renderSavePanel();
 }
-function renderSavePanel(){batchPanel.render(batchContext,report,searchResult?distinctCandidates(searchResult):[],busy,saveBlockedReason({rawEdited,pendingInput:inputEditor?.hasPending(),structureDirty,previewPending,previewFailed}));}
+function renderSavePanel(){batchPanel.render(batchContext,report,searchResult?distinctCandidates(searchResult):[],busy,saveBlockedReason({rawEdited,pendingInput:inputEditor?.hasPending(),structureDirty,previewPending,previewFailed}),{options:[...$('candidate').options].map(o=>({value:o.value,label:o.textContent.split(' · ')[0]})),active:activeCandidate});}
 function renderCandidates(){
   $('candidate-origin').hidden=activeCandidate!=='base';
   const host=$('layout-candidates');host.hidden=!searchResult;
@@ -184,42 +201,45 @@ function renderResult(result,mode){
     if(result.candidates.length){activeCandidate=savedCandidate='0';$('candidate').value='0';show(result.candidates[0],true);}else if(baseline){activeCandidate=savedCandidate='base';$('candidate').value='base';show(baseline,true);}
   }else{searchResult=null;baseline=result;activeCandidate=savedCandidate='current';$('candidate').innerHTML='<option value="current">给定布局</option>';show(result,true);}updateFiles();
 }
-async function loadHistory(runId){
+async function loadHistory(runId,phase=async()=>{}){
+  await phase('读取方案输入与资源报告…');
   const payload=await api(`projects/${currentProjectId}/runs/${runId}/result`),response=await fetch(`/api/projects/${currentProjectId}/runs/${runId}/input`);if(!response.ok)throw new Error('读取历史输入失败');
-  clearResult();$('yaml').value=await response.text();
+  clearResult();inputYaml=await response.text();
   const storage=payload.result.storage;
-  if(storage?.batch_id){const data=await api(`projects/${currentProjectId}/batches/${storage.batch_id}`);batchContext=newBatch(readYaml(data.base_yaml),data.batch.kind,data.batch.search_metadata);Object.assign(batchContext,{id:storage.batch_id,name:data.batch.name,persisted:true,saved:new Map(data.batch.plans.map(p=>[p.source_key,true]))});}
-  renderResult(payload.result,payload.mode);planParent=report?{record:storage?.run_id,key:storage?.source_key||planKey(report)}:null;
-  if(report)await syncYaml();$('history').value=runId;updateHistoryDetails();notice('正在查看历史方案；修改并应用预览后，可以在所属批次中另存新版本。');
+  if(storage?.batch_id){const data=await api(`projects/${currentProjectId}/batches/${storage.batch_id}`);batchContext=newBatch(readYaml(data.base_yaml),data.batch.kind,data.batch.search_metadata);Object.assign(batchContext,{id:storage.batch_id,name:data.batch.name,persisted:true,saved:new Map(data.batch.plans.map(p=>[p.plan_id?'layout-'+p.plan_id:p.source_key,{storage:{run_name:p.name}}]))});}
+  await phase('构建布局与对象详情…');renderResult(payload.result,payload.mode);planParent=report?{record:storage?.run_id,key:storage?.source_key||planKey(report)}:null;
+  if(report)await syncYaml();renderHistoryList(runId);notice('已载入历史方案，可在布局规划中查看。');
 }
 async function loadProject(id){
   if(!id)return;
-  structureDirty=false;$('output-dir').value='';
-  setBusy(true);
-  try{const response=await fetch(`/api/projects/${id}/input`);if(!response.ok)throw new Error('项目输入读取失败');const input=await response.text();currentProjectId=id;creationMode=null;creationFieldsOpen=false;localStorage.setItem('resim-project',id);
-    const items=await refreshProjects(id),meta=items.find(p=>p.id===id);$('project-name').value=meta?.name||id;$('output-dir').value=meta?.project_dir||'';$('project-name').disabled=true;clearResult();$('yaml').value=input;
-    const runs=await refreshHistory(),latest=runs.find(r=>r.status==='completed');
-    if(latest?.batch_id){await loadHistory(latest.run_id);setView(report.dies.length===1?'2d':'3d');return;}
+  try{return await withLoading('正在载入项目',async phase=>{
+    await phase('读取芯片架构与工艺库…');
+    const response=await fetch(`/api/projects/${id}/input`);if(!response.ok)throw new Error('项目输入读取失败');const input=await response.text();structureDirty=false;currentProjectId=id;creationMode=null;creationFieldsOpen=false;
+    const items=await refreshProjects(id),meta=items.find(p=>p.id===id);$('project-name').value=meta?.name||id;$('output-dir').value=meta?.project_dir||'';$('project-name').disabled=true;clearResult();inputYaml=input;
+    await phase('读取项目历史…');const runs=await refreshHistory(),latest=runs.find(r=>r.status==='completed');
+    if(latest?.batch_id){await loadHistory(latest.run_id,phase);setView(report.dies.length===1?'2d':'3d');return true;}
+    await phase('校验输入并计算资源预览…');
     const working=await api('preview',{yaml:input});
-    if(latest){
+    await phase('构建布局与资源详情…');if(latest){
       const payload=await api(`projects/${id}/runs/${latest.run_id}/result`),match=matchingSavedCandidate(payload.result,payload.mode,working.report);
-      if(match!==null){renderResult(payload.result,payload.mode);activeCandidate=savedCandidate=match;$('candidate').value=match;show(working.report,true);$('history').value=latest.run_id;updateHistoryDetails();notice('已载入工程当前输入，对应已保存方案。');}
+      if(match!==null){renderResult(payload.result,payload.mode);activeCandidate=savedCandidate=match;$('candidate').value=match;show(working.report,true);renderHistoryList(latest.run_id);notice('已载入工程当前输入，对应已保存方案。');}
       else{dirty=true;activeCandidate='draft';$('candidate').innerHTML='<option value="draft">当前工程输入 · 未保存预览</option>';show(working.report,true);notice('已按当前工程输入重新预览。当前输入或计算版本与最近报告不同，点击“保存评估结果”生成新记录；历史报告可单独查看。');}
     }else{dirty=true;activeCandidate='draft';$('candidate').innerHTML='<option value="draft">当前工程输入 · 未保存预览</option>';show(working.report,true);notice('已预览当前输入，点击“保存评估结果”创建运行记录。');}
-    $('yaml').value=working.yaml;$('storage-path').textContent=activeStorage?.run_dir||`ResimProjects/${id}/inputs/architecture.yml`;setView(report.dies.length===1?'2d':'3d');
-  }catch(e){openWorkspace('inputs');$('architecture-input-step').open=true;$('editor-panel').hidden=false;$('editor-toggle').setAttribute('aria-expanded','true');notice('当前输入尚不能展示：'+e.message+'。可在输入编辑器中修改；没有完整布局时可运行自动规划。',true);}finally{setBusy(false);}
+    inputYaml=working.yaml;$('storage-path').textContent=activeStorage?.run_dir||'';setView(report.dies.length===1?'2d':'3d');return true;
+  },{complete:'项目载入完成'});}catch(e){openWorkspace('inputs');notice('项目未能载入：'+e.message+'。请检查项目的架构与工艺输入文件。',true);return false;}
 }
-function newProject(name='',mode=null){ openWorkspace('inputs');creationMode=mode;creationFieldsOpen=mode!==null;structureDirty=false;$('structure-rows').replaceChildren();$('output-dir').value=''; $('project-options-panel').hidden=true;$('project-options').setAttribute('aria-expanded','false');$('editor-panel').hidden=true;$('editor-toggle').setAttribute('aria-expanded','false');$('architecture-input-step').open=false;$('technology-input-step').open=false;inputEditor.setMode(null);inputEditor.setTechnologyMode(null);currentProjectId=null;clearResult();$('project').value='';$('project-name').disabled=false;$('project-name').value=name;$('history').innerHTML='<option value="">暂无结果</option>';updateHistoryDetails();$('storage-path').textContent='项目文件夹内保存 inputs、项目配置和命名结果子文件夹。';updateControls();notice(mode?'填写项目名称，再选择架构和工艺库的输入方式。':'载入已有项目，或点击“新建项目”开始。');}
+function newProject(name='',mode=null){ openWorkspace('inputs');creationMode=mode;creationFieldsOpen=mode!==null;structureDirty=false;$('structure-rows').replaceChildren();$('output-dir').value='';inputYaml='';$('architecture-input-step').open=false;$('technology-input-step').open=false;inputEditor.setMode(null);inputEditor.setTechnologyMode(null);currentProjectId=null;clearResult();$('project').value='';$('project-name').disabled=false;$('project-name').value=name;historyRows=[];renderHistoryList();$('storage-path').textContent='';updateControls();notice(mode?'填写项目名称，再选择架构和工艺库的输入方式。':'载入已有项目，或点击“新建项目”开始。');}
 function toggleProjectCreation(mode){
   if(currentProjectId||creationMode!==mode)return false;
   creationFieldsOpen=!creationFieldsOpen;updateControls();
   if(creationFieldsOpen)$('project-name').focus();
   return true;
 }
-async function syncYaml(){if(report&&!rawEdited){const token=revision,project=clone(report.project);project.name=$('project-name').value||project.name;const response=await fetch('/api/yaml',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({yaml:JSON.stringify(project)})});if(!response.ok)throw new Error('当前布局输入校验失败');const text=await response.text();if(token===revision&&!rawEdited)$('yaml').value=text;}}
+async function syncYaml(){if(report&&!rawEdited){const token=revision,project=clone(report.project);project.name=$('project-name').value||project.name;const response=await fetch('/api/yaml',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({yaml:JSON.stringify(project)})});if(!response.ok)throw new Error('当前布局输入校验失败');const text=await response.text();if(token===revision&&!rawEdited)inputYaml=text;}}
 async function execute(mode){
   if(busy)return;
   if(mode==='evaluate')return savePlans('current');
+  if(!report){notice('请先载入或新建项目。',true);return;}
   if(mode==='optimize'&&rawEdited){notice('完整输入尚未应用，请先应用预览，再生成布局方案。',true);return;}
   if(inputEditor?.hasPending()){notice('输入区仍有未应用修改，请先应用预览或撤销。',true);openWorkspace('inputs');return;}
   if(structureDirty){notice('Die 表格有未应用修改，请先应用结构并预览。',true);return;}
@@ -229,15 +249,14 @@ async function execute(mode){
   setBusy(true);if(mode==='optimize')taskProgress.start('正在自动分区与布局');else if(mode==='evaluate')taskProgress.reset();
   $('optimize').textContent=mode==='optimize'?'正在生成方案…':'自动分区与布局';
   $('evaluate').textContent=mode==='evaluate'?'正在保存…':'保存评估结果';
-  notice(mode==='optimize'?'正在生成候选布局，请等待完成。':mode==='validate'?'正在校验输入…':'正在计算并保存当前布局…');
+  notice('正在生成候选布局，请等待完成。');
   try{
-    await syncYaml();const project=readYaml($('yaml').value);assertStack(project);let yaml=$('yaml').value;
+    await syncYaml();const project=readYaml(inputYaml);assertStack(project);let yaml=inputYaml;
     if(mode==='optimize'){
       project.search={...project.search,candidates:candidateCount($('search-count').value)};yaml=JSON.stringify(project);
       taskProgress.phase(`正在搜索并复核候选 · 请求 ${project.search.candidates} 个 · 求解预算 ${project.search.time_limit_s??12} 秒，准备与评估另计。`);
     }
     const result=await api(mode==='optimize'?'optimize/preview':mode,{yaml});
-    if(mode==='validate'){notice(`输入有效：${result.dies} 个 die，${result.modules} 个模块。`);return;}
     if(mode==='optimize'){
       clearResult();batchContext=newBatch(project,'optimize',{search_status:result.search_status,solver_statuses:result.solver_statuses,elapsed_s:result.elapsed_s,generated_candidates:result.candidates.length,message:result.message});renderResult(result,'optimize');await syncYaml();
       const count=distinctCandidates(result).length;
@@ -261,7 +280,7 @@ async function savePlans(mode){
   let name,targets;
   const candidates=searchResult?distinctCandidates(searchResult):[],choices=new Map(batchPanel.choices().map(c=>[c.key,c]));
   try{
-    name=resultFolderName($('result-name').value);
+    name=batchContext.persisted?batchContext.name:resultFolderName($('result-name').value.trim()||'布局批次');
     if(mode==='current'){
       const fallback=activeCandidate==='draft'?'手工调整方案':$('candidate').selectedOptions[0]?.textContent.split(' · ')[0]||'当前方案';
       targets=[{report:clone(report),name:resultFolderName($('plan-name').value.trim()||fallback),parent:planParent?.key!==planKey(report)?planParent:null}];
@@ -278,13 +297,13 @@ async function savePlans(mode){
         plan_name:target.name,yaml:JSON.stringify(target.report.project),preview_plan_id:target.report.plan_id,source_key:planKey(target.report),
         candidate_metadata:target.report.candidate||null,parent_record_id:target.parent?.record||null,parent_source_key:target.parent?.key||null});
       const saved=result.report,storage=saved.storage;
-      currentProjectId=storage.project_id;creationMode=null;creationFieldsOpen=false;localStorage.setItem('resim-project',currentProjectId);$('output-dir').value=storage.project_dir;$('project-name').value=storage.project_name;
+      currentProjectId=storage.project_id;creationMode=null;creationFieldsOpen=false;$('output-dir').value=storage.project_dir;$('project-name').value=storage.project_name;
       batchContext.name=result.batch.name;batchContext.persisted=true;batchContext.saved.set(planKey(saved),saved);lastId=storage.run_id;
       const original=candidates.find(c=>c.report.plan_id===saved.plan_id);if(original)candidateSaves.set(original.id,saved);
       if(report.plan_id===saved.plan_id){report=saved;activeStorage=storage;storageMode='evaluate';dirty=false;draftChanged=false;planParent={record:storage.run_id,key:storage.source_key};savedCandidate=activeCandidate;if(activeCandidate==='draft')$('candidate').selectedOptions[0].textContent=storage.run_name;}
       completed++;renderSavePanel();
     }
-    notice(`已保存 ${completed} 个方案到批次“${batchContext.name}”。`);
+    notice(mode==='current'?`“${targets[0].name}”已保存，可切换下一个方案继续保存。`:`本次已保存 ${completed} 个方案到批次“${batchContext.name}”。`);
   }catch(e){notice(`已保存 ${completed} / ${targets.length} 个方案。${e.message}；其余方案仍未保存，可重试。`,true);}
   finally{
     setBusy(false);updateFiles();
@@ -330,13 +349,11 @@ function show(value,fit=false){
   fillSupplyEditor();
   const owned=report.supply_groups||[];
   $('supply-port-details').innerHTML='<table><thead><tr><th>端口 / 核</th><th>Die / 电压域</th><th>位置 µm</th><th>接入方式</th><th>电压 V / 能力 A</th><th>本核需求 / 余量 A</th></tr></thead><tbody>'+report.ports.map(p=>{const g=owned.find(g=>g.ports.includes(p.id));return `<tr data-port-die="${esc(p.die)}"><td>${esc(p.id)}<small>${esc(p.core||'共享入口')}</small></td><td>${esc(p.die)} / ${esc(p.domain)}</td><td>${fmt(p.x_um)}, ${fmt(p.y_um)}</td><td>${p.feed==='stack_base'?'从底层经 TSV 接入':'外部供电入口'}</td><td>${fmt(p.voltage_V)} / ${fmt(p.max_current_A)}</td><td>${fmt(g?.demand_A)} / ${fmt(g?.margin_A)}<small>${esc(p.provenance||'未填写入口依据')}</small></td></tr>`;}).join('')+'</tbody></table>';
-  const timing=report.timing;
-  $('timing-summary').innerHTML=(timing?.model?`<p>${timing.model.calibrated?'输入标记为已校准':'未校准 · 仅用于方案比较'}：${esc(timing.model.provenance)}</p><p>平面 ${fmt(timing.model.planar_ps_per_um,5)} ps/µm + 跨层 ${fmt(timing.model.tier_ps)} ps/接口；加权总延迟 ${fmt(timing.weighted_delay_ps)} ps，最长单连接 ${fmt(timing.max_link_delay_ps)} ps。</p><p>${esc(timing.scope)} 加权总和不是模型执行时间。</p>`:'<p>未提供延迟系数，不把线长或带宽当作真实传输时间。</p>');
 
   connectionPane?.update(report,previewPending||previewFailed);inspect(report.modules.find(m=>m.id===selectedId)||null,false);updateLive();viewer?.draw(report,previewPending||previewFailed);if(fit)viewer?.reset();updateFiles();
 }
 function updateLive(){
-  if(!report)return;const s=report.summary,b=editBase,metrics=[['互联金属面积',s.wiring_metal_area_um2,b?.wiring_metal_area_um2,'µm²'],['加权线长',s.weighted_wirelength_um,b?.weighted_wirelength_um,'wire·µm'],['峰值拥塞',s.peak_congestion,b?.peak_congestion,''],['信号 TSV',s.signal_via_segments,b?.signal_via_segments,''],['全部 TSV',s.total_via_segments,b?.total_via_segments,''],['总功耗',s.power_W,b?.power_W,'W']];
+  if(!report)return;const s=report.summary,b=editBase,wiringKnown=report.dies.filter(d=>!d.display_platform).every(d=>wiringState(report,d.id).known),metrics=[['互联金属面积',wiringKnown?s.wiring_metal_area_um2:null,b?.wiring_metal_area_um2,'µm²'],['加权线长',wiringKnown?s.weighted_wirelength_um:null,b?.weighted_wirelength_um,'wire·µm'],['峰值拥塞',wiringKnown?s.peak_congestion:null,b?.peak_congestion,''],['信号 TSV',s.signal_via_segments,b?.signal_via_segments,''],['全部 TSV',s.total_via_segments,b?.total_via_segments,''],['总功耗',s.power_W,b?.power_W,'W']];
   $('live-metrics').innerHTML=metrics.map(([label,v,old,unit])=>`<span>${label} <b>${previewPending?'重算中…':fmt(v,4)+(v==null?'':' '+unit)}</b>${!previewPending&&b&&old!=null&&v!=null?`<small>相对编辑前 ${v-old>0?'+':''}${fmt(v-old,4)}</small>`:''}</span>`).join('');
   $('preview-changes').hidden=!dirty;
   $('draft-status').textContent=rawEdited?'输入待应用':previewFailed?'预览失败，可重试或撤销':previewPending?'移动后重算中':dirty?'未保存预览 · 保存评估结果为新版本':'已评估布局';updateControls();
@@ -369,6 +386,7 @@ function inspect(m,filter=true){
   const brief=[['类型 / Core',m.kind+' / '+m.core],['长 × 宽',fmt(m.width_um)+' × '+fmt(m.height_um)+' µm'],['模块占地',area(m.footprint_um2/1e6)+' mm²'],['功耗',fmt(m.power_W)+(m.power_W==null?'':' W')]];
   const resources=[['外围预留',fmt(definition.halo_um||0)+' µm / 边'],['标准单元面积',definition.area_known===false?'未知':area(m.stdcell_area_um2/1e6)+' mm²'],['硬宏面积',definition.area_known===false?'未知':area(m.macro_area_um2/1e6)+' mm²'],['实际标准单元利用率',m.cell_utilization==null?'未知':fmt(m.cell_utilization*100,1)+'%'],['目标单元利用率',fmt(definition.target_cell_utilization*100,1)+'% · 输入设定'],['功耗密度',fmt(m.power_density_W_mm2)+(m.power_density_W_mm2==null?'':' W/mm²')],['局部峰值拥塞',previewPending?'重算中…':fmt(m.peak_congestion,4)],['容量',fmt(m.metrics.capacity_KiB)+' KiB']];
   $('detail').innerHTML=`<h3>${esc(m.id)} <span class="pill">${esc(m.die)}</span></h3>`+brief.map(row).join('')+`<details class="object-section"><summary>资源明细</summary>${resources.map(row).join('')}<p>利用率依据：${esc(definition.utilization_basis||'待确认')}</p><p>${esc(m.provenance)}</p></details>`+corePeers(report,m.core,m.id)+`<button id="inspect-core" class="text-button">${esc(m.core)} 的布局与外部接口 ↗</button>`;
+  $('detail').insertAdjacentHTML('beforeend',referenceDetails(report,m.id));
   $('inspect-core').onclick=()=>showCore(m.core,m.die);bindPeerLinks();
   updateControls();
 }
@@ -383,7 +401,7 @@ function setDraft(project,remember=true){
 }
 async function preview(){
   clearTimeout(previewTimer);if(!report)return;const token=revision;previewController?.abort();previewController=new AbortController();previewPending=true;previewFailed=false;updateLive();updateFiles();
-  try{const response=await api('layout/preview',clone(report.project),previewController.signal);if(token!==revision)return;previewPending=false;$('yaml').value=response.yaml;show(response.report);notice(`布局预览已更新：${response.report.summary.errors} 项违例，${response.report.summary.unknowns} 项缺失。保存评估结果后生成新结果。`);}
+  try{const response=await api('layout/preview',clone(report.project),previewController.signal);if(token!==revision)return;previewPending=false;inputYaml=response.yaml;show(response.report);notice(`布局预览已更新：${response.report.summary.errors} 项违例，${response.report.summary.unknowns} 项缺失。保存评估结果后生成新结果。`);}
   catch(e){if(token!==revision||e.name==='AbortError')return;previewPending=false;previewFailed=true;updateLive();updateFiles();notice('布局预览失败：'+e.message+'。可重试或撤销，当前修改仍保留。',true);}
 }
 async function applyMove(){
@@ -404,22 +422,17 @@ $('apply-spacing').onclick=async()=>{if(busy||!report||rawEdited)return;try{cons
 $('project').onchange=updateControls;
 $('load').onclick=async()=>{if(busy||!$('project').value)return;if(await canLeaveDraft())await loadProject($('project').value);};
 $('hide-project-create').onclick=()=>{if(busy)return;creationFieldsOpen=false;updateControls();$('web-new-project').focus();};
-$('load-run').onclick=async()=>{if(busy||!currentProjectId||!$('history').value||!await canLeaveDraft())return;setBusy(true);try{await loadHistory($('history').value);}catch(e){notice(e.message,true);}finally{setBusy(false);}};
-$('editor-toggle').onclick=async()=>{openWorkspace('inputs');$('architecture-input-step').open=true;$('editor-panel').hidden=!$('editor-panel').hidden;$('editor-toggle').setAttribute('aria-expanded',String(!$('editor-panel').hidden));if(!$('editor-panel').hidden)try{await syncYaml();}catch(e){notice(e.message,true);}};
-$('yaml').oninput=()=>{if(!rawEdited&&report)planParent={record:activeStorage?.batch_id===batchContext?.id?activeStorage.run_id:null,key:planKey(report)};rawEdited=true;revision++;previewController?.abort();clearTimeout(previewTimer);previewPending=false;previewFailed=false;$('edit-mode').checked=false;updateFiles();updateLive();notice('输入已修改，请先点击“应用输入并预览”；当前画面仍是上次布局，暂不能保存。');};
-$('preview-input').onclick=async()=>{
-  if(inputEditor?.hasPending()||structureDirty){notice('请先应用或撤销网页表单修改，再应用完整输入。',true);return;}if(busy)return;setBusy(true);revision++;previewController?.abort();clearTimeout(previewTimer);
-  try{assertStack(readYaml($('yaml').value));const response=await api('preview',{yaml:$('yaml').value});if(!editBase&&report)editBase=clone(report.summary);rawEdited=false;dirty=true;draftChanged=true;previewPending=false;previewFailed=false;undo=[];redo=[];activeCandidate='draft';$('candidate').innerHTML='<option value="draft">输入预览 · 未保存</option>';searchResult=null;$('yaml').value=response.yaml;show(response.report,true);notice('输入已应用并预览，尚未写入工程。确认布局后保存评估结果。');}
-  catch(e){notice('输入预览失败：'+e.message,true);}finally{setBusy(false);}
-};
-for(const mode of ['validate','optimize'])$(mode).onclick=()=>execute(mode);
+$('load-run').onclick=async()=>{if(busy||!currentProjectId||!$('history').value||!await canLeaveDraft())return;try{await withLoading('正在载入历史方案',phase=>loadHistory($('history').value,phase),{complete:'方案载入完成'});}catch(e){notice(e.message,true);}};
+$('optimize').onclick=()=>execute('optimize');
 $('save-result-form').onsubmit=event=>{event.preventDefault();execute('evaluate');};
-$('save-selected').onclick=()=>savePlans('selected');
-$('save-all').onclick=()=>savePlans('all');
-$('history').onchange=updateHistoryDetails;
+$('save-batch').onclick=()=>savePlans('selected');
+$('result-candidate').onchange=()=>selectCandidate($('result-candidate').value);
+$('save-next-plan').onclick=()=>selectCandidate($('save-next-plan').dataset.candidate);
+$('history-batch').onchange=()=>renderHistoryList();
+$('history').onchange=updateHistorySelection;
 async function selectCandidate(next){
-  if(busy||!searchResult||next==='draft')return;
-  $('candidate').value=activeCandidate;if(!await canLeaveDraft(false))return;$('candidate').value=next;
+  if(busy||!searchResult||next==='draft'){renderSavePanel();return;}
+  $('candidate').value=activeCandidate;if(!await canLeaveDraft(false)){renderSavePanel();return;}$('candidate').value=next;
   const saved=candidateSaves.get(next);
   revision++;previewController?.abort();clearTimeout(previewTimer);dirty=!searchResult.storage&&!saved;draftChanged=false;rawEdited=false;previewPending=false;previewFailed=false;undo=[];redo=[];editBase=null;activeCandidate=savedCandidate=next;
   activeStorage=saved?.storage||searchResult.storage||null;storageMode=saved?'evaluate':'optimize';
@@ -437,13 +450,12 @@ $('apply-move').onclick=applyMove;
 $('undo-move').onclick=async()=>{if(busy||rawEdited||!undo.length)return;redo.push(clone(report.project));setDraft(undo.pop(),false);if(selectedId&&$('layer').value!=='all')$('layer').value=report.modules.find(m=>m.id===selectedId).die;await preview();};
 $('redo-move').onclick=async()=>{if(busy||rawEdited||!redo.length)return;undo.push(clone(report.project));setDraft(redo.pop(),false);if(selectedId&&$('layer').value!=='all')$('layer').value=report.modules.find(m=>m.id===selectedId).die;await preview();};
 $('retry-preview').onclick=preview;$('issue-filter').onchange=renderIssues;
-$('input-export').onclick=async()=>{try{await syncYaml();download('resim-input.yml',$('yaml').value,'application/yaml');}catch(e){notice(e.message,true);}};
 $('open-results').onclick=async()=>{try{await api(`projects/${activeStorage.project_id}/runs/${activeStorage.run_id}/open-folder?candidate=${encodeURIComponent(dirty?savedCandidate:activeCandidate)}`,{});}catch(e){notice(e.message,true);}};
 $('copy-results').onclick=async()=>{try{await navigator.clipboard.writeText(currentFolder());notice('当前方案的结果路径已复制。');}catch{notice('复制受浏览器限制，请选择并复制上方路径。');}};
 window.addEventListener('beforeunload',event=>{if(busy||unsavedSearch()||draftChanged||rawEdited||structureDirty||inputEditor?.hasPending()){event.preventDefault();event.returnValue='';}});
 const outputFolders=new OutputFolders({notice,openProject:async path=>{
   setBusy(true);
-  try{const meta=await api('projects/open',{project_dir:path});await loadProject(meta.id);}
+  try{const meta=await api('projects/open',{project_dir:path});if(!await loadProject(meta.id))throw new Error('项目载入失败，请检查输入文件。');}
   finally{setBusy(false);}
 }});
 $('open-project').onclick=async()=>{if(busy||!await canLeaveDraft())return;await outputFolders.open(false,'existing');};
@@ -452,9 +464,8 @@ historyComparison=new HistoryComparison({api,download});
 async function applyInputProject(project,{asNew=false,accepted}={}){
   if(busy||previewPending)throw new Error('正在计算，请稍后应用输入');
   if(structureDirty||rawEdited)throw new Error('请先应用或撤销 Die 表格 / 完整 YAML 修改');
-  setBusy(true);notice('正在校验输入并计算预览…');
-  try{
-    assertStack(project);const result=await api('layout/preview',project);
+  return withLoading('正在校验输入并生成预览',async phase=>{
+    await phase('校验架构、工艺参数及引用关系，计算资源…');assertStack(project);const result=await api('layout/preview',project);
     if(asNew&&draftChanged&&!await canLeaveDraft())return;
     accepted?.();
     if(asNew)newProject(project.name);else if(report){
@@ -464,11 +475,16 @@ async function applyInputProject(project,{asNew=false,accepted}={}){
     revision++;previewController?.abort();clearTimeout(previewTimer);previewPending=false;previewFailed=false;
     dirty=true;draftChanged=true;rawEdited=false;searchResult=null;activeCandidate='draft';
     $('candidate').innerHTML='<option value="draft">输入预览 · 未保存</option>';
-    $('yaml').value=result.yaml;show(result.report,true);$('editor-panel').hidden=true;
+    await phase('更新布局与资源评估…');inputYaml=result.yaml;show(result.report,true);
     notice('输入已应用，资源与实现难点已重新计算。保存评估结果后生成独立历史结果。');
-  }finally{setBusy(false);}
+  },{complete:'输入已校验并应用'});
 }
-try{const items=await refreshProjects(),last=localStorage.getItem('resim-project'),initial=items.find(p=>p.id===last||p.previous_ids?.includes(last))||items.find(p=>p.id==='gcd16-nangate45')||items[0];if(initial)await loadProject(initial.id);else newProject();}catch(e){notice(e.message,true);}
+async function initializeWorkspace(){
+  newProject();setBusy(true);notice('正在读取项目列表…');
+  try{await refreshProjects();notice('选择已有项目并载入，或新建项目开始。');}
+  catch(e){notice('项目列表读取失败：'+e.message+'；可通过项目文件夹打开。',true);}
+  finally{setBusy(false);}
+}
 
 function fillSupplyEditor(){
   const p=report?.project.floorplan.supply_ports.find(p=>p.id===$('edit-supply-port').value);
@@ -572,7 +588,7 @@ $('apply-structure').onclick=async()=>{
   if(busy||!report)return;if(rawEdited){notice('请先应用 YAML 修改，再编辑 Die 表格。',true);return;}
   try{const rows=[...$('structure-rows').rows].map(tr=>{const v=k=>tr.querySelector(`[data-field="${k}"]`).value;return {id:v('id'),originalId:tr.dataset.originalId||null,kind:v('kind'),face:v('face'),area:Number(v('area')),width:Number(v('width')),height:Number(v('height')),thickness:Number(v('thickness')),power:v('power')===''?null:Number(v('power'))};});const project=updateStructure(report.project,rows,interfaceInputValues());
     // Validate and evaluate before accepting the form so a rejected edit leaves the draft intact.
-    setBusy(true);assertStack(project);const result=await api('layout/preview',project);rememberMove();inputEditor.renameDies(new Map(rows.filter(r=>r.originalId).map(r=>[r.originalId,r.id.trim()])),project.architecture.dies);structureDirty=false;dirty=true;draftChanged=true;rawEdited=false;previewFailed=false;previewPending=false;revision++;previewController?.abort();clearTimeout(previewTimer);$('yaml').value=result.yaml;activeCandidate='draft';$('candidate').innerHTML='<option value="draft">结构预览 · 未保存</option>';searchResult=null;show(result.report,true);notice('结构已更新，引用已同步。检查布局后评估保存。');
+    setBusy(true);assertStack(project);const result=await api('layout/preview',project);rememberMove();inputEditor.renameDies(new Map(rows.filter(r=>r.originalId).map(r=>[r.originalId,r.id.trim()])),project.architecture.dies);structureDirty=false;dirty=true;draftChanged=true;rawEdited=false;previewFailed=false;previewPending=false;revision++;previewController?.abort();clearTimeout(previewTimer);inputYaml=result.yaml;activeCandidate='draft';$('candidate').innerHTML='<option value="draft">结构预览 · 未保存</option>';searchResult=null;show(result.report,true);notice('结构已更新，引用已同步。检查布局后评估保存。');
   }catch(e){notice(e.message,true);}finally{setBusy(false);}
 };
 $('output-dir').onchange=()=>notice('项目文件夹已设置，首次保存时写入架构、工艺和结果子文件夹。');
@@ -601,7 +617,9 @@ $('close-difficulties').onclick=()=>{difficultySelection=null;renderDifficulties
 $('difficulty-prev').onclick=()=>{difficultyPageIndex--;renderDifficulties();$('difficulty-title').scrollIntoView({block:'start'});};
 $('difficulty-next').onclick=()=>{difficultyPageIndex++;renderDifficulties();$('difficulty-title').scrollIntoView({block:'start'});};
 
-$('web-new-project').onclick=async()=>{if(busy||toggleProjectCreation('new')||!await canLeaveDraft())return;setBusy(true);try{const data=await api('starter');newProject('新架构工程','new');$('yaml').value=data.yaml;dirty=true;draftChanged=true;show(data.report,true);$('editor-panel').hidden=true;notice('新项目已准备好，请填写名称，再选择架构和工艺库的输入方式。');}catch(e){notice(e.message,true);}finally{setBusy(false);}};
+$('web-new-project').onclick=async()=>{if(busy||toggleProjectCreation('new')||!await canLeaveDraft())return;try{await withLoading('正在准备新项目',async phase=>{const data=await api('starter');await phase('准备架构与工艺输入表单…');newProject('新架构工程','new');inputYaml=data.yaml;dirty=true;draftChanged=true;show(data.report,true);notice('新项目已准备好，请填写名称，再选择架构和工艺库的输入方式。');},{complete:'新项目已准备好'});}catch(e){notice(e.message,true);}};
 
 document.addEventListener('pointerdown',event=>{if(!$('display-settings').contains(event.target))$('display-settings').open=false;});
 document.addEventListener('keydown',event=>{if(event.key==='Escape')$('display-settings').open=false;});
+
+void initializeWorkspace();

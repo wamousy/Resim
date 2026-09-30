@@ -6,7 +6,7 @@ export function connectionScope(link,modules,placements){
 }
 export const SCOPE_NAMES={intra:'同层 core 内',inter:'同层 core 间',cross:'跨 die'};
 export function transferBudget(link){
-  const rate=Number(link.lane_rate_Gbps),data=link.data_wires??Math.ceil(link.bandwidth_GBps*8/rate);
+  const rate=link.lane_rate_Gbps==null?null:Number(link.lane_rate_Gbps),data=link.data_wires??(rate&&link.bandwidth_GBps!=null?Math.ceil(link.bandwidth_GBps*8/rate):null);
   return {bits:link.bus_width_bits??null,lanes:data,laneRate:rate,rawGBps:Number.isFinite(rate)&&rate>0?data*rate/8:null,demandGBps:link.bandwidth_GBps};
 }
 export function logicalCaption(link){

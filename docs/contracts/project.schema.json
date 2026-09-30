@@ -44,6 +44,13 @@
           },
           "title": "Links",
           "type": "array"
+        },
+        "reference_groups": {
+          "items": {
+            "$ref": "#/$defs/ReferenceGroup"
+          },
+          "title": "Reference Groups",
+          "type": "array"
         }
       },
       "required": [
@@ -371,14 +378,42 @@
           "title": "Bus Width Bits"
         },
         "bandwidth_GBps": {
-          "minimum": 0,
-          "title": "Bandwidth Gbps",
-          "type": "number"
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Bandwidth Gbps"
         },
         "lane_rate_Gbps": {
-          "exclusiveMinimum": 0,
-          "title": "Lane Rate Gbps",
-          "type": "number"
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Lane Rate Gbps"
+        },
+        "provenance": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Provenance"
         },
         "data_wires": {
           "anyOf": [
@@ -464,9 +499,7 @@
       "required": [
         "id",
         "source",
-        "target",
-        "bandwidth_GBps",
-        "lane_rate_Gbps"
+        "target"
       ],
       "title": "Link",
       "type": "object"
@@ -853,6 +886,111 @@
         "side"
       ],
       "title": "PortLocation",
+      "type": "object"
+    },
+    "ReferenceGroup": {
+      "additionalProperties": false,
+      "description": "Source estimates for a component or subsystem, never additive child costs.",
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "modules": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Modules",
+          "type": "array"
+        },
+        "source": {
+          "title": "Source",
+          "type": "string"
+        },
+        "label": {
+          "title": "Label",
+          "type": "string"
+        },
+        "width_um": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Width Um"
+        },
+        "height_um": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Height Um"
+        },
+        "area_estimate_um2": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Area Estimate Um2"
+        },
+        "area_basis": {
+          "default": "",
+          "title": "Area Basis",
+          "type": "string"
+        },
+        "cell_count": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Cell Count"
+        },
+        "pin_counts": {
+          "additionalProperties": {
+            "type": "integer"
+          },
+          "title": "Pin Counts",
+          "type": "object"
+        },
+        "notes": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Notes",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "modules",
+        "source",
+        "label"
+      ],
+      "title": "ReferenceGroup",
       "type": "object"
     },
     "Region": {

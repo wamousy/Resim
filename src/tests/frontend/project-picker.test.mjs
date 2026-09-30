@@ -4,7 +4,7 @@ import {readFileSync} from 'node:fs';
 import vm from 'node:vm';
 
 const app=readFileSync(new URL('../../frontend/app.js',import.meta.url),'utf8');
-const handler=app.slice(app.indexOf('async function refreshProjects('),app.indexOf('function updateHistoryDetails('));
+const handler=app.slice(app.indexOf('async function refreshProjects('),app.indexOf('function updateHistorySelection('));
 async function select(items,id){
  const picker={innerHTML:'',value:''};
  const c={currentProjectId:null,api:async()=>items,$:()=>picker,esc:s=>s,historyComparison:null,updateControls(){},notice(){}};

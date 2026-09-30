@@ -12,6 +12,42 @@ from resim_policy_portable import pack_project, unpack_project
 
 
 class StorageTests(unittest.TestCase):
+    def test_lock_is_reentrant_times_out_other_processes_and_leaves_no_project_file(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            script = """import sys
+sys.path.insert(0,sys.argv[1])
+from resim_policy_storage import store_lock
+try:
+    with store_lock(sys.argv[2], timeout=.15): pass
+except TimeoutError: sys.exit(23)
+"""
+            command = [sys.executable, '-c', script, str(Path(__file__).resolve().parents[2] / 'backend'), tmp.swapcase() if os.name == 'nt' else tmp]
+            with self.assertRaisesRegex(RuntimeError, 'simulated'):
+                with store_lock(root):
+                    with store_lock(root, timeout=0):
+                        self.assertEqual(subprocess.run(command, timeout=10).returncode, 23)
+                        self.assertEqual(list(root.iterdir()), [])
+                    raise RuntimeError('simulated')
+            self.assertEqual(subprocess.run(command, timeout=10).returncode, 0)
+            self.assertEqual(list(root.iterdir()), [])
+
+    def test_process_exit_releases_lock_and_committed_journal_remains_recoverable(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            script = """import sys,os
+sys.path.insert(0,sys.argv[1])
+from resim_policy_storage import *
+with store_lock(sys.argv[2]):
+    commit_inputs(Path(sys.argv[2]),{n:'committed' for n in ALLOWED},lambda step:os._exit(17) if step=='journal' else None)
+"""
+            child = subprocess.run([sys.executable, '-c', script, str(Path(__file__).resolve().parents[2] / 'backend'), tmp], timeout=10)
+            self.assertEqual(child.returncode, 17)
+            with store_lock(root, timeout=.5):
+                self.assertTrue(recover(root))
+            self.assertTrue(all((root/n).read_text() == 'committed' for n in ALLOWED))
+            self.assertFalse((root/'.resim-store.lock').exists())
+
     def test_real_process_exit_at_each_commit_boundary_recovers_complete_generation(self):
         for step in ['journal', *ALLOWED]:
             with self.subTest(step=step), tempfile.TemporaryDirectory() as tmp:
@@ -40,6 +76,7 @@ for i in range(12):
 """
             children = [subprocess.Popen([sys.executable, '-c', script, str((Path(__file__).resolve().parents[2] / 'backend')), tmp, str(i)]) for i in range(3)]
             for child in children: self.assertEqual(child.wait(timeout=30), 0)
+            self.assertFalse((Path(tmp)/'.resim-store.lock').exists())
 
     def test_invalid_journal_never_writes_input(self):
         with tempfile.TemporaryDirectory() as tmp:

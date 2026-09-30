@@ -853,6 +853,13 @@
             },
             "type": "array",
             "title": "Links"
+          },
+          "reference_groups": {
+            "items": {
+              "$ref": "#/components/schemas/ReferenceGroup"
+            },
+            "type": "array",
+            "title": "Reference Groups"
           }
         },
         "additionalProperties": false,
@@ -1323,14 +1330,39 @@
             "description": "Logical payload width; independent of serialized physical data lanes"
           },
           "bandwidth_GBps": {
-            "type": "number",
-            "minimum": 0.0,
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Bandwidth Gbps"
           },
           "lane_rate_Gbps": {
-            "type": "number",
-            "exclusiveMinimum": 0.0,
+            "anyOf": [
+              {
+                "type": "number",
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Lane Rate Gbps"
+          },
+          "provenance": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Provenance"
           },
           "data_wires": {
             "anyOf": [
@@ -1415,9 +1447,7 @@
         "required": [
           "id",
           "source",
-          "target",
-          "bandwidth_GBps",
-          "lane_rate_Gbps"
+          "target"
         ],
         "title": "Link"
       },
@@ -1850,6 +1880,107 @@
           "side"
         ],
         "title": "PortLocation"
+      },
+      "ReferenceGroup": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "modules": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "Modules"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "width_um": {
+            "anyOf": [
+              {
+                "type": "number",
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Width Um"
+          },
+          "height_um": {
+            "anyOf": [
+              {
+                "type": "number",
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Height Um"
+          },
+          "area_estimate_um2": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Area Estimate Um2"
+          },
+          "area_basis": {
+            "type": "string",
+            "title": "Area Basis",
+            "default": ""
+          },
+          "cell_count": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cell Count"
+          },
+          "pin_counts": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Pin Counts"
+          },
+          "notes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Notes"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "modules",
+          "source",
+          "label"
+        ],
+        "title": "ReferenceGroup",
+        "description": "Source estimates for a component or subsystem, never additive child costs."
       },
       "Region": {
         "properties": {

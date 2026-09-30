@@ -9,6 +9,38 @@ from resim.server import app, starter, get_store, session_store
 from resim.workspace import ProjectStore
 
 
+@pytest.mark.parametrize('alias', [False, True])
+def test_mixed_case_folder_does_not_replace_project_identity(tmp_path, monkeypatch, alias):
+    root = tmp_path/'projects'
+    monkeypatch.setenv('RESIM_PROJECTS_DIR', str(root))
+    store = ProjectStore(root)
+    folder = root/'chipS'
+    text = starter()['yaml']
+    store.create(text, project_id='chips', name='chipS', project_dir=str(folder))
+    store.create(text, project_id='another', name='Another')
+    if alias:
+        (root/'_project-aliases.json').write_text(json.dumps({'old-chip':'chips'}), encoding='utf-8')
+    requested = 'old-chip' if alias else 'chips'
+    before = {p.relative_to(folder):p.read_bytes() for p in folder.rglob('*') if p.is_file()}
+    # A fresh session must resolve the ID from metadata, including on Windows
+    # where Path.resolve() returns the existing directory's mixed-case spelling.
+    assert ProjectStore(root).project_dir(requested) == folder
+    client = TestClient(app)
+    listed = client.get('/api/projects')
+    assert listed.status_code == 200, listed.text
+    assert {p['id'] for p in listed.json()} == {'chips', 'another'}
+    assert client.post('/api/projects/open', json={'project_dir':str(folder)}).status_code == 200
+    inputs = client.get(f'/api/projects/{requested}/input')
+    assert inputs.status_code == 200, inputs.text
+    assert client.get(f'/api/projects/{requested}/runs').json() == []
+    assert client.post('/api/preview', json={'yaml':inputs.text}).status_code == 200
+    assert {p.relative_to(folder):p.read_bytes() for p in folder.rglob('*') if p.is_file()} == before
+    result = store.simulate(text, project_id=requested, result_folder_name='saved')
+    assert result['storage']['project_id'] == 'chips'
+    assert Path(result['storage']['run_dir']).is_relative_to(folder)
+    assert len(ProjectStore(root).runs(requested)) == 1
+
+
 def test_scan_accepts_unicode_folder_and_survives_rename_without_index(tmp_path):
     root = tmp_path/'projects'
     store = ProjectStore(root)

@@ -1,5 +1,7 @@
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fileSize=n=>!Number.isFinite(n)?'':n<1024?n+' B':n<1024**2?(n/1024).toLocaleString('zh-CN',{maximumFractionDigits:1})+' KB':(n/1024**2).toLocaleString('zh-CN',{maximumFractionDigits:1})+' MB';
+const fileType=name=>name.toLowerCase()==='project.json'?'项目入口':/\.ya?ml$/i.test(name)?'YAML 文件':/\.json$/i.test(name)?'JSON 文件':'文件';
 
 // The local host selects the project folder; results are named children of it.
 export class OutputFolders {
@@ -19,7 +21,7 @@ export class OutputFolders {
     $('folder-create').onclick=()=>this.create();
     $('folder-new-toggle').onclick=()=>{const section=$('folder-new-section');section.hidden=!section.hidden;if(!section.hidden)$('folder-name').focus();};
   }
-  busy(value){for(const e of $('output-folder-dialog').querySelectorAll('input,button'))e.disabled=value; if(!value){$('folder-parent').disabled=!this.current?.parent;$('folder-use').disabled=!this.current;$('folder-create').disabled=!this.current;}}
+  busy(value){$('output-folder-dialog').setAttribute('aria-busy',String(value));for(const e of $('output-folder-dialog').querySelectorAll('input,button'))e.disabled=value; if(!value){$('folder-parent').disabled=!this.current?.parent;$('folder-use').disabled=!this.current;$('folder-create').disabled=!this.current;}}
   status(text,error=false){$('folder-status').textContent=text;$('folder-status').classList.toggle('error',error);}
   async request(path,body){
     const r=await fetch('/api/output-folders'+path,{method:body?'POST':'GET',headers:{'X-Resim-Local':'1',...(body?{'Content-Type':'application/json'}:{})},...(body?{body:JSON.stringify(body)}:{})});
@@ -36,13 +38,15 @@ export class OutputFolders {
   }
   close(){if(this.creating)return;this.serial++;$('output-folder-dialog').close();}
   async load(path){
-    if(this.creating)return;const serial=++this.serial;this.busy(true);this.status('正在读取文件夹…');
+    if(this.creating)return;const serial=++this.serial;this.busy(true);this.status('正在读取文件夹与文件…');
     try{
       const data=await this.request('?path='+encodeURIComponent(path||''));if(serial!==this.serial)return;
       this.current=data;$('folder-path').value=data.path;
-      $('folder-list').innerHTML=data.folders.length?data.folders.map(d=>`<button class="folder-item" data-folder="${esc(d.path)}"><span aria-hidden="true">▱</span>${esc(d.name)}<span aria-hidden="true">›</span></button>`).join(''):'<p class="folder-empty">此目录下没有可显示的子文件夹。</p>';
+      const folders=data.folders||[],files=data.files||[];
+      $('folder-list').innerHTML=folders.length||files.length?folders.map(d=>`<button class="folder-item" data-folder="${esc(d.path)}"><span class="folder-icon" aria-hidden="true">▱</span><span class="folder-entry-name">${esc(d.name)}</span><small>文件夹</small><span class="folder-arrow" aria-hidden="true">›</span></button>`).join('')+files.map(f=>`<div class="folder-item folder-file${f.name.toLowerCase()==='project.json'?' project-entry':''}" title="${esc(f.path)}"><span class="folder-icon" aria-hidden="true">▤</span><span class="folder-entry-name">${esc(f.name)}<small>${fileType(f.name)}</small></span><span class="folder-file-size">${fileSize(f.size_bytes)}</span></div>`).join(''):'<p class="folder-empty">此文件夹为空。</p>';
       for(const b of $('folder-list').querySelectorAll('[data-folder]'))b.onclick=()=>this.load(b.dataset.folder);
-      this.status(data.truncated?'仅显示前 500 个文件夹，可在上方输入完整路径。':this.mode==='existing'?'选择包含 project.json 的项目文件夹。外部项目在下次启动时需要重新打开。':'');
+      const hint=this.mode==='existing'?(files.some(f=>f.name.toLowerCase()==='project.json')?'已找到 project.json，点击“打开此项目”载入。':'进入包含 project.json 的项目文件夹。')+' 外部项目在下次启动时需要重新打开。':'';
+      this.status((data.truncated?'文件夹和文件各最多显示 500 项，可在上方输入完整路径。 ':'')+hint);
     }catch(e){if(serial===this.serial){this.current=null;$('folder-list').replaceChildren();this.status(e.message,true);}}
     finally{if(serial===this.serial)this.busy(false);}
   }

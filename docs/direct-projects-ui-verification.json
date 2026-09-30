@@ -1,8 +1,0 @@
-{
-  "source_and_runtime_match": true,
-  "packaged_api_tests_passed": true,
-  "reason": "Browser control runtime exited during initialization.",
-  "frontend_logic_tests_passed": true,
-  "browser_verified": false,
-  "checked_at": "2026-09-29T09:22:09.8282018Z"
-}

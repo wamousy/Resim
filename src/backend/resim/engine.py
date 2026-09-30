@@ -174,14 +174,16 @@ def evaluate(project: Project):
             issue('warning','ENDPOINT_ESCAPE',l.id,'起终端区域冲突，边缘路径无法避开端点模块内部','先修复模块重叠或 TSV 预留区侵占；当前路径仅供诊断')
         length = sum(abs(t[0]-s[0])+abs(t[1]-s[1]) for seg in segments for s, t in zip(seg["points"], seg["points"][1:]))
         weighted_length += length*l.wires
-        if l.data_wires is not None and l.data_wires < l.required_lanes:
+        if l.required_lanes is None:
+            issue('unknown', 'LINK_RATE_UNKNOWN', l.id, '线数已提供，带宽需求或每线速率未提供', '当前按显式线数评估布线；补充速率后再验证吞吐能力')
+        if l.data_wires is not None and l.required_lanes is not None and l.data_wires < l.required_lanes:
             issue("error", "LINK_BANDWIDTH", l.id, "显式数据线数量不足以承载需求带宽", "增加并行线数或提高每线速率")
         if l.max_tier_hops is not None and abs(i-j) > l.max_tier_hops:
             issue("error", "TIER_HOPS", l.id, "跨层数超过限制", "调整模块所属 die")
         if l.max_planar_length_um is not None and length > l.max_planar_length_um:
             issue("error", "WIRE_LENGTH", l.id, "平面估计线长超过限制", "将模块靠近相应端口或 TSV 区域")
         link_rows.append(dict(id=l.id, source=l.source, target=l.target, source_port=l.source_port, target_port=l.target_port,
-            bus_width_bits=l.bus_width_bits, data_wires=l.allocated_data_wires, control_wires=l.control_wires,
+            provenance=l.provenance, bus_width_bits=l.bus_width_bits, data_wires=l.allocated_data_wires, control_wires=l.control_wires,
             spare_fraction=l.spare_fraction, spare_wires=l.spare_wires, wires=l.wires, required_data_lanes=l.required_lanes,
             data_wires_source="explicit" if l.data_wires is not None else "bandwidth_derived",
             lane_rate_Gbps=l.lane_rate_Gbps, bandwidth_GBps=l.bandwidth_GBps, planar_length_um=length, tier_hops=abs(i-j),
@@ -189,6 +191,8 @@ def evaluate(project: Project):
         route_segments.extend(segments)
     for row in interfaces:
         region=next((r for r in f.tsv_regions if r.id==row['region_id']),None)
+        row['modeled_signal_vias'] = row['signal_vias']
+        row['unallocated_signal_budget'] = max(0, (region.signal_budget_bits or 0) - row['signal_vias']) if region else 0
         if region and region.signal_budget_bits is not None:
             if row['signal_vias']>region.signal_budget_bits:issue('error','INTERFACE_BUDGET',row['id'],'细分连线需求超过接口总位宽预算','调整接口预算或连线分配')
             row['signal_vias']=max(row['signal_vias'],region.signal_budget_bits)
@@ -253,6 +257,17 @@ def evaluate(project: Project):
         weighted_delay_ps=None if delay is None else sum(r['estimated_delay_ps']*r['latency_weight'] for r in link_rows),
         max_link_delay_ps=None if delay is None else max((r['estimated_delay_ps'] for r in link_rows),default=0),
         scope='有效平面延迟系数×边缘路径长度 + 相邻层接口延迟×跨层数；不含排队、串行化、算子执行或时序签核。未校准参数仅用于方案比较。')
+    reference_rows = []
+    for g in a.reference_groups:
+        footprint = sum(placements[mid].width_um * placements[mid].height_um for mid in g.modules)
+        # Combined cell/macro estimates are only a lower bound. Do not divide them
+        # by a standard-cell target, or sum overlapping source groups as die area.
+        fits = None if g.area_estimate_um2 is None else footprint >= g.area_estimate_um2
+        reference_rows.append(dict(**g.model_dump(), placed_footprint_um2=footprint, minimum_area_fits=fits))
+        if fits is False:
+            issue('error', 'REFERENCE_AREA_LOWER_BOUND', ' / '.join(g.modules),
+                  f'{g.label} 参考资源面积 {g.area_estimate_um2 / 1e6:.4f} mm² 已超过当前模块占地 {footprint / 1e6:.4f} mm²',
+                  '增大规划区域；参考面积未拆分标准单元与宏，仍需补充详细面积和利用率约束')
     errors = sum(x["severity"] == "error" for x in issues)
     unknowns = sum(x["severity"] == "unknown" for x in issues)
     fingerprint = hashlib.sha256(project.model_dump_json().encode()).hexdigest()[:16]
@@ -269,13 +284,18 @@ def evaluate(project: Project):
     report = dict(schema_version="resim-report/0.1", simulator_version=__version__, plan_id=fingerprint, name=project.name,
         status="violations" if errors else "incomplete" if unknowns else "within_model_constraints",
         summary=dict(weighted_delay_ps=timing["weighted_delay_ps"],errors=errors, unknowns=unknowns, module_count=len(ms), die_count=len(ds), power_W=power_total, total_die_area_mm2=sum(r["area_mm2"] or 0 for r in die_rows), total_module_footprint_mm2=sum(m["footprint_um2"] for m in module_rows)/1e6, weighted_wirelength_um=weighted_length, signal_via_segments=sum(i["signal_vias"] for i in interfaces if i.get("interconnect","TSV")=="TSV"), signal_hb_sites=sum(i["signal_vias"] for i in interfaces if i.get("interconnect")=="HB"), total_via_segments=None if any(i["total_vias"] is None for i in interfaces) else sum(i["total_vias"] for i in interfaces), peak_congestion=None if any(r["peak_congestion"] is None for r in die_rows) else max((r["peak_congestion"] for r in die_rows), default=None)),
-        timing=timing, supply_groups=detailed_supply, wiring=wiring, metal_routing=metal_routing, spacing=spacing_rows, routing_channels=[c.model_dump() for c in con.routing_channels], dies=die_rows, modules=module_rows, links=link_rows, interfaces=interfaces, supply=supply_rows, ports=[p.model_dump() for p in f.supply_ports], blockages=[b.model_dump() for b in con.blockages], routes=route_segments, congestion=maps, issues=issues,
+        reference_groups=reference_rows, timing=timing, supply_groups=detailed_supply, wiring=wiring, metal_routing=metal_routing, spacing=spacing_rows, routing_channels=[c.model_dump() for c in con.routing_channels], dies=die_rows, modules=module_rows, links=link_rows, interfaces=interfaces, supply=supply_rows, ports=[p.model_dump() for p in f.supply_ports], blockages=[b.model_dump() for b in con.blockages], routes=route_segments, congestion=maps, issues=issues,
         assumptions=["架构级估算，未进行网表综合、详细布线、时序、IR drop、热传导或签核。", "功耗热图显示 W/mm²，不代表温度。", "每条链路按独占并行线路预算；不自动复用总线。跨层链路逐接口计数。", "信号数量含控制线和冗余；供电与地分别按电流上取整，站点使用 max(TSV pitch, bond pitch)。", "供电采用各 die 独立外部供电或从底层向上供电的简化拓扑。", "模块间路径从边界端口出发；未给端口位置时自动选择朝向对端或 TSV 的边中点。绑定通道的连接经过通道中心线；只避开端点模块内部，未进行全局绕障。", "拥塞按已分配金属层独立计算，采用网格内长度加权需求；通道另检查完整线束的同时占轨。金属可用比例估计宏遮挡和 PDN 占用。", "不同 die 共用输入工艺参数；示例 DRAM 面积/金属/功耗不是公开 DRAM 工艺标定值。", "寻优保持模块长宽、TSV 区域和供电端口固定；模块不可细分，分区指整个模块迁移。"] + res.notes,
         provenance=dict(technology=res.technology, source=res.technology_provenance, tsv=None if not res.tsv else res.tsv.provenance), project=project.model_dump())
     from .explain import explain_metrics
     report['summary'].update(metal_overflow_cells=sum(r['overflow_cells'] for r in metal_routing['layers']), unassigned_segments=len(metal_routing['unassigned']), channel_violations=sum(not r['passed'] for r in metal_routing['channels']), spacing_violations=sum(not r['passed'] for r in spacing_rows))
     report['summary'].update(wiring_metal_area_um2=wiring['metal_area_um2'],wiring_track_area_um2=wiring['track_area_um2'])
     report['calculations'] = explain_metrics(report)
+    if a.links and any(r['unallocated_signal_budget'] for r in interfaces):
+        report['routing_status'] = 'partial_connections'
+        scope = '接口总预算尚未全部分配到模块连接；线长、金属面积和拥塞仅覆盖已录入连接，不能作为整片完整布线结论。'
+        report['wiring']['notes'].append(scope)
+        report['assumptions'].append(scope)
     if not a.links and any(r.signal_budget_bits is not None for r in f.tsv_regions):
         for key in ['weighted_delay_ps','weighted_wirelength_um','peak_congestion']:
             report['summary'][key]=None

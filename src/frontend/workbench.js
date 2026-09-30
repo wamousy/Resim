@@ -35,11 +35,6 @@ export function initWorkbench(){
     const next=event.key==='Home'?0:event.key==='End'?names.length-1:(current+(['ArrowRight','ArrowDown'].includes(event.key)?1:-1)+names.length)%names.length;
     event.preventDefault();openWorkspace(names[next]);document.getElementById('tab-'+names[next]).focus();
   });
-  document.getElementById('project-options').onclick=()=>{
-    const panel=document.getElementById('project-options-panel');
-    panel.hidden=!panel.hidden;
-    document.getElementById('project-options').setAttribute('aria-expanded',String(!panel.hidden));
-  };
   document.getElementById('focus-view').onclick=()=>{
     const focused=document.body.classList.toggle('focused-view');
     const button=document.getElementById('focus-view');button.setAttribute('aria-pressed',String(focused));button.textContent=focused?'退出专注视图':'专注视图';

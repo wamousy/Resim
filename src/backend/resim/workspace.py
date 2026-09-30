@@ -184,16 +184,20 @@ class ProjectStore:
             raise ValueError(f'多个文件夹使用同一项目编号 {project_id}，请移出重复副本后重新打开：' + '；'.join(map(str, matches)))
         return next(iter(matches))
 
-    def project_index(self, project_id):
+    def _project_id(self, project_id):
+        """Resolve legacy aliases without deriving identity from filesystem casing."""
         project_id = safe_id(project_id)
         aliases = inside(self.root,self.root/'_project-aliases.json')
         if aliases.is_file():
             mapping = json.loads(aliases.read_text(encoding='utf-8'))
             project_id = safe_id(mapping.get(project_id,project_id))
-        return inside(self.root, self.root / project_id)
+        return project_id
+
+    def project_index(self, project_id):
+        return inside(self.root, self.root / self._project_id(project_id))
 
     def project_dir(self, project_id):
-        project_id = self.project_index(project_id).name
+        project_id = self._project_id(project_id)
         matches = self._locations().get(project_id, {})
         if not matches:
             raise FileNotFoundError(f'未找到项目 {project_id}，请使用“打开项目文件夹”重新载入')

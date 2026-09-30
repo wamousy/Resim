@@ -17,18 +17,27 @@ export function resultFolderName(value){
   return name;
 }
 export class TaskProgress {
-  constructor(host,{clock=()=>performance.now(),repeat=(fn,ms)=>setInterval(fn,ms),cancel=id=>clearInterval(id)}={}){
-    this.host=host;this.clock=clock;this.repeat=repeat;this.cancel=cancel;this.running=false;
+  constructor(host,{clock=()=>performance.now(),repeat=(fn,ms)=>setInterval(fn,ms),cancel=id=>clearInterval(id),paint=()=>new Promise(resolve=>setTimeout(resolve,32))}={}){
+    this.host=host;this.clock=clock;this.repeat=repeat;this.cancel=cancel;this.paint=paint;this.running=false;
     this.el=name=>host.querySelector('[data-task-'+name+']');
     this.el('close').onclick=()=>this.reset();
   }
-  start(title){
+  start(title,{kind='work',detail='正在准备输入，请稍候…'}={}){
     if(this.running)return;
-    this.reset();this.running=true;this.started=this.clock();this.host.hidden=false;this.host.dataset.state='running';
+    this.reset();this.running=true;this.started=this.clock();this.host.hidden=false;this.host.dataset.state='running';this.host.dataset.kind=kind;
     this.host.setAttribute('aria-busy','true');this.el('title').textContent=title;
-    this.el('detail').textContent='正在准备输入，请稍候…';this.el('bar').hidden=false;
+    this.el('detail').textContent=detail;this.el('bar').hidden=false;
     this.el('close').hidden=true;this.el('results').hidden=true;
     this.tick();this.timer=this.repeat(()=>this.tick(),1000);
+  }
+  async run(title,operation,{complete='载入完成',detail='读取输入与方案…'}={}){
+    if(this.running)throw new Error('已有任务正在进行，请稍候。');
+    this.start(title,{kind:'load',detail});this.host.scrollIntoView?.({block:'nearest'});
+    const phase=async message=>{this.phase(message);await this.paint();};
+    try{
+      await this.paint();const result=await operation(phase);
+      this.finish(complete,'');return result;
+    }catch(error){this.finish('操作未完成',error.message,{error:true});throw error;}
   }
   tick(){this.el('elapsed').textContent='已用时 '+elapsedLabel(this.clock()-this.started);}
   phase(detail){this.el('detail').textContent=detail;}

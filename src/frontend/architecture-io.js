@@ -62,6 +62,7 @@ export function updateModule(project,values,originalId=null){
 export function removeModule(project,id){
   if(project.architecture.modules.length<=1)throw new Error('至少保留一个模块');
   if(project.architecture.links.some(l=>l.source===id||l.target===id))throw new Error('请先移除或修改引用该模块的连接');
+  if(project.architecture.reference_groups?.some(g=>g.modules.includes(id)))throw new Error('该模块有图纸参考记录，请先在架构 YAML 中调整相应 reference_groups');
   const next=structuredClone(project);next.architecture.modules=next.architecture.modules.filter(m=>m.id!==id);next.floorplan.placements=next.floorplan.placements.filter(p=>p.module!==id);return next;
 }
 export function updateLink(project,v,originalId=null){
@@ -71,7 +72,8 @@ export function updateLink(project,v,originalId=null){
   if(a.links.some(l=>l.id===id&&l.id!==originalId))throw new Error('连接 ID 已存在');
   if(!a.modules.some(m=>m.id===v.source)||!a.modules.some(m=>m.id===v.target))throw new Error('发送和接收模块必须存在');
   if(v.source===v.target)throw new Error('请选择不同的发送和接收模块');
-  const old=a.links.find(l=>l.id===originalId),l={...(old||{}),id,source:v.source,target:v.target,source_port:v.sourcePort.trim()||'out',target_port:v.targetPort.trim()||'in',bus_width_bits:numeric(v.width,'逻辑位宽',{nullable:true,integer:true,positive:true}),bandwidth_GBps:numeric(v.bandwidth,'带宽'),lane_rate_Gbps:numeric(v.rate,'每线速率',{positive:true}),data_wires:numeric(v.wires,'物理数据线数',{nullable:true,positive:true,integer:true}),control_wires:numeric(v.control,'控制线数',{integer:true}),spare_fraction:numeric(v.spare,'冗余比例')};
+  const old=a.links.find(l=>l.id===originalId),l={...(old||{}),id,source:v.source,target:v.target,source_port:v.sourcePort.trim()||'out',target_port:v.targetPort.trim()||'in',bus_width_bits:numeric(v.width,'逻辑位宽',{nullable:true,integer:true,positive:true}),bandwidth_GBps:numeric(v.bandwidth,'带宽',{nullable:true}),lane_rate_Gbps:numeric(v.rate,'每线速率',{nullable:true,positive:true}),data_wires:numeric(v.wires,'物理数据线数',{nullable:true,positive:true,integer:true}),control_wires:numeric(v.control,'控制线数',{integer:true}),spare_fraction:numeric(v.spare,'冗余比例')};
+  if(l.data_wires==null&&(l.bandwidth_GBps==null||l.lane_rate_Gbps==null))throw new Error('请填写物理数据线数，或同时填写带宽和每线速率');
   if(l.spare_fraction>1)throw new Error('冗余比例不能超过 1');
   const i=a.links.findIndex(l=>l.id===originalId);if(i<0)a.links.push(l);else a.links[i]=l;return next;
 }

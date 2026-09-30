@@ -36,10 +36,20 @@ after(async()=>{
  // Only this test's freshly allocated temporary tree is removed.
  if(root&&dirname(resolve(root))===resolve(tmpdir())&&basename(root).startsWith('resim-output-check-'))await rm(root,{recursive:true,force:true,maxRetries:10,retryDelay:100});
 });
-test('directory listing starts in the configured project root and excludes files',async()=>{
+test('directory listing shows folders and files without reading their contents',async()=>{
  const r=await call('/api/output-folders');assert.equal(r.status,200);assert.equal(resolve(r.data.path),resolve(projects));
- await writeFile(join(output,'not-a-folder.txt'),'test');
- const listed=await call('/api/output-folders?path='+encodeURIComponent(output));assert.equal(listed.status,200);assert.deepEqual(listed.data.folders,[]);
+ const browse=join(root,'文件浏览');await mkdir(join(browse,'inputs'),{recursive:true});
+ await writeFile(join(browse,'project.json'),'{}');await writeFile(join(browse,'说明.txt'),'test');
+ await writeFile(join(browse,'inputs','芯片结构.yml'),'name: chipS');
+ const listed=await call('/api/output-folders?path='+encodeURIComponent(browse));assert.equal(listed.status,200);
+ assert.deepEqual(listed.data.folders.map(d=>d.name),['inputs']);
+ assert.deepEqual(listed.data.files.map(f=>f.name),['project.json','说明.txt']);
+ assert.equal(listed.data.files[0].size_bytes,2);assert.equal(listed.data.files[1].size_bytes,4);
+ assert.equal(resolve(listed.data.files[0].path),resolve(browse,'project.json'));
+ assert.equal(listed.data.truncated,false);assert.equal(listed.data.files[0].content,undefined);
+ const inputs=await call('/api/output-folders?path='+encodeURIComponent(join(browse,'inputs')));
+ assert.deepEqual(inputs.data.folders,[]);assert.equal(inputs.data.files[0].name,'芯片结构.yml');
+ assert.deepEqual((await call('/api/output-folders?path='+encodeURIComponent(output))).data.files,[]);
 });
 test('repeated launch reuses the same desktop service and preserves its project root',async()=>{
  const second=spawnSync(launcher,['serve','--port',new URL(url).port,'--projects-dir',projects],{windowsHide:true,encoding:'utf8',timeout:10000});

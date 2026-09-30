@@ -8,13 +8,13 @@ function fixture(openProject){
   const nodes=new Map();
   const node=id=>{
     if(!nodes.has(id))nodes.set(id,{value:'',textContent:'',hidden:false,disabled:false,
-      classList:{toggle(){}},addEventListener(){},replaceChildren(){},querySelectorAll(){return [];},
+      attributes:{},setAttribute(k,v){this.attributes[k]=v;},classList:{toggle(){}},addEventListener(){},replaceChildren(){},querySelectorAll(){return [];},
       showModal(){this.open=true;},close(){this.open=false;},focus(){},dispatchEvent(){}});
     return nodes.get(id);
   };
   const Folder=vm.runInNewContext(source+'\nOutputFolders;',{
     document:{getElementById:node},Event:class{},
-    fetch:async()=>({ok:true,json:async()=>({path:'C:/projects',parent:'C:/',root:'C:/',folders:[]})}),
+    fetch:async()=>({ok:true,json:async()=>({path:'C:/projects',parent:'C:/',root:'C:/',folders:[],files:[{name:'project.json',path:'C:/projects/project.json',size_bytes:2},{name:'芯片&布局.yml',path:'C:/projects/芯片&布局.yml',size_bytes:2048}]})}),
   });
   const notices=[];
   return {folder:new Folder({notice:message=>notices.push(message),openProject}),node,notices};
@@ -28,6 +28,11 @@ test('open existing project uses the selected path and does not change new-proje
   assert.equal(node('folder-new-toggle').hidden,true);
   assert.equal(node('folder-new-section').hidden,true);
   assert.match(node('folder-status').textContent,/下次启动/);
+  assert.match(node('folder-status').textContent,/已找到 project.json/);
+  assert.match(node('folder-list').innerHTML,/project.json/);
+  assert.match(node('folder-list').innerHTML,/芯片&amp;布局.yml/);
+  assert.match(node('folder-list').innerHTML,/2 KB/);
+  assert.doesNotMatch(node('folder-list').innerHTML,/folder-empty|data-folder=/);
   await folder.use('C:/external/chip',false);
   assert.deepEqual(calls,['C:/external/chip']);
   assert.equal(node('output-dir').value,'C:/new-project');

@@ -60,7 +60,10 @@ def route_link(link,placements,modules,ordered,regions,channels=()):
             pool=owned or candidates
             midpoint=[(a+b)/2 for a,b in zip(center(p),center(q))]
             region=min(pool,key=lambda r:sum(abs(a-b) for a,b in zip(center(r),midpoint)),default=None)
-            point=center(region) if region else [(a+b)/2 for a,b in zip(center(p),center(q))]
+            # A whole-interface HB budget is a distributed face connection, not
+            # a TSV hole at the decorative rectangle's center.
+            distributed_hb = region and region.interconnect == 'HB' and region.core is None and region.signal_budget_bits is not None and region.interface_pitch_um is None
+            point=midpoint if distributed_hb or region is None else center(region)
             vertical.append(dict(link=link.id,lower_die=lower,upper_die=upper,point=point,boundary=min(k,k+step),region_id=region.id if region else None,missing_region=region is None))
     source=anchor(p,vertical[0]['point'] if vertical else center(q),modules[link.source].port_locations.get(link.source_port),'east')
     target=anchor(q,vertical[-1]['point'] if vertical else center(p),modules[link.target].port_locations.get(link.target_port),'west')

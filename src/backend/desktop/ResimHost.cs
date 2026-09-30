@@ -206,18 +206,30 @@ public static class ResimHost {
         if (!Directory.Exists(path)) throw new DirectoryNotFoundException("文件夹不存在，请选择已有的上级目录后新建。");
         return path.TrimEnd(Path.DirectorySeparatorChar) + (path.Length <= 3 ? "\\" : "");
     }
+    static bool VisibleEntry(string path) {
+        try { return (File.GetAttributes(path) & (FileAttributes.Hidden | FileAttributes.System)) == 0; }
+        catch (IOException) { return false; }
+        catch (UnauthorizedAccessException) { return false; }
+    }
+    static long? FileSize(string path) {
+        try { return new FileInfo(path).Length; }
+        catch (IOException) { return null; }
+        catch (UnauthorizedAccessException) { return null; }
+    }
     static object FolderList(string value) {
         string path = DirectoryPath(value);
-        var entries = Directory.EnumerateDirectories(path).Where(p => {
-            try { return (File.GetAttributes(p) & (FileAttributes.Hidden | FileAttributes.System)) == 0; }
-            catch (IOException) { return false; }
-        }).Take(501).ToArray();
+        var entries = Directory.EnumerateDirectories(path).Where(VisibleEntry)
+            .OrderBy(p => Path.GetFileName(p), StringComparer.CurrentCultureIgnoreCase).Take(501).ToArray();
+        var files = Directory.EnumerateFiles(path).Where(VisibleEntry)
+            .OrderBy(p => String.Equals(Path.GetFileName(p), "project.json", StringComparison.OrdinalIgnoreCase) ? 0 : 1)
+            .ThenBy(p => Path.GetFileName(p), StringComparer.CurrentCultureIgnoreCase).Take(501).ToArray();
         var parent = Directory.GetParent(path);
         return new {
             path, parent = parent == null ? null : parent.FullName,
-            root = Path.GetPathRoot(path), default_path = projects, truncated = entries.Length > 500,
+            root = Path.GetPathRoot(path), default_path = projects, truncated = entries.Length > 500 || files.Length > 500,
             folders = entries.Take(500).OrderBy(p => Path.GetFileName(p), StringComparer.CurrentCultureIgnoreCase)
-                .Select(p => new { name = Path.GetFileName(p), path = p }).ToArray()
+                .Select(p => new { name = Path.GetFileName(p), path = p }).ToArray(),
+            files = files.Take(500).Select(p => new { name = Path.GetFileName(p), path = p, size_bytes = FileSize(p) }).ToArray()
         };
     }
     static object MakeFolder(string json) {
