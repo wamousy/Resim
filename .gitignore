@@ -1,0 +1,18 @@
+# Generated developer outputs (not source or application dependencies).
+.pytest_cache/
+**/__pycache__/
+src/tools/.venv/
+src/tools/.build/
+src/tools/.artifacts/
+**/*.egg-info/
+app/Resim.Engine.next.exe
+app/Resim.Host.test.exe
+*.tmp
+
+# Local projects, private configuration and release archives are not source.
+/ResimProjects/
+/.resim-backups/
+.env
+.env.*
+!.env.example
+*.log

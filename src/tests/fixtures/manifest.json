@@ -1,0 +1,37 @@
+[
+  {
+    "fixture": "projects/gcd16-nangate45/inputs/architecture.yml",
+    "source_project": "gcd16-nangate45",
+    "snapshot": "frozen current input with explicit RTL bus widths",
+    "sha256": "e400a448fee8c0cc9b9b3eaded6531b77f56ea878043ffcbf1e18cbc60cc3f9f",
+    "note": "Frozen regression input; explicit up faces added to legacy simple stacks."
+  },
+  {
+    "fixture": "projects/gemmini-2logic-8dram/inputs/architecture.yml",
+    "source_project": "gemmini-2logic-8dram",
+    "snapshot": "20260920t102658554256-evaluate-977c5f0a",
+    "sha256": "0cdf41b5cc073616cc4dc2d5e643803761251edef938072c939840c707ee89d6",
+    "note": "Frozen regression input; explicit up faces added to legacy simple stacks."
+  },
+  {
+    "fixture": "projects/3d-resource-violations/inputs/architecture.yml",
+    "source_project": "3d-resource-violations",
+    "snapshot": "20260920t112932441575-evaluate-bfd1019d",
+    "sha256": "5ad7c069903df83ebdd9f7e3aa0055749a1a255daf235c658c28cc54a869abcd",
+    "note": "Frozen regression input; explicit up faces added to legacy simple stacks."
+  },
+  {
+    "fixture": "projects/tensor-datapath-nangate45/inputs/architecture.yml",
+    "source_project": "tensor-datapath-nangate45",
+    "snapshot": "20260921t094633632798-evaluate-be2757e7",
+    "sha256": "b29bb9f6f7eedd8992759c7f43e287ee32b019628a408c6bdad4d8c294e46897",
+    "note": "Frozen regression input; explicit up faces added to legacy simple stacks."
+  },
+  {
+    "fixture": "projects/blx-scheme1/inputs/architecture.yml",
+    "source_project": "blx-scheme1",
+    "snapshot": "20260921t125748338941-evaluate-180d97d5",
+    "sha256": "1e1f510b30f9ca7cc5aa5df456586653640e02bc8ffdd8e709ad2ec8282e865a",
+    "note": "Frozen regression input; explicit up faces added to legacy simple stacks."
+  }
+]
